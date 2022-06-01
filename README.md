@@ -86,3 +86,32 @@ Arena и др.
 ## Архитектурные характеристики
 
 Монолитное веб-приложение.
+
+
+## Описание типа приложения и выбранного технологического стека
+
+**Тип приложения:** Web SPA.
+
+**Технологический стек:**
+
+* Backend:
+    * [C#](https://docs.microsoft.com/ru-ru/dotnet/csharp/)
+    * [Entity Framework](https://docs.microsoft.com/ru-ru/ef/)
+* Frontend:
+    * [Blazor Framework](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
+        * C#
+        * HTML
+* База данных:
+    * [PostgreSQL](https://www.postgresql.org/)
+
+## Верхнеуровневое разбиение на компоненты
+
+## UML диаграмма классов компонента доступа к данным
+
+## UML диаграмма классов компонента бизнес-логики
+
+## UML диаграмма классов сущностей базы данных
+
+## UML диаграмма классов сущностей системы
+
+## UML диаграмма классов транспортных сущностей

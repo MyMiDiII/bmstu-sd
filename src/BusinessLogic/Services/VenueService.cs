@@ -57,6 +57,7 @@ namespace BusinessLogic.Services
                         && elem.Type == venue.Type
                         && elem.Address == venue.Address);
         }
+
         private bool NotExist(long id)
         {
             return _venueRepository.GetByID(id) == null;

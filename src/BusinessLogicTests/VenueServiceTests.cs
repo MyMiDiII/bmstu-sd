@@ -14,6 +14,7 @@ namespace BusinessLogicTests
         private IVenueRepository _mockRepo;
         List<Venue> _mockVenues;
         private IVenueService _service;
+
         public VenueServiceTests()
         {
             _mockVenues = new List<Venue>

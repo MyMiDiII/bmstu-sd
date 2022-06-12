@@ -6,6 +6,6 @@ namespace BusinessLogic.IRepositories
     {
         List<Player> GetByRating(uint rating);
         List<Player> GetByLeague(string league);
-        Player GetByName(string name);
+        Player? GetByName(string name);
     }
 }

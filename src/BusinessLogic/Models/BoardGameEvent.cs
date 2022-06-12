@@ -9,6 +9,7 @@
         public uint Duration { get; set; }
         public uint Cost { get; set; }
         public bool Purchase { get; set; }
-        public TimeOnly RegistrationTime { get; set; }
+        public long OrganizerID { get; set; }
+        public long VenueID { get; set; }
     }
 }

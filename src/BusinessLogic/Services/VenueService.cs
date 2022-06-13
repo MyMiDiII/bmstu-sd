@@ -7,6 +7,7 @@ namespace BusinessLogic.Services
     public interface IVenueService
     {
         List<Venue> GetVenues();
+        public Venue? GetVenueByID(long id);
         void CreateVenue(Venue venue);
         void UpdateVenue(Venue venue);
         void DeleteVenue(Venue venue);
@@ -24,6 +25,11 @@ namespace BusinessLogic.Services
         public List<Venue> GetVenues()
         {
             return _venueRepository.GetAll();
+        }
+
+        public Venue? GetVenueByID(long id)
+        {
+            return _venueRepository.GetByID(id);
         }
 
         public void CreateVenue(Venue venue)

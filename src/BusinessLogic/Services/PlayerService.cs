@@ -8,6 +8,9 @@ namespace BusinessLogic.Services
     public interface IPlayerService
     {
         List<Player> GetPlayers();
+        public Player? GetPlayerByID(long id);
+        public Player? GetPlayerByName(string name);
+        public List<Player> GetPlayersByEvent(long eventID);
         void CreatePlayer(string name);
         void UpdatePlayer(Player player);
         void DeletePlayer(Player player);

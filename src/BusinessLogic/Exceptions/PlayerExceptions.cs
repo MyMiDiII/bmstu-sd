@@ -9,4 +9,7 @@
     
     public class AlreadyExistsPlayerException : PlayerException { }
     public class NotExistsPlayerException : PlayerException { }
+    public class UserIsNotPlayerException : PlayerException { }
+    public class AlreadyExistsPlayerRegistraionException : PlayerException { }
+    public class NotExistsPlayerRegistraionException : PlayerException { }
 }

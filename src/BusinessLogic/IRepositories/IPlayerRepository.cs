@@ -8,5 +8,8 @@ namespace BusinessLogic.IRepositories
         List<Player> GetByLeague(string league);
         List<Player> GetByEvent(long eventID);
         Player? GetByName(string name);
+        void AddToEvent(BGEventRegistration registration);
+        void DeleteFromEvent(BGEventRegistration registration);
+        long GetRegistrationID(BGEventRegistration registration);
     }
 }

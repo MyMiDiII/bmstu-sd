@@ -1,6 +1,6 @@
-﻿using BusinessLogic.Models;
+﻿using BusinessLogic.Exceptions;
 using BusinessLogic.IRepositories;
-using BusinessLogic.Exceptions;
+using BusinessLogic.Models;
 
 namespace BusinessLogic.Services
 {
@@ -10,15 +10,34 @@ namespace BusinessLogic.Services
         void CreateUser(User user);
         void UpdateUser(User user);
         void DeleteUser(User user);
+        public long GetCurrentUserID();
+        public User GetCurrentUser();
     }
 
     public class UserService : IUserService
     {
         private IUserRepository _userRepository;
+        private User curUser;
 
         public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
+            curUser = new User
+            {
+                ID = 0,
+                Name = "guest",
+                Role = "guest"
+            };
+        }
+
+        public long GetCurrentUserID()
+        {
+            return curUser.ID;
+        }
+
+        public User GetCurrentUser()
+        {
+            return curUser;
         }
 
         public List<User> GetUsers()

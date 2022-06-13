@@ -7,7 +7,7 @@ namespace BusinessLogic.Services
     public interface IOrganizerService
     {
         List<Organizer> GetOrganizers();
-        public Organizer? GetOrganizerByID(uint id);
+        public Organizer? GetOrganizerByID(long id);
         void CreateOrganizer(Organizer organizer);
         void UpdateOrganizer(Organizer organizer);
         void DeleteOrganizer(Organizer organizer);
@@ -27,7 +27,7 @@ namespace BusinessLogic.Services
             return _organizerRepository.GetAll();
         }
 
-        public Organizer? GetOrganizerByID(uint id)
+        public Organizer? GetOrganizerByID(long id)
         {
             return _organizerRepository.GetByID(id);
         }

@@ -1,13 +1,14 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
+using BusinessLogic.Config;
 
 namespace BusinessLogic.Services
 {
     public interface IPlayerService
     {
         List<Player> GetPlayers();
-        void CreatePlayer(Player player);
+        void CreatePlayer(string name);
         void UpdatePlayer(Player player);
         void DeletePlayer(Player player);
     }
@@ -26,10 +27,32 @@ namespace BusinessLogic.Services
             return _playerRepository.GetAll();
         }
 
-        public void CreatePlayer(Player player)
+        public Player? GetPlayerByID(long id)
         {
-            if (Exist(player))
+            return _playerRepository.GetByID(id);
+        }
+
+        public Player? GetPlayerByName(string name)
+        {
+            return _playerRepository.GetByName(name);
+        }
+
+        public List<Player> GetPlayersByEvent(long eventID)
+        {
+            return _playerRepository.GetByEvent(eventID);
+        }
+
+        public void CreatePlayer(string name)
+        {
+            if (Exist(name))
                 throw new AlreadyExistsPlayerException();
+
+            Player player = new Player
+            {
+                Name = name,
+                League = PlayerConfig.Leagues.First(),
+                Rating = 0
+            };
 
             _playerRepository.Add(player);
         }
@@ -50,9 +73,9 @@ namespace BusinessLogic.Services
             _playerRepository.Delete(player);
         }
 
-        private bool Exist(Player player)
+        private bool Exist(string name)
         {
-             return _playerRepository.GetByName(player.Name) != null;
+             return _playerRepository.GetByName(name) != null;
         }
 
         private bool NotExist(long id)

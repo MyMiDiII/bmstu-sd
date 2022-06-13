@@ -1,11 +1,13 @@
 ﻿using Xunit;
 using Moq;
 using System.Collections.Generic;
+using System.Linq;
 
 using BusinessLogic.IRepositories;
 using BusinessLogic.Models;
 using BusinessLogic.Services;
 using BusinessLogic.Exceptions;
+using BusinessLogic.Config;
 
 namespace BusinessLogicTests
 {
@@ -100,34 +102,27 @@ namespace BusinessLogicTests
             var expectedCount = _mockPlayers.Count;
             var expectedCount2 = expectedCount + 1;
             var res = _service.GetPlayers();
-            var player = new Player
-            {
-                Name = "new",
-                Rating = 20,
-                League = "Легенда"
-            };
+
+            var playerName = "new";
 
             Assert.Equal(expectedCount, res.Count);
 
-            _service.CreatePlayer(player);
+            _service.CreatePlayer(playerName);
 
             res = _service.GetPlayers();
 
             Assert.Equal(expectedCount2, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount2));
+            Assert.Equal(res.Last().League, PlayerConfig.Leagues.First());
+            Assert.Equal(res.Last().Rating, (uint) 0);
         }
 
         [Fact]
         public void ThrowAlreadyExistsExcCreatePlayerTest()
         {
-            var player = new Player
-            {
-                Name = "MyMiDi",
-                Rating = 0,
-                League = "Просто зашел"
-            };
+            var playerName = "MyMiDi";
 
-            System.Action action = () => _service.CreatePlayer(player);
+            System.Action action = () => _service.CreatePlayer(playerName);
 
             Assert.Throws<AlreadyExistsPlayerException>(action);
         }

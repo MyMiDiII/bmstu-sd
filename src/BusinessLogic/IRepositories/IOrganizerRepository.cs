@@ -6,5 +6,6 @@ namespace BusinessLogic.IRepositories
     {
         List<Organizer> GetByName(string name);
         List<Organizer> GetByAddress(string address);
+        List<BoardGameEvent> GetOrganizerEvents(long organizerID);
     }
 }

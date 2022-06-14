@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Moq;
+using System.Linq;
 using System.Collections.Generic;
 
 using BusinessLogic.IRepositories;
@@ -12,8 +13,10 @@ namespace BusinessLogicTests
     public class OrganizerServiceTests
     {
         private readonly IOrganizerRepository _mockRepo;
-        private readonly List<Organizer> _mockOrganizers;
         private readonly IOrganizerService _service;
+
+        private readonly List<Organizer> _mockOrganizers;
+        private readonly List<BoardGameEvent> _mockBGEvents;
 
         public OrganizerServiceTests()
         {
@@ -56,6 +59,10 @@ namespace BusinessLogicTests
                     PhoneNumber = "312",
                 }
             };
+            _mockBGEvents = new List<BoardGameEvent>
+            {
+                new BoardGameEvent { ID = 1, Title = "First", OrganizerID = 2 }
+            };
 
             var mockRepo = new Mock<IOrganizerRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockOrganizers);
@@ -85,6 +92,12 @@ namespace BusinessLogicTests
                 );
             mockRepo.Setup(repo => repo.Delete(It.IsAny<Organizer>())).Callback(
                 (Organizer organizer) => _mockOrganizers.RemoveAll(x => x.ID == organizer.ID));
+            mockRepo.Setup(repo => repo.GetOrganizerEvents(It.IsAny<long>())).Returns(
+                (long organizerID) =>
+                {
+                    return _mockBGEvents.FindAll(x => x.OrganizerID == organizerID);
+                }
+                );
 
             _mockRepo = mockRepo.Object;
             _service = new OrganizerService(_mockRepo);
@@ -205,6 +218,18 @@ namespace BusinessLogicTests
             void action() => _service.DeleteOrganizer(organizer);
 
             Assert.Throws<NotExistsOrganizerException>(action);
+        }
+
+        [Fact]
+        public void GetEventsByGameTest()
+        {
+            var expectedCount = 1;
+            var organizer = new Organizer { ID = 2 };
+
+            var events = _service.GetEventsByOrganizer(organizer);
+
+            Assert.Equal(expectedCount, events.Count);
+            Assert.Equal("First", events.First().Title);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace BusinessLogic.Services
         void CreateOrganizer(Organizer organizer);
         void UpdateOrganizer(Organizer organizer);
         void DeleteOrganizer(Organizer organizer);
+        List<BoardGameEvent> GetEventsByOrganizer(Organizer organizer);
     }
 
     public class OrganizerService : IOrganizerService
@@ -66,6 +67,11 @@ namespace BusinessLogic.Services
         private bool NotExist(long id)
         {
             return _organizerRepository.GetByID(id) == null;
+        }
+
+        public List<BoardGameEvent> GetEventsByOrganizer(Organizer organizer)
+        {
+            return _organizerRepository.GetOrganizerEvents(organizer.ID);
         }
     }
 }

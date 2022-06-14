@@ -11,9 +11,9 @@ namespace BusinessLogicTests
 {
     public class UserServiceTests
     {
-        private IUserRepository _mockRepo;
-        List<User> _mockUsers;
-        private IUserService _service;
+        private readonly IUserRepository _mockRepo;
+        private readonly List<User> _mockUsers;
+        private readonly IUserService _service;
 
         public UserServiceTests()
         {
@@ -142,7 +142,7 @@ namespace BusinessLogicTests
                 Role = "organizer"
             };
 
-            System.Action action = () => _service.CreateUser(user);
+            void action() => _service.CreateUser(user);
 
             Assert.Throws<AlreadyExistsUserException>(action);
         }
@@ -168,9 +168,9 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount));
             var newVal = res.Find(item => item.ID == user.ID);
-            Assert.Equal(newVal.ID, user.ID);
-            Assert.Equal(newVal.Name, user.Name);
-            Assert.Equal(newVal.Role, user.Role);
+            Assert.Equal(newVal?.ID, user.ID);
+            Assert.Equal(newVal?.Name, user.Name);
+            Assert.Equal(newVal?.Role, user.Role);
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace BusinessLogicTests
         {
             var user = new User { ID = 100 };
 
-            System.Action action = () => _service.UpdateUser(user);
+            void action() => _service.UpdateUser(user);
 
             Assert.Throws<NotExistsUserException>(action);
         }
@@ -205,7 +205,7 @@ namespace BusinessLogicTests
         {
             var user = new User { ID = 100 };
 
-            System.Action action = () => _service.DeleteUser(user);
+            void action() => _service.DeleteUser(user);
 
             Assert.Throws<NotExistsUserException>(action);
         }

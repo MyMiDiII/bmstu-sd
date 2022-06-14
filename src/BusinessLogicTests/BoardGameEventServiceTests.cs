@@ -12,9 +12,9 @@ namespace BusinessLogicTests
 {
     public class BoardGameEventServiceTests
     {
-        private IBoardGameEventRepository _mockRepo;
-        List<BoardGameEvent> _mockBoardGameEvents;
-        private IBoardGameEventService _service;
+        private readonly IBoardGameEventRepository _mockRepo;
+        private readonly List<BoardGameEvent> _mockBoardGameEvents;
+        private readonly IBoardGameEventService _service;
 
         public BoardGameEventServiceTests()
         {
@@ -149,7 +149,7 @@ namespace BusinessLogicTests
                 VenueID = 1
             };
 
-            System.Action action = () => _service.CreateBoardGameEvent(boardGameEvent);
+            void action() => _service.CreateBoardGameEvent(boardGameEvent);
 
             Assert.Throws<AlreadyExistsBoardGameEventException>(action);
         }
@@ -181,15 +181,15 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount));
             var newVal = res.Find(item => item.ID == boardGameEvent.ID);
-            Assert.Equal(newVal.ID, boardGameEvent.ID);
-            Assert.Equal(newVal.Title, boardGameEvent.Title);
-            Assert.Equal(newVal.Date, boardGameEvent.Date);
-            Assert.Equal(newVal.StartTime, boardGameEvent.StartTime);
-            Assert.Equal(newVal.Duration, boardGameEvent.Duration);
-            Assert.Equal(newVal.Cost, boardGameEvent.Cost);
-            Assert.Equal(newVal.Purchase, boardGameEvent.Purchase);
-            Assert.Equal(newVal.OrganizerID, boardGameEvent.OrganizerID);
-            Assert.Equal(newVal.VenueID, boardGameEvent.VenueID);
+            Assert.Equal(newVal?.ID, boardGameEvent.ID);
+            Assert.Equal(newVal?.Title, boardGameEvent.Title);
+            Assert.Equal(newVal?.Date, boardGameEvent.Date);
+            Assert.Equal(newVal?.StartTime, boardGameEvent.StartTime);
+            Assert.Equal(newVal?.Duration, boardGameEvent.Duration);
+            Assert.Equal(newVal?.Cost, boardGameEvent.Cost);
+            Assert.Equal(newVal?.Purchase, boardGameEvent.Purchase);
+            Assert.Equal(newVal?.OrganizerID, boardGameEvent.OrganizerID);
+            Assert.Equal(newVal?.VenueID, boardGameEvent.VenueID);
         }
 
         [Fact]
@@ -197,7 +197,7 @@ namespace BusinessLogicTests
         {
             var boardGameEvent = new BoardGameEvent { ID = 100 };
 
-            System.Action action = () => _service.UpdateBoardGameEvent(boardGameEvent);
+            void action() => _service.UpdateBoardGameEvent(boardGameEvent);
 
             Assert.Throws<NotExistsBoardGameEventException>(action);
         }
@@ -224,7 +224,7 @@ namespace BusinessLogicTests
         {
             var boardGameEvent = new BoardGameEvent { ID = 100 };
 
-            System.Action action = () => _service.DeleteBoardGameEvent(boardGameEvent);
+            void action() => _service.DeleteBoardGameEvent(boardGameEvent);
 
             Assert.Throws<NotExistsBoardGameEventException>(action);
         }

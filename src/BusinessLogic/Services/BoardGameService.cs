@@ -14,7 +14,7 @@ namespace BusinessLogic.Services
 
     public class BoardGameService : IBoardGameService
     {
-        private IBoardGameRepository _boardGameRepository;
+        private readonly IBoardGameRepository _boardGameRepository;
 
         public BoardGameService(IBoardGameRepository boardGameRepository)
         {

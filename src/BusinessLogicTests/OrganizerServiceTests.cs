@@ -11,9 +11,9 @@ namespace BusinessLogicTests
 {
     public class OrganizerServiceTests
     {
-        private IOrganizerRepository _mockRepo;
-        List<Organizer> _mockOrganizers;
-        private IOrganizerService _service;
+        private readonly IOrganizerRepository _mockRepo;
+        private readonly List<Organizer> _mockOrganizers;
+        private readonly IOrganizerService _service;
 
         public OrganizerServiceTests()
         {
@@ -133,7 +133,7 @@ namespace BusinessLogicTests
                 Address = "Санкт-Петербург"
             };
 
-            System.Action action = () => _service.CreateOrganizer(organizer);
+            void action() => _service.CreateOrganizer(organizer);
 
             Assert.Throws<AlreadyExistsOrganizerException>(action);
         }
@@ -162,12 +162,12 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount));
             var newVal = res.Find(item => item.ID == organizer.ID);
-            Assert.Equal(newVal.ID, organizer.ID);
-            Assert.Equal(newVal.Name, organizer.Name);
-            Assert.Equal(newVal.Address, organizer.Address);
-            Assert.Equal(newVal.Email, organizer.Email);
-            Assert.Equal(newVal.URL, organizer.URL);
-            Assert.Equal(newVal.PhoneNumber, organizer.PhoneNumber);
+            Assert.Equal(newVal?.ID, organizer.ID);
+            Assert.Equal(newVal?.Name, organizer.Name);
+            Assert.Equal(newVal?.Address, organizer.Address);
+            Assert.Equal(newVal?.Email, organizer.Email);
+            Assert.Equal(newVal?.URL, organizer.URL);
+            Assert.Equal(newVal?.PhoneNumber, organizer.PhoneNumber);
         }
 
         [Fact]
@@ -175,7 +175,7 @@ namespace BusinessLogicTests
         {
             var organizer = new Organizer { ID = 100 };
 
-            System.Action action = () => _service.UpdateOrganizer(organizer);
+            void action() => _service.UpdateOrganizer(organizer);
 
             Assert.Throws<NotExistsOrganizerException>(action);
         }
@@ -202,7 +202,7 @@ namespace BusinessLogicTests
         {
             var organizer = new Organizer { ID = 100 };
 
-            System.Action action = () => _service.DeleteOrganizer(organizer);
+            void action() => _service.DeleteOrganizer(organizer);
 
             Assert.Throws<NotExistsOrganizerException>(action);
         }

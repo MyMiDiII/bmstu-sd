@@ -18,7 +18,9 @@ namespace BusinessLogicTests
 
         private readonly List<Player> _mockPlayers;
         private readonly List<BoardGameEvent> _mockBGEvents;
+        private readonly List<BoardGame> _mockBoardGames;
         private readonly List<BGERegistration> _mockRegistrations;
+        private readonly List<FavoriteBoardGame> _mockFavoriteGames;
 
         public PlayerServiceTests()
         {
@@ -53,6 +55,16 @@ namespace BusinessLogicTests
                     Rating = 0
                 }
             };
+            _mockBoardGames = new List<BoardGame>
+            {
+                new BoardGame
+                {
+                    ID = 1,
+                    Title = "Title1",
+                    Produser = "Producer1",
+                    Year = 2001,
+                }
+            };
             _mockBGEvents = new List<BoardGameEvent>
             {
                 new BoardGameEvent { ID = 1, Title = "First" }
@@ -60,6 +72,10 @@ namespace BusinessLogicTests
             _mockRegistrations = new List<BGERegistration>()
             {
                 new BGERegistration { ID = 1, PlayerID = 2, BoardGameEventID = 1}
+            };
+            _mockFavoriteGames = new List<FavoriteBoardGame>()
+            {
+                new FavoriteBoardGame { ID = 1, PlayerID = 2, BoardGameID = 1}
             };
 
             var mockRepo = new Mock<IPlayerRepository>();
@@ -123,6 +139,22 @@ namespace BusinessLogicTests
                 }
                 );
 
+            mockRepo.Setup(repo =>
+            repo.GetFavoriteID(It.IsAny<FavoriteBoardGame>())).Returns(
+                (FavoriteBoardGame favoriteBoardGame) =>
+                {
+                    var foundFavorite = _mockFavoriteGames.Find(x =>
+                        x.PlayerID == favoriteBoardGame.PlayerID
+                        && x.BoardGameID == favoriteBoardGame.BoardGameID);
+                    return (foundFavorite == null) ? -1 : foundFavorite.ID;
+                });
+            mockRepo.Setup(repo => repo.AddToPlayer(It.IsAny<FavoriteBoardGame>())).Callback(
+                (FavoriteBoardGame favoriteBoardGame) =>
+                {
+                    favoriteBoardGame.ID = _mockFavoriteGames.Count + 1;
+                    _mockFavoriteGames.Add(favoriteBoardGame);
+                }
+                );
             //mockRepo.Setup(repo => repo.GetByEvent(It.IsAny<long>())).Returns(
             //    (long eventID) =>
             //    {
@@ -302,6 +334,20 @@ namespace BusinessLogicTests
 
             Assert.Equal(expectedCount, events.Count);
             Assert.Equal("First", events.First().Title);
+        }
+
+        [Fact]
+        public void AddBoardGameToFavoriteTest()
+        {
+            var expectedCount = _mockFavoriteGames.Count + 1;
+
+            var game = new BoardGame() { ID = 1 };
+
+            _service.AddBoardGameToFavorite(game);
+
+            Assert.Equal(expectedCount, _mockFavoriteGames.Count);
+            Assert.NotNull(_mockFavoriteGames.Find(x => x.PlayerID == 1
+                                                     && x.BoardGameID == game.ID));
         }
     }
 }

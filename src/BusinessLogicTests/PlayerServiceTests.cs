@@ -94,12 +94,15 @@ namespace BusinessLogicTests
                 );
             mockRepo.Setup(repo => repo.DeleteFromEvent(It.IsAny<BGERegistration>())).Callback(
                 (BGERegistration registration) =>
-                _mockPlayers.RemoveAll(x => x.ID == registration.ID));
+                _mockRegistrations.RemoveAll(x => x.PlayerID == registration.PlayerID
+                                       && x.BoardGameEventID == registration.BoardGameEventID));
             mockRepo.Setup(repo =>
             repo.GetRegistrationID(It.IsAny<BGERegistration>())).Returns(
                 (BGERegistration registration) =>
                 {
-                    var foundReg = _mockPlayers.Find(x => x.ID == registration.ID);
+                    var foundReg = _mockRegistrations.Find(x =>
+                        x.BoardGameEventID == registration.BoardGameEventID
+                        && x.PlayerID == registration.PlayerID);
                     return (foundReg == null) ? -1 : foundReg.ID;
                 });
 
@@ -247,6 +250,24 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, _mockRegistrations.Count);
             Assert.NotNull(_mockRegistrations.Find(x => x.PlayerID == 1
                                                      && x.BoardGameEventID == bgEvent.ID));
+        }
+
+        [Fact]
+        public void UnregisterPlayerForEventTest()
+        {
+            _mockRegistrations.Add(new BGERegistration
+            {
+                ID = 1,
+                BoardGameEventID = 1,
+                PlayerID = 1
+            });
+            var expectedCount = _mockRegistrations.Count - 1;
+
+            var bgEvent = new BoardGameEvent() { ID = 1 };
+
+            _service.UnregisterPlayerForEvent(bgEvent);
+
+            Assert.Equal(expectedCount, _mockRegistrations.Count);
         }
     }
 }

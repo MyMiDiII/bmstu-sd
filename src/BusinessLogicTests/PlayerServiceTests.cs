@@ -168,14 +168,6 @@ namespace BusinessLogicTests
                     return _mockBoardGames.FindAll(x => gamesIDs.Contains(x.ID));
                 }
                 );
-            //mockRepo.Setup(repo => repo.GetByEvent(It.IsAny<long>())).Returns(
-            //    (long eventID) =>
-            //    {
-            //        var playerIDs = _mockRegistrations
-            //                        .FindAll(x => x.BoardGameEventID == eventID)
-            //                        .Select(x => x.PlayerID);
-            //        return _mockPlayers.FindAll(x => playerIDs.Contains(x.ID));
-            //    });
 
             _mockRepo = mockRepo.Object;
 

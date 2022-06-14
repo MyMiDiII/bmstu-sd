@@ -13,7 +13,6 @@ namespace BusinessLogic.Services
         void DeletePlayer(Player player);
         public Player? GetPlayerByID(long id);
         public Player? GetPlayerByName(string name);
-        //public List<Player> GetPlayersByEvent(long eventID);
         public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
         public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
         public List<BoardGameEvent> GetCurrentPlayerEvents();
@@ -88,11 +87,6 @@ namespace BusinessLogic.Services
         {
             return _playerRepository.GetByName(name);
         }
-
-        //public List<Player> GetPlayersByEvent(long eventID)
-        //{
-        //    return _playerRepository.GetByEvent(eventID);
-        //}
 
         public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
         {

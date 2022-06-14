@@ -19,6 +19,8 @@ namespace BusinessLogicTests
         private readonly List<BoardGameEvent> _mockBoardGameEvents;
         private readonly List<BoardGame> _mockBoardGames;
         private readonly List<EventGame> _mockEventGames;
+        private readonly List<Player> _mockPlayers;
+        private readonly List<BGERegistration> _mockRegistrations;
 
         public BoardGameEventServiceTests()
         {
@@ -75,6 +77,20 @@ namespace BusinessLogicTests
             {
                 new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
             };
+            _mockPlayers = new List<Player>
+            {
+                new Player
+                {
+                    ID = 1,
+                    Name = "MyMiDi",
+                    League = "Новичок",
+                    Rating = 100
+                }
+            };
+            _mockRegistrations = new List<BGERegistration>()
+            {
+                new BGERegistration { ID = 1, PlayerID = 1, BoardGameEventID = 1}
+            };
 
             var mockRepo = new Mock<IBoardGameEventRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockBoardGameEvents);
@@ -116,6 +132,14 @@ namespace BusinessLogicTests
                     return _mockBoardGames.FindAll(x => gamesID.Contains(x.ID));
                 }
                 );
+            mockRepo.Setup(repo => repo.GetEventPlayers(It.IsAny<long>())).Returns(
+                (long eventID) =>
+                {
+                    var playerIDs = _mockRegistrations
+                                    .FindAll(x => x.BoardGameEventID == eventID)
+                                    .Select(x => x.PlayerID);
+                    return _mockPlayers.FindAll(x => playerIDs.Contains(x.ID));
+                });
 
             _mockRepo = mockRepo.Object;
             _service = new BoardGameEventService(_mockRepo);
@@ -266,6 +290,18 @@ namespace BusinessLogicTests
 
             Assert.Equal(expectedCount, games.Count);
             Assert.Equal("Title1", games.First().Title);
+        }
+
+        [Fact]
+        public void GetPlayersByEventTest()
+        {
+            var expectedCount = 1;
+            var bgEvent = new BoardGameEvent { ID = 1 };
+
+            var players = _service.GetPlayersByEvent(bgEvent);
+
+            Assert.Equal(expectedCount, players.Count);
+            Assert.Equal("MyMiDi", players.First().Name);
         }
     }
 }

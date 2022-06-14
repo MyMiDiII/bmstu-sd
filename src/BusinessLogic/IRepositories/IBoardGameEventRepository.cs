@@ -12,5 +12,6 @@ namespace BusinessLogic.IRepositories
         List<BoardGameEvent> GetByRegistration(TimeOnly time);
         List<BoardGameEvent> GetByPurchase(bool purchase);
         List<BoardGame> GetEventGames(long evendID);
+        List<Player> GetEventPlayers(long eventID);
     }
 }

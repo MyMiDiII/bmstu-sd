@@ -14,8 +14,8 @@ namespace BusinessLogic.Services
         public Player? GetPlayerByID(long id);
         public Player? GetPlayerByName(string name);
         //public List<Player> GetPlayersByEvent(long eventID);
-        public void RegisterPlayerForEvent(BoardGameEvent bgEvent);
-        public void UnregisterPlayerForEvent(BoardGameEvent bgEvent);
+        public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
+        public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
     }
 
     public class PlayerService : IPlayerService
@@ -90,7 +90,7 @@ namespace BusinessLogic.Services
         //    return _playerRepository.GetByEvent(eventID);
         //}
 
-        public void RegisterPlayerForEvent(BoardGameEvent bgEvent)
+        public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
         {
             User curUser = _userService.GetCurrentUser();
 
@@ -111,7 +111,7 @@ namespace BusinessLogic.Services
             _playerRepository.AddToEvent(curRegistation);
         }
 
-        public void UnregisterPlayerForEvent(BoardGameEvent bgEvent)
+        public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
         {
             User curUser = _userService.GetCurrentUser();
 

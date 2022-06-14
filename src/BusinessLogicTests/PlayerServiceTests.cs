@@ -245,7 +245,7 @@ namespace BusinessLogicTests
 
             var bgEvent = new BoardGameEvent() { ID = 1 };
 
-            _service.RegisterPlayerForEvent(bgEvent);
+            _service.RegisterCurrentPlayerForEvent(bgEvent);
 
             Assert.Equal(expectedCount, _mockRegistrations.Count);
             Assert.NotNull(_mockRegistrations.Find(x => x.PlayerID == 1
@@ -265,7 +265,7 @@ namespace BusinessLogicTests
 
             var bgEvent = new BoardGameEvent() { ID = 1 };
 
-            _service.UnregisterPlayerForEvent(bgEvent);
+            _service.UnregisterCurrentPlayerForEvent(bgEvent);
 
             Assert.Equal(expectedCount, _mockRegistrations.Count);
         }

@@ -159,6 +159,15 @@ namespace BusinessLogicTests
                 (FavoriteBoardGame favoriteBoardGame) =>
                 _mockFavoriteGames.RemoveAll(x => x.PlayerID == favoriteBoardGame.PlayerID
                                             && x.BoardGameID == favoriteBoardGame.BoardGameID));
+            mockRepo.Setup(repo => repo.GetPlayerFavorites(It.IsAny<long>())).Returns(
+                (long playerID) =>
+                {
+                    var gamesIDs = _mockFavoriteGames
+                                    .FindAll(x => x.PlayerID == playerID)
+                                    .Select(x => x.BoardGameID);
+                    return _mockBoardGames.FindAll(x => gamesIDs.Contains(x.ID));
+                }
+                );
             //mockRepo.Setup(repo => repo.GetByEvent(It.IsAny<long>())).Returns(
             //    (long eventID) =>
             //    {
@@ -372,5 +381,21 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, _mockRegistrations.Count);
         }
 
+        [Fact]
+        public void GetPlayerFavoritesTest()
+        {
+            _mockFavoriteGames.Add(new FavoriteBoardGame
+            {
+                ID = 2,
+                BoardGameID = 1,
+                PlayerID = 1
+            });
+            var expectedCount = 1;
+
+            var games = _service.GetCurrentPlayerFavorites();
+
+            Assert.Equal(expectedCount, games.Count);
+            Assert.Equal("Title1", games.First().Title);
+        }
     }
 }

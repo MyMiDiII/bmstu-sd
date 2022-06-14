@@ -12,8 +12,9 @@ namespace BusinessLogic.IRepositories
         void DeleteFromEvent(BGERegistration registration);
         long GetRegistrationID(BGERegistration registration);
         List<BoardGameEvent> GetPlayerEvents(long playerID);
-        long GetFavoriteID(FavoriteBoardGame favoriteBoardGame);
         void AddToPlayer(FavoriteBoardGame favoriteBoardGame);
         void DeleteFromPlayer(FavoriteBoardGame favoriteBoardGame);
+        long GetFavoriteID(FavoriteBoardGame favoriteBoardGame);
+        List<BoardGame> GetPlayerFavorites(long playerID);
     }
 }

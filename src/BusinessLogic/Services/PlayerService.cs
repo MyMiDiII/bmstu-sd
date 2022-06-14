@@ -19,6 +19,7 @@ namespace BusinessLogic.Services
         public List<BoardGameEvent> GetCurrentPlayerEvents();
         public void AddBoardGameToFavorite(BoardGame boardGame);
         public void DeleteBoardGameFromFavorite(BoardGame boardGame);
+        public List<BoardGame> GetCurrentPlayerFavorites();
     }
 
     public class PlayerService : IPlayerService
@@ -187,6 +188,18 @@ namespace BusinessLogic.Services
                 throw new NotExistsPlayerFavoriteGameException();
 
             _playerRepository.DeleteFromPlayer(curFavorite);
+        }
+
+        public List<BoardGame> GetCurrentPlayerFavorites()
+        {
+            User curUser = _userService.GetCurrentUser();
+
+            if (curUser.Role != "player")
+                throw new UserIsNotPlayerException();
+
+            long playerID = curUser.RoleID;
+
+            return _playerRepository.GetPlayerFavorites(playerID);
         }
     }
 }

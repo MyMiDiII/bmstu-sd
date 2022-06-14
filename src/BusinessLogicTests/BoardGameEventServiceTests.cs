@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Moq;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 
@@ -13,8 +14,11 @@ namespace BusinessLogicTests
     public class BoardGameEventServiceTests
     {
         private readonly IBoardGameEventRepository _mockRepo;
-        private readonly List<BoardGameEvent> _mockBoardGameEvents;
         private readonly IBoardGameEventService _service;
+
+        private readonly List<BoardGameEvent> _mockBoardGameEvents;
+        private readonly List<BoardGame> _mockBoardGames;
+        private readonly List<EventGame> _mockEventGames;
 
         public BoardGameEventServiceTests()
         {
@@ -56,7 +60,21 @@ namespace BusinessLogicTests
                     OrganizerID = 1,
                     VenueID = 2
                 }
-                };
+            };
+            _mockBoardGames = new List<BoardGame>
+            {
+                new BoardGame
+                {
+                    ID = 1,
+                    Title = "Title1",
+                    Produser = "Producer1",
+                    Year = 2001,
+                }
+            };
+            _mockEventGames = new List<EventGame>
+            {
+                new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
+            };
 
             var mockRepo = new Mock<IBoardGameEventRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockBoardGameEvents);
@@ -89,6 +107,15 @@ namespace BusinessLogicTests
                 );
             mockRepo.Setup(repo => repo.Delete(It.IsAny<BoardGameEvent>())).Callback(
                 (BoardGameEvent boardGameEvent) => _mockBoardGameEvents.RemoveAll(x => x.ID == boardGameEvent.ID));
+            mockRepo.Setup(repo => repo.GetEventGames(It.IsAny<long>())).Returns(
+                (long eventID) =>
+                {
+                    var gamesID = _mockEventGames
+                                    .FindAll(x => x.BoardGameEventID == eventID)
+                                    .Select(x => x.BoardGameID);
+                    return _mockBoardGames.FindAll(x => gamesID.Contains(x.ID));
+                }
+                );
 
             _mockRepo = mockRepo.Object;
             _service = new BoardGameEventService(_mockRepo);
@@ -227,6 +254,18 @@ namespace BusinessLogicTests
             void action() => _service.DeleteBoardGameEvent(boardGameEvent);
 
             Assert.Throws<NotExistsBoardGameEventException>(action);
+        }
+
+        [Fact]
+        public void GetGamesByEventTest()
+        {
+            var expectedCount = 1;
+            var bgEvent = new BoardGameEvent { ID = 1 };
+
+            var games = _service.GetGamesByEvent(bgEvent);
+
+            Assert.Equal(expectedCount, games.Count);
+            Assert.Equal("Title1", games.First().Title);
         }
     }
 }

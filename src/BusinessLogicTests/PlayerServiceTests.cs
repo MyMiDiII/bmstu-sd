@@ -17,6 +17,7 @@ namespace BusinessLogicTests
         private readonly IPlayerService _service;
 
         private readonly List<Player> _mockPlayers;
+        private readonly List<BoardGameEvent> _mockBGEvents;
         private readonly List<BGERegistration> _mockRegistrations;
 
         public PlayerServiceTests()
@@ -52,7 +53,14 @@ namespace BusinessLogicTests
                     Rating = 0
                 }
             };
-            _mockRegistrations = new List<BGERegistration>();
+            _mockBGEvents = new List<BoardGameEvent>
+            {
+                new BoardGameEvent { ID = 1, Title = "First" }
+            };
+            _mockRegistrations = new List<BGERegistration>()
+            {
+                new BGERegistration { ID = 1, PlayerID = 2, BoardGameEventID = 1}
+            };
 
             var mockRepo = new Mock<IPlayerRepository>();
 
@@ -105,6 +113,15 @@ namespace BusinessLogicTests
                         && x.PlayerID == registration.PlayerID);
                     return (foundReg == null) ? -1 : foundReg.ID;
                 });
+            mockRepo.Setup(repo => repo.GetPlayerEvents(It.IsAny<long>())).Returns(
+                (long playerID) =>
+                {
+                    var eventsIDs = _mockRegistrations
+                                    .FindAll(x => x.PlayerID == playerID)
+                                    .Select(x => x.BoardGameEventID);
+                    return _mockBGEvents.FindAll(x => eventsIDs.Contains(x.ID));
+                }
+                );
 
             //mockRepo.Setup(repo => repo.GetByEvent(It.IsAny<long>())).Returns(
             //    (long eventID) =>
@@ -257,7 +274,7 @@ namespace BusinessLogicTests
         {
             _mockRegistrations.Add(new BGERegistration
             {
-                ID = 1,
+                ID = 2,
                 BoardGameEventID = 1,
                 PlayerID = 1
             });
@@ -268,6 +285,23 @@ namespace BusinessLogicTests
             _service.UnregisterCurrentPlayerForEvent(bgEvent);
 
             Assert.Equal(expectedCount, _mockRegistrations.Count);
+        }
+
+        [Fact]
+        public void GetPlayerEventsTest()
+        {
+            _mockRegistrations.Add(new BGERegistration
+            {
+                ID = 2,
+                BoardGameEventID = 1,
+                PlayerID = 1
+            });
+            var expectedCount = 1;
+
+            var events = _service.GetCurrentPlayerEvents();
+
+            Assert.Equal(expectedCount, events.Count);
+            Assert.Equal("First", events.First().Title);
         }
     }
 }

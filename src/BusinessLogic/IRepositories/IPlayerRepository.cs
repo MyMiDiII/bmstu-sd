@@ -11,5 +11,6 @@ namespace BusinessLogic.IRepositories
         void AddToEvent(BGERegistration registration);
         void DeleteFromEvent(BGERegistration registration);
         long GetRegistrationID(BGERegistration registration);
+        List<BoardGameEvent> GetPlayerEvents(long playerID);
     }
 }

@@ -16,6 +16,7 @@ namespace BusinessLogic.Services
         //public List<Player> GetPlayersByEvent(long eventID);
         public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
         public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
+        public List<BoardGameEvent> GetCurrentPlayerEvents();
     }
 
     public class PlayerService : IPlayerService
@@ -67,7 +68,7 @@ namespace BusinessLogic.Services
 
         private bool Exist(string name)
         {
-             return _playerRepository.GetByName(name) != null;
+            return _playerRepository.GetByName(name) != null;
         }
 
         private bool NotExist(long id)
@@ -130,6 +131,18 @@ namespace BusinessLogic.Services
                 throw new NotExistsPlayerRegistraionException();
 
             _playerRepository.DeleteFromEvent(curRegistation);
+        }
+
+        public List<BoardGameEvent> GetCurrentPlayerEvents()
+        {
+            User curUser = _userService.GetCurrentUser();
+
+            if (curUser.Role != "player")
+                throw new UserIsNotPlayerException();
+
+            long playerID = curUser.RoleID;
+
+            return _playerRepository.GetPlayerEvents(playerID);
         }
     }
 }

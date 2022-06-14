@@ -15,7 +15,7 @@ namespace BusinessLogic.Services
 
     public class OrganizerService : IOrganizerService
     {
-        private IOrganizerRepository _organizerRepository;
+        private readonly IOrganizerRepository _organizerRepository;
 
         public OrganizerService(IOrganizerRepository organizerRepository)
         {

@@ -15,7 +15,7 @@ namespace BusinessLogic.Services
 
     public class VenueService : IVenueService
     {
-        private IVenueRepository _venueRepository;
+        private readonly IVenueRepository _venueRepository;
 
         public VenueService(IVenueRepository venueRepository)
         {

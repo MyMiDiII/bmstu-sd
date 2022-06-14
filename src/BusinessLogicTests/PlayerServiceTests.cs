@@ -13,11 +13,11 @@ namespace BusinessLogicTests
 {
     public class PlayerServiceTests
     {
-        private IPlayerRepository _mockRepo;
-        private IPlayerService _service;
+        private readonly IPlayerRepository _mockRepo;
+        private readonly IPlayerService _service;
 
-        private List<Player> _mockPlayers;
-        private List<BGERegistration> _mockRegistrations;
+        private readonly List<Player> _mockPlayers;
+        private readonly List<BGERegistration> _mockRegistrations;
 
         public PlayerServiceTests()
         {
@@ -164,7 +164,7 @@ namespace BusinessLogicTests
         {
             var playerName = "MyMiDi";
 
-            System.Action action = () => _service.CreatePlayer(playerName);
+            void action() => _service.CreatePlayer(playerName);
 
             Assert.Throws<AlreadyExistsPlayerException>(action);
         }
@@ -203,7 +203,7 @@ namespace BusinessLogicTests
         {
             var player = new Player { ID = 100 };
 
-            System.Action action = () => _service.UpdatePlayer(player);
+            void action() => _service.UpdatePlayer(player);
 
             Assert.Throws<NotExistsPlayerException>(action);
         }
@@ -230,7 +230,7 @@ namespace BusinessLogicTests
         {
             var player = new Player { ID = 100 };
 
-            System.Action action = () => _service.DeletePlayer(player);
+            void action() => _service.DeletePlayer(player);
 
             Assert.Throws<NotExistsPlayerException>(action);
         }

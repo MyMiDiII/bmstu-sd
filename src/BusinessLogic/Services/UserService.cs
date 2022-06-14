@@ -16,7 +16,7 @@ namespace BusinessLogic.Services
 
     public class UserService : IUserService
     {
-        private IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
         private User _curUser;
 
         public UserService(IUserRepository userRepository)

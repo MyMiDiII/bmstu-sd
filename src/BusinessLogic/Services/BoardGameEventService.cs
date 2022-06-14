@@ -14,7 +14,7 @@ namespace BusinessLogic.Services
 
     public class BoardGameEventService : IBoardGameEventService
     {
-        private IBoardGameEventRepository _boardGameEventRepository;
+        private readonly IBoardGameEventRepository _boardGameEventRepository;
 
         public BoardGameEventService(IBoardGameEventRepository boardGameEventRepository)
         {

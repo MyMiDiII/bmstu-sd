@@ -19,8 +19,8 @@ namespace BusinessLogic.Services
 
     public class PlayerService : IPlayerService
     {
-        private IPlayerRepository _playerRepository;
-        private IUserService _userService;
+        private readonly IPlayerRepository _playerRepository;
+        private readonly IUserService _userService;
 
         public PlayerService(IPlayerRepository playerRepository, IUserService userService)
         {
@@ -38,7 +38,7 @@ namespace BusinessLogic.Services
             if (Exist(name))
                 throw new AlreadyExistsPlayerException();
 
-            Player player = new Player
+            var player = new Player
             {
                 Name = name,
                 League = PlayerConfig.Leagues.First(),

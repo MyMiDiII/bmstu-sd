@@ -9,4 +9,6 @@
     
     public class AlreadyExistsUserException : UserException { }
     public class NotExistsUserException : UserException { }
+    public class IncorrectUserPasswordException : UserException { }
+    public class FailedConnectionToDataStoreException : UserException { }
 }

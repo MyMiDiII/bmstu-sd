@@ -1,4 +1,6 @@
-﻿using BusinessLogic.Exceptions;
+﻿using bcrypt = BCrypt.Net;
+
+using BusinessLogic.Exceptions;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Models;
 
@@ -12,6 +14,7 @@ namespace BusinessLogic.Services
         void DeleteUser(User user);
         public long GetCurrentUserID();
         public User GetCurrentUser();
+        public void Login(LoginRequest loginRequest);
     }
 
     public class UserService : IUserService
@@ -83,6 +86,34 @@ namespace BusinessLogic.Services
         private bool NotExist(long id)
         {
             return _userRepository.GetByID(id) == null;
+        }
+
+        private bool ValidatePassword(string textPassword, string hashPassword)
+        {
+            return bcrypt.BCrypt.Verify(textPassword, hashPassword);
+        }
+
+        public void Login(LoginRequest loginRequest)
+        {
+            var tmpUser = new User()
+            {
+                Name = loginRequest.Name,
+                Password = loginRequest.Password,
+                Role = loginRequest.Role
+            };
+
+            if (!Exist(tmpUser))
+                throw new NotExistsUserException();
+
+            var existingUser = _userRepository.GetByName(tmpUser.Name);
+
+            if (!ValidatePassword(tmpUser.Password, existingUser.Password))
+                throw new IncorrectUserPasswordException();
+
+            if (!_userRepository.ConnectUserToDataStore(existingUser))
+                throw new FailedConnectionToDataStoreException();
+
+            SetCurrentUser(existingUser);
         }
     }
 }

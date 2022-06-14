@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Moq;
+using System.Linq;
 using System.Collections.Generic;
 
 using BusinessLogic.IRepositories;
@@ -12,8 +13,11 @@ namespace BusinessLogicTests
     public class BoardGameServiceTests
     {
         private IBoardGameRepository _mockRepo;
-        List<BoardGame> _mockBoardGames;
         private IBoardGameService _service;
+
+        List<BoardGame> _mockBoardGames;
+        List<EventGame> _mockEventGames;
+        List<BoardGameEvent> _mockBGEvents;
 
         public BoardGameServiceTests()
         {
@@ -58,7 +62,15 @@ namespace BusinessLogicTests
                     MaxDuration = 15,
                     MinDuration = 10
                 }
-                };
+            };
+            _mockEventGames = new List<EventGame>
+            {
+                new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
+            };
+            _mockBGEvents = new List<BoardGameEvent>
+            {
+                new BoardGameEvent { ID = 1, Title = "First" }
+            };
 
             var mockRepo = new Mock<IBoardGameRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockBoardGames);
@@ -92,6 +104,15 @@ namespace BusinessLogicTests
                 );
             mockRepo.Setup(repo => repo.Delete(It.IsAny<BoardGame>())).Callback(
                 (BoardGame boardGame) => _mockBoardGames.RemoveAll(x => x.ID == boardGame.ID));
+            mockRepo.Setup(repo => repo.GetGameEvents(It.IsAny<long>())).Returns(
+                (long gameID) =>
+                {
+                    var eventsIDs = _mockEventGames
+                                    .FindAll(x => x.BoardGameID == gameID)
+                                    .Select(x => x.BoardGameEventID);
+                    return _mockBGEvents.FindAll(x => eventsIDs.Contains(x.ID));
+                }
+                );
 
             _mockRepo = mockRepo.Object;
             _service = new BoardGameService(_mockRepo);
@@ -228,6 +249,18 @@ namespace BusinessLogicTests
             System.Action action = () => _service.DeleteBoardGame(boardGame);
 
             Assert.Throws<NotExistsBoardGameException>(action);
+        }
+
+        [Fact]
+        public void GetEventsByGameTest()
+        {
+            var expectedCount = 1;
+            var game = new BoardGame { ID = 1 };
+
+            var events = _service.GetEventsByGame(game);
+
+            Assert.Equal(expectedCount, events.Count);
+            Assert.Equal("First", events.First().Title);
         }
     }
 }

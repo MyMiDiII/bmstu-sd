@@ -10,6 +10,7 @@ namespace BusinessLogic.Services
         void CreateBoardGame(BoardGame boardGame);
         void UpdateBoardGame(BoardGame boardGame);
         void DeleteBoardGame(BoardGame boardGame);
+        List<BoardGameEvent> GetEventsByGame(BoardGame boardGame);
     }
 
     public class BoardGameService : IBoardGameService
@@ -61,6 +62,11 @@ namespace BusinessLogic.Services
         private bool NotExist(long id)
         {
             return _boardGameRepository.GetByID(id) == null;
+        }
+
+        public List<BoardGameEvent> GetEventsByGame(BoardGame boardGame)
+        {
+            return _boardGameRepository.GetGameEvents(boardGame.ID);
         }
     }
 }

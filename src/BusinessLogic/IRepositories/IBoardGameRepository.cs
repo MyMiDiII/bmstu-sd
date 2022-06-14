@@ -10,5 +10,6 @@ namespace BusinessLogic.IRepositories
         List<BoardGame> GetByAge(uint age);
         List<BoardGame> GetByPlayerNum(uint num);
         List<BoardGame> GetByDuration(uint duration);
+        List<BoardGameEvent> GetGameEvents(long gameID);
     }
 }

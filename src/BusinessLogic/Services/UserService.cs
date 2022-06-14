@@ -17,12 +17,12 @@ namespace BusinessLogic.Services
     public class UserService : IUserService
     {
         private IUserRepository _userRepository;
-        private User curUser;
+        private User _curUser;
 
         public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            curUser = new User
+            _curUser = new User
             {
                 ID = 0,
                 Name = "guest",
@@ -32,12 +32,17 @@ namespace BusinessLogic.Services
 
         public long GetCurrentUserID()
         {
-            return curUser.ID;
+            return _curUser.ID;
         }
 
         public User GetCurrentUser()
         {
-            return curUser;
+            return _curUser;
+        }
+
+        public void SetCurrentUser(User user)
+        {
+            _curUser = user;
         }
 
         public List<User> GetUsers()

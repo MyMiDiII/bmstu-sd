@@ -13,7 +13,7 @@ namespace BusinessLogic.Services
         void DeletePlayer(Player player);
         public Player? GetPlayerByID(long id);
         public Player? GetPlayerByName(string name);
-        public List<Player> GetPlayersByEvent(long eventID);
+        //public List<Player> GetPlayersByEvent(long eventID);
         public void RegisterPlayerForEvent(BoardGameEvent bgEvent);
     }
 
@@ -84,21 +84,21 @@ namespace BusinessLogic.Services
             return _playerRepository.GetByName(name);
         }
 
-        public List<Player> GetPlayersByEvent(long eventID)
-        {
-            return _playerRepository.GetByEvent(eventID);
-        }
+        //public List<Player> GetPlayersByEvent(long eventID)
+        //{
+        //    return _playerRepository.GetByEvent(eventID);
+        //}
 
         public void RegisterPlayerForEvent(BoardGameEvent bgEvent)
         {
             User curUser = _userService.GetCurrentUser();
 
-            if (curUser.Role == "player")
+            if (curUser.Role != "player")
                 throw new UserIsNotPlayerException();
 
             long playerID = curUser.RoleID;
 
-            var curRegistation = new BGEventRegistration()
+            var curRegistation = new BGERegistration()
             {
                 BoardGameEventID = bgEvent.ID,
                 PlayerID = playerID,
@@ -110,25 +110,25 @@ namespace BusinessLogic.Services
             _playerRepository.AddToEvent(curRegistation);
         }
 
-        public void UnregisterPlayerForEvent(BoardGameEvent bgEvent)
-        {
-            User curUser = _userService.GetCurrentUser();
+        //public void UnregisterPlayerForEvent(BoardGameEvent bgEvent)
+        //{
+        //    User curUser = _userService.GetCurrentUser();
 
-            if (curUser.Role == "player")
-                throw new UserIsNotPlayerException();
+        //    if (curUser.Role == "player")
+        //        throw new UserIsNotPlayerException();
 
-            long playerID = curUser.RoleID;
+        //    long playerID = curUser.RoleID;
 
-            var curRegistation = new BGEventRegistration()
-            {
-                BoardGameEventID = bgEvent.ID,
-                PlayerID = playerID,
-            };
+        //    var curRegistation = new BGERegistration()
+        //    {
+        //        BoardGameEventID = bgEvent.ID,
+        //        PlayerID = playerID,
+        //    };
 
-            if (_playerRepository.GetRegistrationID(curRegistation) == -1)
-                throw new NotExistsPlayerRegistraionException();
+        //    if (_playerRepository.GetRegistrationID(curRegistation) == -1)
+        //        throw new NotExistsPlayerRegistraionException();
 
-            _playerRepository.DeleteFromEvent(curRegistation);
-        }
+        //    _playerRepository.DeleteFromEvent(curRegistation);
+        //}
     }
 }

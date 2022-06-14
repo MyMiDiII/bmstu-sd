@@ -1,6 +1,6 @@
 ﻿namespace BusinessLogic.Models
 {
-    public class BGEventRegistration
+    public class BGERegistration
     {
         public long ID { get; set; }
         public long BoardGameEventID { get; set; }

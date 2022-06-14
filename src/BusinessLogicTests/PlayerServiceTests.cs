@@ -14,8 +14,10 @@ namespace BusinessLogicTests
     public class PlayerServiceTests
     {
         private IPlayerRepository _mockRepo;
-        List<Player> _mockPlayers;
         private IPlayerService _service;
+
+        private List<Player> _mockPlayers;
+        private List<BGERegistration> _mockRegistrations;
 
         public PlayerServiceTests()
         {
@@ -50,9 +52,16 @@ namespace BusinessLogicTests
                     Rating = 0
                 }
             };
+            _mockRegistrations = new List<BGERegistration>();
 
             var mockRepo = new Mock<IPlayerRepository>();
+
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockPlayers);
+            mockRepo.Setup(repo => repo.GetByID(It.IsAny<long>())).Returns(
+                (long id) => _mockPlayers.Find(x => x.ID == id));
+            mockRepo.Setup(repo => repo.GetByName(It.IsAny<string>())).Returns(
+                (string name) => _mockPlayers.Find(x => x.Name == name));
+
             mockRepo.Setup(repo => repo.Add(It.IsAny<Player>())).Callback(
                 (Player player) =>
                 {
@@ -60,10 +69,6 @@ namespace BusinessLogicTests
                     _mockPlayers.Add(player);
                 }
                 );
-            mockRepo.Setup(repo => repo.GetByID(It.IsAny<long>())).Returns(
-                (long id) => _mockPlayers.Find(x => x.ID == id));
-            mockRepo.Setup(repo => repo.GetByName(It.IsAny<string>())).Returns(
-                (string name) => _mockPlayers.Find(x => x.Name == name));
             mockRepo.Setup(repo => repo.Update(It.IsAny<Player>())).Callback(
                 (Player player) =>
                 {
@@ -80,8 +85,45 @@ namespace BusinessLogicTests
             mockRepo.Setup(repo => repo.Delete(It.IsAny<Player>())).Callback(
                 (Player player) => _mockPlayers.RemoveAll(x => x.ID == player.ID));
 
+            mockRepo.Setup(repo => repo.AddToEvent(It.IsAny<BGERegistration>())).Callback(
+                (BGERegistration registration) =>
+                {
+                    registration.ID = _mockPlayers.Count + 1;
+                    _mockRegistrations.Add(registration);
+                }
+                );
+            mockRepo.Setup(repo => repo.DeleteFromEvent(It.IsAny<BGERegistration>())).Callback(
+                (BGERegistration registration) =>
+                _mockPlayers.RemoveAll(x => x.ID == registration.ID));
+            mockRepo.Setup(repo =>
+            repo.GetRegistrationID(It.IsAny<BGERegistration>())).Returns(
+                (BGERegistration registration) =>
+                {
+                    var foundReg = _mockPlayers.Find(x => x.ID == registration.ID);
+                    return (foundReg == null) ? -1 : foundReg.ID;
+                });
+
+            //mockRepo.Setup(repo => repo.GetByEvent(It.IsAny<long>())).Returns(
+            //    (long eventID) =>
+            //    {
+            //        var playerIDs = _mockRegistrations
+            //                        .FindAll(x => x.BoardGameEventID == eventID)
+            //                        .Select(x => x.PlayerID);
+            //        return _mockPlayers.FindAll(x => playerIDs.Contains(x.ID));
+            //    });
+
             _mockRepo = mockRepo.Object;
-            _service = new PlayerService(_mockRepo);
+
+            var mockUserRepo = new Mock<IUserRepository>();
+            var userService = new UserService(mockUserRepo.Object);
+            userService.SetCurrentUser(new User()
+            {
+                Name = "test",
+                Role = "player",
+                RoleID = 1
+            });
+
+            _service = new PlayerService(_mockRepo, userService);
         }
 
         [Fact]
@@ -149,10 +191,11 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount));
             var newVal = res.Find(item => item.ID == player.ID);
-            Assert.Equal(newVal.ID, player.ID);
-            Assert.Equal(newVal.Name, player.Name);
-            Assert.Equal(newVal.League, player.League);
-            Assert.Equal(newVal.Rating, player.Rating);
+            Assert.NotNull(newVal);
+            Assert.Equal(newVal?.ID, player.ID);
+            Assert.Equal(newVal?.Name, player.Name);
+            Assert.Equal(newVal?.League, player.League);
+            Assert.Equal(newVal?.Rating, player.Rating);
         }
 
         [Fact]
@@ -190,6 +233,20 @@ namespace BusinessLogicTests
             System.Action action = () => _service.DeletePlayer(player);
 
             Assert.Throws<NotExistsPlayerException>(action);
+        }
+
+        [Fact]
+        public void RegisterPlayerForEventTest()
+        {
+            var expectedCount = _mockRegistrations.Count + 1;
+
+            var bgEvent = new BoardGameEvent() { ID = 1 };
+
+            _service.RegisterPlayerForEvent(bgEvent);
+
+            Assert.Equal(expectedCount, _mockRegistrations.Count);
+            Assert.NotNull(_mockRegistrations.Find(x => x.PlayerID == 1
+                                                     && x.BoardGameEventID == bgEvent.ID));
         }
     }
 }

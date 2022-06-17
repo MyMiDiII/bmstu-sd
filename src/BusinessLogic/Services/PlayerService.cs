@@ -88,14 +88,19 @@ namespace BusinessLogic.Services
             return _playerRepository.GetByName(name);
         }
 
-        public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
+        private long GetCurrentPlayerID()
         {
-            User curUser = _userService.GetCurrentUser();
+            long playerID = _userService.GetCurrentUserRoleID("player");
 
-            if (curUser.Role != "player")
+            if (playerID == -1)
                 throw new UserIsNotPlayerException();
 
-            long playerID = curUser.RoleID;
+            return playerID;
+        }
+
+        public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
+        {
+            long playerID = GetCurrentPlayerID();
 
             var curRegistation = new BGERegistration()
             {
@@ -111,12 +116,7 @@ namespace BusinessLogic.Services
 
         public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
         {
-            User curUser = _userService.GetCurrentUser();
-
-            if (curUser.Role != "player")
-                throw new UserIsNotPlayerException();
-
-            long playerID = curUser.RoleID;
+            long playerID = GetCurrentPlayerID();
 
             var curRegistation = new BGERegistration()
             {
@@ -132,24 +132,13 @@ namespace BusinessLogic.Services
 
         public List<BoardGameEvent> GetCurrentPlayerEvents()
         {
-            User curUser = _userService.GetCurrentUser();
-
-            if (curUser.Role != "player")
-                throw new UserIsNotPlayerException();
-
-            long playerID = curUser.RoleID;
-
+            long playerID = GetCurrentPlayerID();
             return _playerRepository.GetPlayerEvents(playerID);
         }
 
         public void AddBoardGameToFavorite(BoardGame boardGame)
         {
-            User curUser = _userService.GetCurrentUser();
-
-            if (curUser.Role != "player")
-                throw new UserIsNotPlayerException();
-
-            long playerID = curUser.RoleID;
+            long playerID = GetCurrentPlayerID();
 
             var curFavorite = new FavoriteBoardGame()
             {
@@ -165,12 +154,7 @@ namespace BusinessLogic.Services
 
         public void DeleteBoardGameFromFavorite(BoardGame boardGame)
         {
-            User curUser = _userService.GetCurrentUser();
-
-            if (curUser.Role != "player")
-                throw new UserIsNotPlayerException();
-
-            long playerID = curUser.RoleID;
+            long playerID = GetCurrentPlayerID();
 
             var curFavorite = new FavoriteBoardGame()
             {
@@ -186,13 +170,7 @@ namespace BusinessLogic.Services
 
         public List<BoardGame> GetCurrentPlayerFavorites()
         {
-            User curUser = _userService.GetCurrentUser();
-
-            if (curUser.Role != "player")
-                throw new UserIsNotPlayerException();
-
-            long playerID = curUser.RoleID;
-
+            long playerID = GetCurrentPlayerID();
             return _playerRepository.GetPlayerFavorites(playerID);
         }
     }

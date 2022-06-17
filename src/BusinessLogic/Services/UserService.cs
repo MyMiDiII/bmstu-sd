@@ -1,8 +1,7 @@
-﻿using bcrypt = BCrypt.Net;
-
-using BusinessLogic.Exceptions;
+﻿using BusinessLogic.Exceptions;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Models;
+using BusinessLogic.Services;
 
 namespace BusinessLogic.Services
 {
@@ -14,6 +13,7 @@ namespace BusinessLogic.Services
         void DeleteUser(User user);
         public long GetCurrentUserID();
         public User GetCurrentUser();
+        public long GetCurrentUserRoleID(string role);
         public void Login(LoginRequest loginRequest);
     }
 
@@ -21,16 +21,13 @@ namespace BusinessLogic.Services
     {
         private readonly IUserRepository _userRepository;
         private User _curUser;
+        private readonly IEncryptionService _encryptionService;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IEncryptionService encryptionService)
         {
             _userRepository = userRepository;
-            _curUser = new User
-            {
-                ID = 0,
-                Name = "guest",
-                Role = "guest"
-            };
+            _curUser = _userRepository.GetDefauldUser();
+            _encryptionService = encryptionService;
         }
 
         public long GetCurrentUserID()
@@ -43,8 +40,15 @@ namespace BusinessLogic.Services
             return _curUser;
         }
 
-        public void SetCurrentUser(User user)
+        public long GetCurrentUserRoleID(string roleName)
         {
+            var role = _curUser.Roles.Find(x => x.RoleName == roleName);
+            return role == null ? -1 : role.RoleID;
+        }
+
+        private void SetCurrentUser(User user)
+        {
+            user.Roles = _userRepository.GetUserRoles(user.ID);
             _curUser = user;
         }
 
@@ -79,8 +83,7 @@ namespace BusinessLogic.Services
 
         private bool Exist(User user)
         {
-            var foundUser = _userRepository.GetByName(user.Name);
-            return foundUser != null && user.Role == foundUser.Role;
+            return _userRepository.GetByName(user.Name) != null;
         }
 
         private bool NotExist(long id)
@@ -88,26 +91,20 @@ namespace BusinessLogic.Services
             return _userRepository.GetByID(id) == null;
         }
 
-        private bool ValidatePassword(string textPassword, string hashPassword)
-        {
-            return bcrypt.BCrypt.Verify(textPassword, hashPassword);
-        }
-
         public void Login(LoginRequest loginRequest)
         {
             var tmpUser = new User()
             {
                 Name = loginRequest.Name,
-                Password = loginRequest.Password,
-                Role = loginRequest.Role
+                Password = loginRequest.Password
             };
-
-            if (!Exist(tmpUser))
-                throw new NotExistsUserException();
 
             var existingUser = _userRepository.GetByName(tmpUser.Name);
 
-            if (!ValidatePassword(tmpUser.Password, existingUser.Password))
+            if (existingUser == null)
+                throw new NotExistsUserException();
+
+            if (!_encryptionService.ValidatePassword(tmpUser.Password, existingUser.Password))
                 throw new IncorrectUserPasswordException();
 
             if (!_userRepository.ConnectUserToDataStore(existingUser))

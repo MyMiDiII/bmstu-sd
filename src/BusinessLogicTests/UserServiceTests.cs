@@ -17,31 +17,37 @@ namespace BusinessLogicTests
 
         public UserServiceTests()
         {
+            var enctyptionService = new BCryptEntryptionService();
+
             _mockUsers = new List<User>
             {
                 new User
                 {
                     ID = 1,
                     Name = "MyMiDi",
-                    Role = "admin"
+                    Password = enctyptionService.HashPassword("strong"),
+                    Roles = new List<Role> { new Role() { RoleName = "admin"} }
                 },
                 new User
                 {
                     ID = 2,
                     Name = "amunra2",
-                    Role = "organizer"
+                    Password = enctyptionService.HashPassword("123simple123"),
+                    Roles = new List<Role> { new Role() { RoleName = "organizer"} }
                 },
                 new User
                 {
                     ID = 3,
                     Name = "hamzreg",
-                    Role = "player"
+                    Password = enctyptionService.HashPassword("hoba"),
+                    Roles = new List<Role> { new Role() { RoleName = "player"} }
                 },
                 new User
                 {
                     ID = 4,
                     Name = "guest",
-                    Role = "guest"
+                    Password = enctyptionService.HashPassword("guest"),
+                    Roles = new List<Role> { new Role() { RoleName = "guest"} }
                 }
             };
 
@@ -66,15 +72,19 @@ namespace BusinessLogicTests
                         .ForEach(x =>
                         {
                             x.Name = user.Name;
-                            x.Role = user.Role;
+                            x.Roles= user.Roles;
                         });
                 }
                 );
             mockRepo.Setup(repo => repo.Delete(It.IsAny<User>())).Callback(
                 (User user) => _mockUsers.RemoveAll(x => x.ID == user.ID));
+            mockRepo.Setup(repo => repo.ConnectUserToDataStore(It.IsAny<User>())).Returns(
+                (User user) => user.ID == 1);
+            mockRepo.Setup(repo => repo.GetUserRoles(It.IsAny<long>())).Returns(
+                (long id) => _mockUsers.Find(x => x.ID == id)?.Roles);
 
             _mockRepo = mockRepo.Object;
-            _service = new UserService(_mockRepo);
+            _service = new UserService(_mockRepo, enctyptionService);
         }
 
         [Fact]
@@ -98,29 +108,7 @@ namespace BusinessLogicTests
             var user = new User
             {
                 Name = "new",
-                Role = "player"
-            };
-
-            Assert.Equal(expectedCount, res.Count);
-
-            _service.CreateUser(user);
-
-            res = _service.GetUsers();
-
-            Assert.Equal(expectedCount2, res.Count);
-            Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount2));
-        }
-
-        [Fact]
-        public void SameNameAnotherRoleCreateUserTest()
-        {
-            var expectedCount = _mockUsers.Count;
-            var expectedCount2 = expectedCount + 1;
-            var res = _service.GetUsers();
-            var user = new User
-            {
-                Name = "amunra2",
-                Role = "player"
+                Roles = new List<Role> { new Role() { RoleName = "player" } }
             };
 
             Assert.Equal(expectedCount, res.Count);
@@ -139,7 +127,7 @@ namespace BusinessLogicTests
             var user = new User
             {
                 Name = "amunra2",
-                Role = "organizer"
+                Roles = new List<Role> { new Role() { RoleName = "organizer" } }
             };
 
             void action() => _service.CreateUser(user);
@@ -155,7 +143,7 @@ namespace BusinessLogicTests
             {
                 ID = 1,
                 Name = "MyMiDiAdmin",
-                Role = "admin"
+                Roles = new List<Role> { new Role() { RoleName = "admin" } }
             };
 
             var res = _service.GetUsers();
@@ -170,7 +158,8 @@ namespace BusinessLogicTests
             var newVal = res.Find(item => item.ID == user.ID);
             Assert.Equal(newVal?.ID, user.ID);
             Assert.Equal(newVal?.Name, user.Name);
-            Assert.Equal(newVal?.Role, user.Role);
+            Assert.Equal(newVal?.Roles.Count, user.Roles.Count);
+            Assert.Equal(newVal?.Roles[0].RoleName, user.Roles[0].RoleName);
         }
 
         [Fact]
@@ -208,6 +197,51 @@ namespace BusinessLogicTests
             void action() => _service.DeleteUser(user);
 
             Assert.Throws<NotExistsUserException>(action);
+        }
+
+        [Fact]
+        public void ThrowNotExistsExcLoginTest()
+        {
+            var request = new LoginRequest() { Name = "NotUser" };
+
+            void action() => _service.Login(request);
+
+            Assert.Throws<NotExistsUserException>(action);
+        }
+
+        [Fact]
+        public void ThrowIncorrectUserPasswordExcLoginTest()
+        {
+            var request = new LoginRequest() { Name = "MyMiDi", Password = "verystrong" };
+
+            void action() => _service.Login(request);
+
+            Assert.Throws<IncorrectUserPasswordException>(action);
+        }
+
+        [Fact]
+        public void ThrowFailedConnectionExcLoginTest()
+        {
+            var request = new LoginRequest() { Name = "amunra2", Password = "123simple123" };
+
+            void action() => _service.Login(request);
+
+            Assert.Throws<FailedConnectionToDataStoreException>(action);
+        }
+
+        [Fact]
+        public void SuccessfulLoginTest()
+        {
+            var request = new LoginRequest() { Name = "MyMiDi", Password = "strong" };
+
+            _service.Login(request);
+
+            var curUser = _service.GetCurrentUser();
+
+            Assert.Equal(1, curUser.ID);
+            Assert.Equal("MyMiDi", curUser.Name);
+            Assert.Equal(curUser.Roles.Count, _mockUsers[0].Roles.Count);
+            Assert.Equal(curUser.Roles[0].RoleName, _mockUsers[0].Roles[0].RoleName);
         }
     }
 }

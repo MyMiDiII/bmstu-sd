@@ -8,6 +8,7 @@ namespace BusinessLogic.IRepositories
         User? GetByName(string username);
         List<User> GetByRole(string role);
         bool ConnectUserToDataStore(User user);
-        List<Role>? GetUserRoles(long id);
+        List<Role> GetUserRoles(long id);
+        void AddWithBasicRole(User user);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Xunit;
 using Moq;
 using System.Collections.Generic;
+using System.Linq;
 
+using BusinessLogic.Config;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Models;
 using BusinessLogic.Services;
@@ -14,10 +16,12 @@ namespace BusinessLogicTests
         private readonly IUserRepository _mockRepo;
         private readonly List<User> _mockUsers;
         private readonly IUserService _service;
+        private readonly IEncryptionService _encryptionService;
+        private readonly List<Player> _mockPlayers;
 
         public UserServiceTests()
         {
-            var enctyptionService = new BCryptEntryptionService();
+            _encryptionService = new BCryptEntryptionService();
 
             _mockUsers = new List<User>
             {
@@ -25,31 +29,32 @@ namespace BusinessLogicTests
                 {
                     ID = 1,
                     Name = "MyMiDi",
-                    Password = enctyptionService.HashPassword("strong"),
+                    Password = _encryptionService.HashPassword("strong"),
                     Roles = new List<Role> { new Role() { RoleName = "admin"} }
                 },
                 new User
                 {
                     ID = 2,
                     Name = "amunra2",
-                    Password = enctyptionService.HashPassword("123simple123"),
+                    Password = _encryptionService.HashPassword("123simple123"),
                     Roles = new List<Role> { new Role() { RoleName = "organizer"} }
                 },
                 new User
                 {
                     ID = 3,
                     Name = "hamzreg",
-                    Password = enctyptionService.HashPassword("hoba"),
+                    Password = _encryptionService.HashPassword("hoba"),
                     Roles = new List<Role> { new Role() { RoleName = "player"} }
                 },
                 new User
                 {
                     ID = 4,
                     Name = "guest",
-                    Password = enctyptionService.HashPassword("guest"),
+                    Password = _encryptionService.HashPassword("guest"),
                     Roles = new List<Role> { new Role() { RoleName = "guest"} }
                 }
             };
+            _mockPlayers = new List<Player>();
 
             var mockRepo = new Mock<IUserRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockUsers);
@@ -81,10 +86,43 @@ namespace BusinessLogicTests
             mockRepo.Setup(repo => repo.ConnectUserToDataStore(It.IsAny<User>())).Returns(
                 (User user) => user.ID == 1);
             mockRepo.Setup(repo => repo.GetUserRoles(It.IsAny<long>())).Returns(
-                (long id) => _mockUsers.Find(x => x.ID == id)?.Roles);
+                (long id) =>
+                {
+                    var found = _mockUsers.Find(x => x.ID == id)?.Roles;
+                    return found == null ? new List<Role>() : found;
+                });
+            mockRepo.Setup(repo => repo.AddWithBasicRole(It.IsAny<User>())).Callback(
+                (User user) =>
+                {
+                    var player = new Player
+                    {
+                        ID = _mockPlayers.Count + 1,
+                        Name = user.Name,
+                        League = PlayerConfig.Leagues.First(),
+                        Rating = 0
+                    };
+                    _mockPlayers.Add(player);
+
+                    var newUser = new User
+                    {
+                        ID = _mockUsers.Count + 1,
+                        Name = user.Name,
+                        Password = user.Password,
+                        Roles = new List<Role>()
+                        {
+                            new Role
+                            {
+                                RoleName = "player",
+                                RoleID = player.ID
+                            }
+                        }
+                    };
+
+                    _mockUsers.Add(newUser);
+                });
 
             _mockRepo = mockRepo.Object;
-            _service = new UserService(_mockRepo, enctyptionService);
+            _service = new UserService(_mockRepo, _encryptionService);
         }
 
         [Fact]
@@ -242,6 +280,31 @@ namespace BusinessLogicTests
             Assert.Equal("MyMiDi", curUser.Name);
             Assert.Equal(curUser.Roles.Count, _mockUsers[0].Roles.Count);
             Assert.Equal(curUser.Roles[0].RoleName, _mockUsers[0].Roles[0].RoleName);
+        }
+
+        [Fact]
+        public void ThrowAlreadyExistsExcRegisterTest()
+        {
+            var request = new RegisterRequest() { Name = "MyMiDi" };
+
+            void action() => _service.Register(request);
+
+            Assert.Throws<AlreadyExistsUserException>(action);
+        }
+
+        [Fact]
+        public void SuccessfulRegisterTest()
+        {
+            var request = new RegisterRequest() { Name = "NewUser", Password = "password" };
+
+            _service.Register(request);
+
+            var newUser = _mockUsers.Find(x => x.Name == request.Name);
+            Assert.NotNull(newUser);
+            Assert.Equal("NewUser", newUser?.Name);
+            Assert.True(_encryptionService.ValidatePassword(request.Password, newUser?.Password));
+            Assert.Equal("player", newUser?.Roles[0].RoleName);
+            Assert.Single(_mockPlayers);
         }
     }
 }

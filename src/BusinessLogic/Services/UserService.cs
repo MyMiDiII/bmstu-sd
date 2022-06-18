@@ -15,6 +15,7 @@ namespace BusinessLogic.Services
         public User GetCurrentUser();
         public long GetCurrentUserRoleID(string role);
         public void Login(LoginRequest loginRequest);
+        public void Register(RegisterRequest registerRequest);
     }
 
     public class UserService : IUserService
@@ -111,6 +112,22 @@ namespace BusinessLogic.Services
                 throw new FailedConnectionToDataStoreException();
 
             SetCurrentUser(existingUser);
+        }
+
+        public void Register(RegisterRequest registerRequest)
+        {
+            var tmpUser = new User()
+            {
+                Name = registerRequest.Name,
+                Password = registerRequest.Password
+            };
+
+            if (_userRepository.GetByName(tmpUser.Name) != null)
+                throw new AlreadyExistsUserException();
+
+            tmpUser.Password = _encryptionService.HashPassword(tmpUser.Password);
+
+            _userRepository.AddWithBasicRole(tmpUser);
         }
     }
 }

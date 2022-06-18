@@ -10,11 +10,11 @@ namespace BusinessLogic.Services
         void CreateUser(User user);
         void UpdateUser(User user);
         void DeleteUser(User user);
-        public long GetCurrentUserID();
-        public User GetCurrentUser();
-        public long GetCurrentUserRoleID(string role);
-        public void Login(LoginRequest loginRequest);
-        public void Register(RegisterRequest registerRequest);
+        long GetCurrentUserID();
+        User GetCurrentUser();
+        long GetCurrentUserRoleID(string role);
+        void Login(LoginRequest loginRequest);
+        void Register(RegisterRequest registerRequest);
     }
 
     public class UserService : IUserService

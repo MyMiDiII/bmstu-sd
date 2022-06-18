@@ -10,14 +10,14 @@ namespace BusinessLogic.Services
         void CreatePlayer(string name);
         void UpdatePlayer(Player player);
         void DeletePlayer(Player player);
-        public Player? GetPlayerByID(long id);
-        public Player? GetPlayerByName(string name);
-        public void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
-        public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
-        public List<BoardGameEvent> GetCurrentPlayerEvents();
-        public void AddBoardGameToFavorite(BoardGame boardGame);
-        public void DeleteBoardGameFromFavorite(BoardGame boardGame);
-        public List<BoardGame> GetCurrentPlayerFavorites();
+        Player? GetPlayerByID(long id);
+        Player? GetPlayerByName(string name);
+        void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
+        void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
+        List<BoardGameEvent> GetCurrentPlayerEvents();
+        void AddBoardGameToFavorite(BoardGame boardGame);
+        void DeleteBoardGameFromFavorite(BoardGame boardGame);
+        List<BoardGame> GetCurrentPlayerFavorites();
     }
 
     public class PlayerService : IPlayerService

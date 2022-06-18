@@ -11,7 +11,7 @@ namespace BusinessLogic.Services
         void UpdateBoardGameEvent(BoardGameEvent boardGameEvent);
         void DeleteBoardGameEvent(BoardGameEvent boardGameEvent);
         List<BoardGame> GetGamesByEvent(BoardGameEvent boardGameEvent);
-        public List<Player> GetPlayersByEvent(BoardGameEvent boardGameEvent);
+        List<Player> GetPlayersByEvent(BoardGameEvent boardGameEvent);
     }
 
     public class BoardGameEventService : IBoardGameEventService

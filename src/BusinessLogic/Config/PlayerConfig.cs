@@ -2,7 +2,7 @@
 {
     public class PlayerConfig
     {
-        public static List<string> Leagues = new List<string>
+        public static readonly List<string> Leagues = new()
         {
             "Просто зашел",
             "Новичок",
@@ -13,6 +13,5 @@
             "Профессионал",
             "Легенда"
         };
-
     }
 }

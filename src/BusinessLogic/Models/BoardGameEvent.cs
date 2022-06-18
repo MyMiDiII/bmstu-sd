@@ -11,5 +11,11 @@
         public bool Purchase { get; set; }
         public long OrganizerID { get; set; }
         public long VenueID { get; set; }
+
+        public BoardGameEvent(string title, DateOnly date)
+        {
+            Title = title;
+            Date = date;
+        }
     }
 }

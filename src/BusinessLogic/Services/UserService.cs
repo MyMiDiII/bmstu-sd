@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.Exceptions;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Models;
-using BusinessLogic.Services;
 
 namespace BusinessLogic.Services
 {
@@ -94,11 +93,7 @@ namespace BusinessLogic.Services
 
         public void Login(LoginRequest loginRequest)
         {
-            var tmpUser = new User()
-            {
-                Name = loginRequest.Name,
-                Password = loginRequest.Password
-            };
+            var tmpUser = new User(loginRequest.Name, loginRequest.Password);
 
             var existingUser = _userRepository.GetByName(tmpUser.Name);
 
@@ -116,11 +111,7 @@ namespace BusinessLogic.Services
 
         public void Register(RegisterRequest registerRequest)
         {
-            var tmpUser = new User()
-            {
-                Name = registerRequest.Name,
-                Password = registerRequest.Password
-            };
+            var tmpUser = new User(registerRequest.Name, registerRequest.Password);
 
             if (_userRepository.GetByName(tmpUser.Name) != null)
                 throw new AlreadyExistsUserException();

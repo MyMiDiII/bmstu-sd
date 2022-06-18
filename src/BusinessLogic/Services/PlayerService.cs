@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
-using BusinessLogic.Config;
 
 namespace BusinessLogic.Services
 {
@@ -42,12 +41,7 @@ namespace BusinessLogic.Services
             if (Exist(name))
                 throw new AlreadyExistsPlayerException();
 
-            var player = new Player
-            {
-                Name = name,
-                League = PlayerConfig.Leagues.First(),
-                Rating = 0
-            };
+            var player = new Player(name);
 
             _playerRepository.Add(player);
         }

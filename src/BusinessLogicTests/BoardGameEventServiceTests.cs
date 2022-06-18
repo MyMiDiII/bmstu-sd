@@ -26,11 +26,9 @@ namespace BusinessLogicTests
         {
             _mockBoardGameEvents = new List<BoardGameEvent>
             {
-                new BoardGameEvent
+                new BoardGameEvent("Title1", new DateOnly(2022, 6, 1))
                 {
                     ID = 1,
-                    Title = "Title1",
-                    Date = new DateOnly(2022, 6, 1),
                     StartTime = new TimeOnly(13, 0),
                     Duration = 300,
                     Cost = 0,
@@ -38,11 +36,9 @@ namespace BusinessLogicTests
                     OrganizerID = 1,
                     VenueID = 1
                 },
-                new BoardGameEvent
+                new BoardGameEvent("Title2", new DateOnly(2022, 6, 13))
                 {
                     ID = 2,
-                    Title = "Title2",
-                    Date = new DateOnly(2022, 6, 13),
                     StartTime = new TimeOnly(13, 0),
                     Duration = 300,
                     Cost = 400,
@@ -50,11 +46,9 @@ namespace BusinessLogicTests
                     OrganizerID = 2,
                     VenueID = 1
                 },
-                new BoardGameEvent
+                new BoardGameEvent("Title3", new DateOnly(2022, 6, 17))
                 {
                     ID = 3,
-                    Title = "Title3",
-                    Date = new DateOnly(2022, 6, 17),
                     StartTime = new TimeOnly(13, 0),
                     Duration = 300,
                     Cost = 250,
@@ -65,10 +59,9 @@ namespace BusinessLogicTests
             };
             _mockBoardGames = new List<BoardGame>
             {
-                new BoardGame
+                new BoardGame("Title1")
                 {
                     ID = 1,
-                    Title = "Title1",
                     Produser = "Producer1",
                     Year = 2001,
                 }
@@ -79,10 +72,9 @@ namespace BusinessLogicTests
             };
             _mockPlayers = new List<Player>
             {
-                new Player
+                new Player("MyMiDi")
                 {
                     ID = 1,
-                    Name = "MyMiDi",
                     League = "Новичок",
                     Rating = 100
                 }
@@ -163,10 +155,8 @@ namespace BusinessLogicTests
             var expectedCount = _mockBoardGameEvents.Count;
             var expectedCount2 = expectedCount + 1;
             var res = _service.GetBoardGameEvents();
-            var boardGameEvent = new BoardGameEvent
+            var boardGameEvent = new BoardGameEvent("Title4", new DateOnly(2022, 6, 17))
             {
-                Title = "Title4",
-                Date = new DateOnly(2022, 6, 17),
                 StartTime = new TimeOnly(13, 0),
                 Duration = 300,
                 Cost = 250,
@@ -188,10 +178,8 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowAlreadyExistsExcCreateBoardGameEventTest()
         {
-            var boardGameEvent = new BoardGameEvent
+            var boardGameEvent = new BoardGameEvent("Title2", new DateOnly(2022, 6, 13))
             {
-                Title = "Title2",
-                Date = new DateOnly(2022, 6, 13),
                 StartTime = new TimeOnly(15, 0),
                 Duration = 300,
                 Cost = 400,
@@ -209,11 +197,9 @@ namespace BusinessLogicTests
         public void UpdateBoardGameEventTest()
         {
             var expectedCount = _mockBoardGameEvents.Count;
-            var boardGameEvent = new BoardGameEvent
+            var boardGameEvent = new BoardGameEvent("Title2", new DateOnly(2022, 6, 2))
             {
                 ID = 1,
-                Title = "Title2",
-                Date = new DateOnly(2022, 6, 2),
                 StartTime = new TimeOnly(13, 0),
                 Duration = 300,
                 Cost = 0,
@@ -246,7 +232,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcUpdateBoardGameEventTest()
         {
-            var boardGameEvent = new BoardGameEvent { ID = 100 };
+            var boardGameEvent = new BoardGameEvent("title", new DateOnly(2001, 1, 1)) { ID = 100 };
 
             void action() => _service.UpdateBoardGameEvent(boardGameEvent);
 
@@ -257,7 +243,7 @@ namespace BusinessLogicTests
         public void DeleteBoardGameEventTest()
         {
             var expectedCount = _mockBoardGameEvents.Count;
-            var boardGameEvent = new BoardGameEvent { ID = 1 };
+            var boardGameEvent = new BoardGameEvent("title", new DateOnly(2001, 1, 1)) { ID = 1 };
 
             var res = _service.GetBoardGameEvents();
             Assert.Equal(expectedCount, res.Count);
@@ -273,7 +259,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcDeleteBoardGameEventTest()
         {
-            var boardGameEvent = new BoardGameEvent { ID = 100 };
+            var boardGameEvent = new BoardGameEvent("title", new DateOnly(2001, 1, 1)) { ID = 100 };
 
             void action() => _service.DeleteBoardGameEvent(boardGameEvent);
 
@@ -284,7 +270,7 @@ namespace BusinessLogicTests
         public void GetGamesByEventTest()
         {
             var expectedCount = 1;
-            var bgEvent = new BoardGameEvent { ID = 1 };
+            var bgEvent = new BoardGameEvent("title", new DateOnly(2001, 1, 1)) { ID = 1 };
 
             var games = _service.GetGamesByEvent(bgEvent);
 
@@ -296,7 +282,7 @@ namespace BusinessLogicTests
         public void GetPlayersByEventTest()
         {
             var expectedCount = 1;
-            var bgEvent = new BoardGameEvent { ID = 1 };
+            var bgEvent = new BoardGameEvent("title", new DateOnly(2001, 1, 1)) { ID = 1 };
 
             var players = _service.GetPlayersByEvent(bgEvent);
 

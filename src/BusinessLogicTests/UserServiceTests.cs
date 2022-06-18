@@ -25,33 +25,25 @@ namespace BusinessLogicTests
 
             _mockUsers = new List<User>
             {
-                new User
+                new User("MyMiDi", _encryptionService.HashPassword("strong"))
                 {
                     ID = 1,
-                    Name = "MyMiDi",
-                    Password = _encryptionService.HashPassword("strong"),
-                    Roles = new List<Role> { new Role() { RoleName = "admin"} }
+                    Roles = new List<Role> { new Role("admin") }
                 },
-                new User
+                new User("amunra2", _encryptionService.HashPassword("123simple123"))
                 {
                     ID = 2,
-                    Name = "amunra2",
-                    Password = _encryptionService.HashPassword("123simple123"),
-                    Roles = new List<Role> { new Role() { RoleName = "organizer"} }
+                    Roles = new List<Role> { new Role("organizer") }
                 },
-                new User
+                new User("hamzreg", _encryptionService.HashPassword("hoba"))
                 {
                     ID = 3,
-                    Name = "hamzreg",
-                    Password = _encryptionService.HashPassword("hoba"),
-                    Roles = new List<Role> { new Role() { RoleName = "player"} }
+                    Roles = new List<Role> { new Role("player") }
                 },
-                new User
+                new User("guest", _encryptionService.HashPassword("guest"))
                 {
                     ID = 4,
-                    Name = "guest",
-                    Password = _encryptionService.HashPassword("guest"),
-                    Roles = new List<Role> { new Role() { RoleName = "guest"} }
+                    Roles = new List<Role> { new Role("guest") }
                 }
             };
             _mockPlayers = new List<Player>();
@@ -89,30 +81,26 @@ namespace BusinessLogicTests
                 (long id) =>
                 {
                     var found = _mockUsers.Find(x => x.ID == id)?.Roles;
-                    return found == null ? new List<Role>() : found;
+                    return found ?? new List<Role>();
                 });
             mockRepo.Setup(repo => repo.AddWithBasicRole(It.IsAny<User>())).Callback(
                 (User user) =>
                 {
-                    var player = new Player
+                    var player = new Player(user.Name)
                     {
                         ID = _mockPlayers.Count + 1,
-                        Name = user.Name,
                         League = PlayerConfig.Leagues.First(),
                         Rating = 0
                     };
                     _mockPlayers.Add(player);
 
-                    var newUser = new User
+                    var newUser = new User(user.Name, user.Password)
                     {
                         ID = _mockUsers.Count + 1,
-                        Name = user.Name,
-                        Password = user.Password,
                         Roles = new List<Role>()
                         {
-                            new Role
+                            new Role("player")
                             {
-                                RoleName = "player",
                                 RoleID = player.ID
                             }
                         }
@@ -143,10 +131,9 @@ namespace BusinessLogicTests
             var expectedCount = _mockUsers.Count;
             var expectedCount2 = expectedCount + 1;
             var res = _service.GetUsers();
-            var user = new User
+            var user = new User("new", "123")
             {
-                Name = "new",
-                Roles = new List<Role> { new Role() { RoleName = "player" } }
+                Roles = new List<Role> { new Role("player") }
             };
 
             Assert.Equal(expectedCount, res.Count);
@@ -162,10 +149,9 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowAlreadyExistsExcCreateUserTest()
         {
-            var user = new User
+            var user = new User("amunra2", "123")
             {
-                Name = "amunra2",
-                Roles = new List<Role> { new Role() { RoleName = "organizer" } }
+                Roles = new List<Role> { new Role("organizer") }
             };
 
             void action() => _service.CreateUser(user);
@@ -177,11 +163,10 @@ namespace BusinessLogicTests
         public void UpdateUserTest()
         {
             var expectedCount = _mockUsers.Count;
-            var user = new User
+            var user = new User("MyMiDiAdmin", "admin")
             {
                 ID = 1,
-                Name = "MyMiDiAdmin",
-                Roles = new List<Role> { new Role() { RoleName = "admin" } }
+                Roles = new List<Role> { new Role("admin") }
             };
 
             var res = _service.GetUsers();
@@ -203,7 +188,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcUpdateUserTest()
         {
-            var user = new User { ID = 100 };
+            var user = new User("name", "pass") { ID = 100 };
 
             void action() => _service.UpdateUser(user);
 
@@ -214,7 +199,7 @@ namespace BusinessLogicTests
         public void DeleteUserTest()
         {
             var expectedCount = _mockUsers.Count;
-            var user = new User { ID = 2 };
+            var user = new User("name", "pass") { ID = 2 };
 
             var res = _service.GetUsers();
             Assert.Equal(expectedCount, res.Count);
@@ -230,7 +215,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcDeleteUserTest()
         {
-            var user = new User { ID = 100 };
+            var user = new User("name", "pass") { ID = 100 };
 
             void action() => _service.DeleteUser(user);
 
@@ -240,7 +225,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcLoginTest()
         {
-            var request = new LoginRequest() { Name = "NotUser" };
+            var request = new LoginRequest("NotUser", "123");
 
             void action() => _service.Login(request);
 
@@ -250,7 +235,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowIncorrectUserPasswordExcLoginTest()
         {
-            var request = new LoginRequest() { Name = "MyMiDi", Password = "verystrong" };
+            var request = new LoginRequest("MyMiDi", "verystrong" );
 
             void action() => _service.Login(request);
 
@@ -260,7 +245,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowFailedConnectionExcLoginTest()
         {
-            var request = new LoginRequest() { Name = "amunra2", Password = "123simple123" };
+            var request = new LoginRequest("amunra2", "123simple123");
 
             void action() => _service.Login(request);
 
@@ -270,7 +255,7 @@ namespace BusinessLogicTests
         [Fact]
         public void SuccessfulLoginTest()
         {
-            var request = new LoginRequest() { Name = "MyMiDi", Password = "strong" };
+            var request = new LoginRequest("MyMiDi", "strong");
 
             _service.Login(request);
 
@@ -285,7 +270,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowAlreadyExistsExcRegisterTest()
         {
-            var request = new RegisterRequest() { Name = "MyMiDi" };
+            var request = new RegisterRequest("MyMiDi", "123");
 
             void action() => _service.Register(request);
 
@@ -295,14 +280,14 @@ namespace BusinessLogicTests
         [Fact]
         public void SuccessfulRegisterTest()
         {
-            var request = new RegisterRequest() { Name = "NewUser", Password = "password" };
+            var request = new RegisterRequest("NewUser", "password");
 
             _service.Register(request);
 
             var newUser = _mockUsers.Find(x => x.Name == request.Name);
             Assert.NotNull(newUser);
             Assert.Equal("NewUser", newUser?.Name);
-            Assert.True(_encryptionService.ValidatePassword(request.Password, newUser?.Password));
+            Assert.True(_encryptionService.ValidatePassword(request.Password, newUser?.Password ?? "wrong"));
             Assert.Equal("player", newUser?.Roles[0].RoleName);
             Assert.Single(_mockPlayers);
         }

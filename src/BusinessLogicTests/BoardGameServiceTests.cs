@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Moq;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -12,21 +13,20 @@ namespace BusinessLogicTests
 {
     public class BoardGameServiceTests
     {
-        private IBoardGameRepository _mockRepo;
-        private IBoardGameService _service;
+        private readonly IBoardGameRepository _mockRepo;
+        private readonly IBoardGameService _service;
 
-        List<BoardGame> _mockBoardGames;
-        List<EventGame> _mockEventGames;
-        List<BoardGameEvent> _mockBGEvents;
+        private readonly List<BoardGame> _mockBoardGames;
+        private readonly List<EventGame> _mockEventGames;
+        private readonly List<BoardGameEvent> _mockBGEvents;
 
         public BoardGameServiceTests()
         {
             _mockBoardGames = new List<BoardGame>
             {
-                new BoardGame
+                new BoardGame("Title1")
                 {
                     ID = 1,
-                    Title = "Title1",
                     Produser = "Producer1",
                     Year = 2001,
                     MaxAge = 5,
@@ -36,10 +36,9 @@ namespace BusinessLogicTests
                     MaxDuration = 15,
                     MinDuration = 10
                 },
-                new BoardGame
+                new BoardGame("Title2")
                 {
                     ID = 2,
-                    Title = "Title2",
                     Produser = "Producer2",
                     Year = 2011,
                     MaxAge = 99,
@@ -49,10 +48,9 @@ namespace BusinessLogicTests
                     MaxDuration = 180,
                     MinDuration = 60
                 },
-                new BoardGame
+                new BoardGame("Title1")
                 {
                     ID = 3,
-                    Title = "Title1",
                     Produser = "Producer2",
                     Year = 2001,
                     MaxAge = 18,
@@ -69,7 +67,7 @@ namespace BusinessLogicTests
             };
             _mockBGEvents = new List<BoardGameEvent>
             {
-                new BoardGameEvent { ID = 1, Title = "First" }
+                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 }
             };
 
             var mockRepo = new Mock<IBoardGameRepository>();
@@ -136,9 +134,8 @@ namespace BusinessLogicTests
             var expectedCount = _mockBoardGames.Count;
             var expectedCount2 = expectedCount + 1;
             var res = _service.GetBoardGames();
-            var boardGame = new BoardGame
+            var boardGame = new BoardGame("Пандемия")
             {
-                Title = "Пандемия",
                 Produser = "Hobby World",
                 Year = 2014,
                 MaxAge = 99,
@@ -162,14 +159,13 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowAlreadyExistsExcCreateBoardGameTest()
         {
-            var boardGame = new BoardGame
+            var boardGame = new BoardGame("Title1")
             {
-                Title = "Title1",
                 Produser = "Producer1",
                 Year = 2001,
             };
 
-            System.Action action = () => _service.CreateBoardGame(boardGame);
+            void action() => _service.CreateBoardGame(boardGame);
 
             Assert.Throws<AlreadyExistsBoardGameException>(action);
         }
@@ -178,10 +174,9 @@ namespace BusinessLogicTests
         public void UpdateBoardGameTest()
         {
             var expectedCount = _mockBoardGames.Count;
-            var boardGame = new BoardGame
+            var boardGame = new BoardGame("Бункер")
             {
                 ID = 1,
-                Title = "Бункер",
                 Produser = "Экономикус",
                 Year = 2001,
                 MaxAge = 99,
@@ -202,24 +197,24 @@ namespace BusinessLogicTests
             Assert.Equal(expectedCount, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount));
             var newVal = res.Find(item => item.ID == boardGame.ID);
-            Assert.Equal(newVal.ID, boardGame.ID);
-            Assert.Equal(newVal.Title, boardGame.Title);
-            Assert.Equal(newVal.Produser, boardGame.Produser);
-            Assert.Equal(newVal.Year, boardGame.Year);
-            Assert.Equal(newVal.MinAge, boardGame.MinAge);
-            Assert.Equal(newVal.MaxAge, boardGame.MaxAge);
-            Assert.Equal(newVal.MinPlayerNum, boardGame.MinPlayerNum);
-            Assert.Equal(newVal.MaxPlayerNum, boardGame.MaxPlayerNum);
-            Assert.Equal(newVal.MinDuration, boardGame.MinDuration);
-            Assert.Equal(newVal.MaxDuration, boardGame.MaxDuration);
+            Assert.Equal(newVal?.ID, boardGame.ID);
+            Assert.Equal(newVal?.Title, boardGame.Title);
+            Assert.Equal(newVal?.Produser, boardGame.Produser);
+            Assert.Equal(newVal?.Year, boardGame.Year);
+            Assert.Equal(newVal?.MinAge, boardGame.MinAge);
+            Assert.Equal(newVal?.MaxAge, boardGame.MaxAge);
+            Assert.Equal(newVal?.MinPlayerNum, boardGame.MinPlayerNum);
+            Assert.Equal(newVal?.MaxPlayerNum, boardGame.MaxPlayerNum);
+            Assert.Equal(newVal?.MinDuration, boardGame.MinDuration);
+            Assert.Equal(newVal?.MaxDuration, boardGame.MaxDuration);
         }
 
         [Fact]
         public void ThrowNotExistsExcUpdateBoardGameTest()
         {
-            var boardGame = new BoardGame { ID = 100 };
+            var boardGame = new BoardGame("1") { ID = 100 };
 
-            System.Action action = () => _service.UpdateBoardGame(boardGame);
+            void action() => _service.UpdateBoardGame(boardGame);
 
             Assert.Throws<NotExistsBoardGameException>(action);
         }
@@ -228,7 +223,7 @@ namespace BusinessLogicTests
         public void DeleteBoardGameTest()
         {
             var expectedCount = _mockBoardGames.Count;
-            var boardGame = new BoardGame { ID = 1 };
+            var boardGame = new BoardGame("1") { ID = 1 };
 
             var res = _service.GetBoardGames();
             Assert.Equal(expectedCount, res.Count);
@@ -244,9 +239,9 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcDeleteBoardGameTest()
         {
-            var boardGame = new BoardGame { ID = 100 };
+            var boardGame = new BoardGame("1") { ID = 100 };
 
-            System.Action action = () => _service.DeleteBoardGame(boardGame);
+            void action() => _service.DeleteBoardGame(boardGame);
 
             Assert.Throws<NotExistsBoardGameException>(action);
         }
@@ -255,7 +250,7 @@ namespace BusinessLogicTests
         public void GetEventsByGameTest()
         {
             var expectedCount = 1;
-            var game = new BoardGame { ID = 1 };
+            var game = new BoardGame("1") { ID = 1 };
 
             var events = _service.GetEventsByGame(game);
 

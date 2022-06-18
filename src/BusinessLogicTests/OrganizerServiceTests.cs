@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Moq;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -22,38 +23,30 @@ namespace BusinessLogicTests
         {
             _mockOrganizers = new List<Organizer>
             {
-                new Organizer
+                new Organizer("Мак", "Москва")
                 {
                     ID = 1,
-                    Name = "Мак",
-                    Address = "Москва",
                     Email = null,
                     URL = "www.mac.ru",
                     PhoneNumber = "123",
                 },
-                new Organizer
+                new Organizer("Посиделки", "Санкт-Петербург")
                 {
                     ID = 2,
-                    Name = "Посиделки",
-                    Address = "Санкт-Петербург",
                     Email = "hotline@sithere.ru",
                     URL = null,
                     PhoneNumber = "321",
                 },
-                new Organizer
+                new Organizer("Мой дом", "Зеленоград")
                 {
                     ID = 3,
-                    Name = "Мой дом",
-                    Address = "Зеленоград",
                     Email = "myhome@yandex.ru",
                     URL = "www.myhome.ru",
                     PhoneNumber = null,
                 },
-                new Organizer
+                new Organizer("Nice to meet you", "Москва")
                 {
                     ID = 4,
-                    Name = "Nice to meet you",
-                    Address = "Москва",
                     Email = "nice@nice.com",
                     URL = "www.nice.com",
                     PhoneNumber = "312",
@@ -61,7 +54,7 @@ namespace BusinessLogicTests
             };
             _mockBGEvents = new List<BoardGameEvent>
             {
-                new BoardGameEvent { ID = 1, Title = "First", OrganizerID = 2 }
+                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1, OrganizerID = 2 }
             };
 
             var mockRepo = new Mock<IOrganizerRepository>();
@@ -121,11 +114,7 @@ namespace BusinessLogicTests
             var expectedCount = _mockOrganizers.Count;
             var expectedCount2 = expectedCount + 1;
             var res = _service.GetOrganizers();
-            var organizer = new Organizer
-            {
-                Name = "new",
-                Address = "new",
-            };
+            var organizer = new Organizer("new", "new");
 
             Assert.Equal(expectedCount, res.Count);
 
@@ -140,11 +129,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowAlreadyExistsExcCreateOrganizerTest()
         {
-            var organizer = new Organizer
-            {
-                Name = "Посиделки",
-                Address = "Санкт-Петербург"
-            };
+            var organizer = new Organizer("Посиделки", "Санкт-Петербург");
 
             void action() => _service.CreateOrganizer(organizer);
 
@@ -155,11 +140,9 @@ namespace BusinessLogicTests
         public void UpdateOrganizerTest()
         {
             var expectedCount = _mockOrganizers.Count;
-            var organizer = new Organizer
+            var organizer = new Organizer("Мак", "new")
             {
                 ID = 1,
-                Name = "Мак",
-                Address = "new",
                 Email = null,
                 URL = "www.mac.ru",
                 PhoneNumber = "123",
@@ -186,7 +169,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcUpdateOrganizerTest()
         {
-            var organizer = new Organizer { ID = 100 };
+            var organizer = new Organizer("Мак", "new") { ID = 100 };
 
             void action() => _service.UpdateOrganizer(organizer);
 
@@ -197,7 +180,7 @@ namespace BusinessLogicTests
         public void DeleteOrganizerTest()
         {
             var expectedCount = _mockOrganizers.Count;
-            var organizer = new Organizer { ID = 1 };
+            var organizer = new Organizer("Мак", "new") { ID = 1 };
 
             var res = _service.GetOrganizers();
             Assert.Equal(expectedCount, res.Count);
@@ -213,7 +196,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcDeleteOrganizerTest()
         {
-            var organizer = new Organizer { ID = 100 };
+            var organizer = new Organizer("Мак", "new") { ID = 100 };
 
             void action() => _service.DeleteOrganizer(organizer);
 
@@ -224,7 +207,7 @@ namespace BusinessLogicTests
         public void GetEventsByGameTest()
         {
             var expectedCount = 1;
-            var organizer = new Organizer { ID = 2 };
+            var organizer = new Organizer("Мак", "new") { ID = 2 };
 
             var events = _service.GetEventsByOrganizer(organizer);
 

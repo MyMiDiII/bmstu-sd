@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,48 +27,43 @@ namespace BusinessLogicTests
         {
             _mockPlayers = new List<Player>
             {
-                new Player
+                new Player("MyMiDi")
                 {
                     ID = 1,
-                    Name = "MyMiDi",
                     League = "Новичок",
                     Rating = 100
                 },
-                new Player
+                new Player("amunra2")
                 {
                     ID = 2,
-                    Name = "amunra2",
                     League = "Просто зашел",
                     Rating = 0
                 },
-                new Player
+                new Player("hamzreg")
                 {
                     ID = 3,
-                    Name = "hamzreg",
                     League = "Бывалый",
                     Rating = 1000
                 },
-                new Player
+                new Player("Мак")
                 {
                     ID = 4,
-                    Name = "Мак",
                     League = "Новичок",
                     Rating = 0
                 }
             };
             _mockBoardGames = new List<BoardGame>
             {
-                new BoardGame
+                new BoardGame("Title1")
                 {
                     ID = 1,
-                    Title = "Title1",
                     Produser = "Producer1",
                     Year = 2001,
                 }
             };
             _mockBGEvents = new List<BoardGameEvent>
             {
-                new BoardGameEvent { ID = 1, Title = "First" }
+                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 }
             };
             _mockRegistrations = new List<BGERegistration>()
             {
@@ -173,11 +169,7 @@ namespace BusinessLogicTests
 
             var mockUserRepo = new Mock<IUserRepository>();
             mockUserRepo.Setup(repo => repo.GetDefauldUser()).Returns(
-                new User()
-                {
-                    Name = "test",
-                    Roles = new List<Role> { new Role() { RoleName = "player", RoleID = 1 } }
-                });
+                new User("test", "123") { Roles = new List<Role> { new Role("player") { RoleID = 1 } } });
             var userService = new UserService(mockUserRepo.Object, new BCryptEntryptionService());
 
             _service = new PlayerService(_mockRepo, userService);
@@ -230,10 +222,9 @@ namespace BusinessLogicTests
         public void UpdatePlayerTest()
         {
             var expectedCount = _mockPlayers.Count;
-            var player = new Player
+            var player = new Player("MyMiDi")
             {
                 ID = 1,
-                Name = "MyMiDi",
                 League = "Бывалый",
                 Rating = 0
             };
@@ -258,7 +249,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcUpdatePlayerTest()
         {
-            var player = new Player { ID = 100 };
+            var player = new Player("MyMiDi") { ID = 100 };
 
             void action() => _service.UpdatePlayer(player);
 
@@ -269,7 +260,7 @@ namespace BusinessLogicTests
         public void DeletePlayerTest()
         {
             var expectedCount = _mockPlayers.Count;
-            var player = new Player { ID = 1 };
+            var player = new Player("MyMiDi") { ID = 1 };
 
             var res = _service.GetPlayers();
             Assert.Equal(expectedCount, res.Count);
@@ -285,7 +276,7 @@ namespace BusinessLogicTests
         [Fact]
         public void ThrowNotExistsExcDeletePlayerTest()
         {
-            var player = new Player { ID = 100 };
+            var player = new Player("MyMiDi") { ID = 100 };
 
             void action() => _service.DeletePlayer(player);
 
@@ -297,7 +288,7 @@ namespace BusinessLogicTests
         {
             var expectedCount = _mockRegistrations.Count + 1;
 
-            var bgEvent = new BoardGameEvent() { ID = 1 };
+            var bgEvent = new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 };
 
             _service.RegisterCurrentPlayerForEvent(bgEvent);
 
@@ -317,7 +308,7 @@ namespace BusinessLogicTests
             });
             var expectedCount = _mockRegistrations.Count - 1;
 
-            var bgEvent = new BoardGameEvent() { ID = 1 };
+            var bgEvent = new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 };
 
             _service.UnregisterCurrentPlayerForEvent(bgEvent);
 
@@ -346,7 +337,7 @@ namespace BusinessLogicTests
         {
             var expectedCount = _mockFavoriteGames.Count + 1;
 
-            var game = new BoardGame() { ID = 1 };
+            var game = new BoardGame("123") { ID = 1 };
 
             _service.AddBoardGameToFavorite(game);
 
@@ -366,7 +357,7 @@ namespace BusinessLogicTests
             });
             var expectedCount = _mockFavoriteGames.Count - 1;
 
-            var game = new BoardGame() { ID = 1 };
+            var game = new BoardGame("123") { ID = 1 };
 
             _service.DeleteBoardGameFromFavorite(game);
 

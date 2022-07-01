@@ -1,4 +1,6 @@
-﻿namespace BusinessLogic.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BusinessLogic.Models
 {
     public class BoardGameEvent
     {
@@ -9,6 +11,7 @@
         public uint Duration { get; set; }
         public uint Cost { get; set; }
         public bool Purchase { get; set; }
+        [ForeignKey("Organizer")]
         public long OrganizerID { get; set; }
         public long VenueID { get; set; }
 

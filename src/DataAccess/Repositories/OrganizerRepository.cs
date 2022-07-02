@@ -7,9 +7,9 @@ namespace DataAccess.Repositories
 {
     public class OrganizerRepository : IOrganizerRepository
     {
-        private AppContext _dbcontext;
+        private BGEContext _dbcontext;
 
-        public OrganizerRepository(AppContext dbcontext)
+        public OrganizerRepository(BGEContext dbcontext)
         {
             _dbcontext = dbcontext;
         }

@@ -7,9 +7,9 @@ namespace DataAccess.Repositories
 {
     public class VenueRepository : IVenueRepository
     {
-        private AppContext _dbcontext;
+        private BGEContext _dbcontext;
 
-        public VenueRepository(AppContext dbcontext)
+        public VenueRepository(BGEContext dbcontext)
         {
             _dbcontext = dbcontext;
         }

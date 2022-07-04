@@ -118,5 +118,24 @@ namespace DataAccessTests
             Assert.Equal("антикафе", found?.Type);
             Assert.Equal("Москва", found?.Address);
         }
+
+        [Fact]
+        public void VenueDeleteTest()
+        {
+            var context = CreateContext();
+            var rep = CreateVenueRepository(context);
+            var venue = new Venue("V1", "антикафе", "Москва") { ID = 1 };
+
+            rep.Delete(venue);
+
+            Assert.Single(context.Venues);
+            var deleted = context.Venues.Single(v => v.Name == "V1");
+            Assert.NotNull(deleted);
+            Assert.True(deleted.Deleted);
+            Assert.Equal(1, deleted?.ID);
+            Assert.Equal("V1", deleted?.Name);
+            Assert.Equal("антикафе", deleted?.Type);
+            Assert.Equal("Москва", deleted?.Address);
+        }
     }
 }

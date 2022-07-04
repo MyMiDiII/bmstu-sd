@@ -2,6 +2,7 @@
 
 using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
+using BusinessLogic.Exceptions;
 
 namespace DataAccess.Repositories
 {
@@ -16,13 +17,20 @@ namespace DataAccess.Repositories
 
         public void Add(Venue elem)
         {
-            _dbcontext.Venues.Add(elem);
-            _dbcontext.SaveChanges();
+            try
+            {
+                _dbcontext.Venues.Add(elem);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new AddVenueException();
+            }
         }
 
         public List<Venue> GetAll()
         {
-            return _dbcontext.Venues.ToList();
+            return _dbcontext.Venues.Where(venue => !venue.Deleted).ToList();
         }
 
         public Venue? GetByID(long id)
@@ -32,32 +40,49 @@ namespace DataAccess.Repositories
 
         public void Update(Venue elem)
         {
-            _dbcontext.Venues.Update(elem);
-            _dbcontext.SaveChanges();
-        }
+            try
+            {
+                _dbcontext.Venues.Update(elem);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new UpdateVenueException();
+            }
+       }
 
         public void Delete(Venue elem)
         {
+            var tmp = _dbcontext.Venues.Find(elem.ID);
+
+            if (tmp is null)
+                throw new NotExistsVenueException();
+
+            if (tmp.Deleted)
+                throw new AlreadyDeletedVenueException();
+
+            tmp.Deleted = true;
+            Update(tmp);
         }
 
         public List<Venue> GetByName(string name)
         {
             return _dbcontext.Venues
-                   .Where(venue => venue.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                   .Where(venue => !venue.Deleted && venue.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
                    .ToList();
         }
 
         public List<Venue> GetByAddress(string address)
         {
             return _dbcontext.Venues
-                   .Where(venue => venue.Address.Contains(address, StringComparison.OrdinalIgnoreCase))
+                   .Where(venue => !venue.Deleted && venue.Address.Contains(address, StringComparison.OrdinalIgnoreCase))
                    .ToList();
         }
 
         public List<Venue> GetByType(string type)
         {
             return _dbcontext.Venues
-                   .Where(venue => venue.Type.Contains(type, StringComparison.OrdinalIgnoreCase))
+                   .Where(venue => !venue.Deleted && venue.Type.Contains(type, StringComparison.OrdinalIgnoreCase))
                    .ToList();
         }
     }

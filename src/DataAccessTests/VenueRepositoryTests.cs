@@ -1,6 +1,5 @@
 using Xunit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 using DataAccess;
 using DataAccess.Repositories;
@@ -28,10 +27,10 @@ namespace DataAccessTests
             context.SaveChanges();
         }
 
-        private BGEContext CreateContext() => new BGEContext(_dbContextOptions);
-        private VenueRepository CreateVenueRepository() => new VenueRepository(CreateContext());
-        private VenueRepository CreateVenueRepository(BGEContext context) =>
-            new VenueRepository(context);
+        private BGEContext CreateContext() => new(_dbContextOptions);
+        private VenueRepository CreateVenueRepository() => new(CreateContext());
+        private static VenueRepository CreateVenueRepository(BGEContext context) =>
+            new(context);
 
         [Fact]
         public void VenueGetAllTest()

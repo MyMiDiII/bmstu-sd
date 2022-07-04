@@ -1,6 +1,5 @@
 ﻿using Xunit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 using DataAccess;
 using DataAccess.Repositories;
@@ -29,10 +28,10 @@ namespace DataAccessTests
             context.SaveChanges();
         }
 
-        private BGEContext CreateContext() => new BGEContext(_dbContextOptions);
-        private OrganizerRepository CreateOrganizerRepository() => new OrganizerRepository(CreateContext());
-        private OrganizerRepository CreateOrganizerRepository(BGEContext context) =>
-            new OrganizerRepository(context);
+        private BGEContext CreateContext() => new(_dbContextOptions);
+        private OrganizerRepository CreateOrganizerRepository() => new(CreateContext());
+        private static OrganizerRepository CreateOrganizerRepository(BGEContext context) =>
+            new(context);
 
         [Fact]
         public void OrganizerGetAllTest()

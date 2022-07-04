@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-using BusinessLogic.Models;
+﻿using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
 
@@ -8,7 +6,7 @@ namespace DataAccess.Repositories
 {
     public class OrganizerRepository : IOrganizerRepository
     {
-        private BGEContext _dbcontext;
+        private readonly BGEContext _dbcontext;
 
         public OrganizerRepository(BGEContext dbcontext)
         {

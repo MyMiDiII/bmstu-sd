@@ -49,7 +49,7 @@ namespace DataAccess.Repositories
             {
                 throw new UpdateOrganizerException();
             }
-       }
+        }
 
         public void Delete(Organizer elem)
         {
@@ -78,6 +78,7 @@ namespace DataAccess.Repositories
                    .Where(organizer => !organizer.Deleted && organizer.Address.Contains(address, StringComparison.OrdinalIgnoreCase))
                    .ToList();
         }
+
         public List<BoardGameEvent> GetOrganizerEvents(long organizerID)
         {
             return _dbcontext.Events

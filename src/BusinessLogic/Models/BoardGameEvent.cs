@@ -14,6 +14,7 @@ namespace BusinessLogic.Models
         [ForeignKey("Organizer")]
         public long OrganizerID { get; set; }
         public long VenueID { get; set; }
+        public List<BoardGame> Games { get; set; } = new List<BoardGame>();
 
         public BoardGameEvent(string title, DateOnly date)
         {

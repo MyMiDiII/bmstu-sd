@@ -7,9 +7,9 @@ namespace BusinessLogic.IRepositories
         List<BoardGame> GetByTitle(string title); 
         List<BoardGame> GetByProducer(string producer);
         List<BoardGame> GetByYear(uint year);
-        List<BoardGame> GetByAge(uint age);
-        List<BoardGame> GetByPlayerNum(uint num);
-        List<BoardGame> GetByDuration(uint duration);
+        List<BoardGame> GetByAge(uint minAge, uint maxAge);
+        List<BoardGame> GetByPlayerNum(uint minNum, uint maxNum);
+        List<BoardGame> GetByDuration(uint minDuration, uint maxDuration);
         List<BoardGameEvent> GetGameEvents(long gameID);
     }
 }

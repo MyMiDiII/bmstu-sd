@@ -13,8 +13,11 @@
         public uint MaxDuration { get; set; }
         public uint MinDuration { get; set; }
         public bool Deleted { get; set; }
-        public List<BoardGameEvent> Events { get; set; } = new List<BoardGameEvent>();
 
-        public BoardGame(string title) { Title = title; Deleted = false; }
+        public BoardGame(string title)
+        {
+            Title = title;
+            Deleted = false;
+        }
     }
 }

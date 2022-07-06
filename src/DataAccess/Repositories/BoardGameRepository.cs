@@ -119,8 +119,13 @@ namespace DataAccess.Repositories
         public List<BoardGameEvent> GetGameEvents(long gameID)
         {
             return _dbcontext.Events
-                   .Where(bgEvent => bgEvent.Games.Any(game => game.ID == gameID))
-                   .ToList();
+                    .Join(_dbcontext.EventGameRelations,
+                          e => e.ID,
+                          egr => egr.BoardGameEventID,
+                          (e, egr) => new { e, egr.BoardGameID })
+                    .Where(r => r.BoardGameID == gameID)
+                    .Select(r => r.e)
+                    .ToList();
         }
     }
 }

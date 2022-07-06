@@ -2,6 +2,17 @@
 
 namespace BusinessLogic.Models
 {
+    public enum BoardGameEventState
+    {
+        Planned,
+        Registration,
+        Ready,
+        Started,
+        Finished,
+        Cancelled,
+        Deleted
+    }
+
     public class BoardGameEvent
     {
         public long ID { get; set; }
@@ -11,15 +22,19 @@ namespace BusinessLogic.Models
         public uint Duration { get; set; }
         public uint Cost { get; set; }
         public bool Purchase { get; set; }
+        public TimeOnly RegistrationTime { get; set; }
+        public BoardGameEventState State { get; set; }
         [ForeignKey("Organizer")]
         public long OrganizerID { get; set; }
         public long VenueID { get; set; }
-        public List<BoardGame> Games { get; set; } = new List<BoardGame>();
+        public bool Deleted { get; set; }
 
         public BoardGameEvent(string title, DateOnly date)
         {
             Title = title;
             Date = date;
+            State = BoardGameEventState.Planned;
+            Deleted = false;
         }
     }
 }

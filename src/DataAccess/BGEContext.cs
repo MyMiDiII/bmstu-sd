@@ -10,8 +10,10 @@ namespace DataAccess
         public DbSet<Organizer> Organizers { get; set; }
         public DbSet<BoardGameEvent> Events { get; set; }
         public DbSet<BoardGame> Games { get; set; }
+        public DbSet<Player> Players { get; set; }
 
         public DbSet<EventGame> EventGameRelations { get; set; }
+        public DbSet<BGERegistration> Registrations { get; set; }
 
         public BGEContext(DbContextOptions<BGEContext> options) : base(options) { }
     }

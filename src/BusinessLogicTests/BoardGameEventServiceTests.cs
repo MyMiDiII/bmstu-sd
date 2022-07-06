@@ -66,10 +66,7 @@ namespace BusinessLogicTests
                     Year = 2001,
                 }
             };
-            _mockEventGames = new List<EventGame>
-            {
-                new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
-            };
+            _mockEventGames = new List<EventGame> { new EventGame(1, 1) };
             _mockPlayers = new List<Player>
             {
                 new Player("MyMiDi")

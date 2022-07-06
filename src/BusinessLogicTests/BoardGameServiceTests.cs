@@ -61,10 +61,7 @@ namespace BusinessLogicTests
                     MinDuration = 10
                 }
             };
-            _mockEventGames = new List<EventGame>
-            {
-                new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
-            };
+            _mockEventGames = new List<EventGame> { new EventGame(1, 1) };
             _mockBGEvents = new List<BoardGameEvent>
             {
                 new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 }

@@ -1,8 +1,12 @@
-﻿namespace BusinessLogic.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BusinessLogic.Models
 {
     public class BoardGame
     {
+        [Key]
         public long ID { get; set; }
+        [Required]
         public string Title { get; set; }
         public string? Produser { get; set; }
         public uint Year { get; set; }

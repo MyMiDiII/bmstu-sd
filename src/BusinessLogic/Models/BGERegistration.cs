@@ -6,9 +6,9 @@ namespace BusinessLogic.Models
     public class BGERegistration
     {
         [Key]
-        public long ID { get; set; }
         [ForeignKey("BoardGameEvent")]
         public long BoardGameEventID { get; set; }
+        [Key]
         [ForeignKey("Player")]
         public long PlayerID { get; set; }
 

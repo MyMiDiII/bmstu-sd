@@ -82,7 +82,7 @@ namespace BusinessLogic.Services
         {
             long playerID = _playerService.GetCurrentPlayerID();
 
-            if (_boardGameRepository.CheckGameInFavorites(boardGame.ID, playerID))
+            if (!_boardGameRepository.CheckGameInFavorites(boardGame.ID, playerID))
                 throw new NotExistsPlayerFavoriteGameException();
 
             _boardGameRepository.DeleteFromFavorites(boardGame.ID, playerID);

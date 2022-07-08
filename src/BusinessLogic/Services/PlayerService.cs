@@ -105,7 +105,7 @@ namespace BusinessLogic.Services
         {
             long playerID = GetCurrentPlayerID();
 
-            if (_playerRepository.CheckPlayerRegistration(bgEvent.ID, playerID))
+            if (!_playerRepository.CheckPlayerRegistration(bgEvent.ID, playerID))
                 throw new NotExistsPlayerRegistraionException();
 
             _playerRepository.DeleteFromEvent(bgEvent.ID, playerID);

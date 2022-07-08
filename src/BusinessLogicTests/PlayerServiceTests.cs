@@ -125,6 +125,15 @@ namespace BusinessLogicTests
                     return _mockBGEvents.FindAll(x => eventsIDs.Contains(x.ID));
                 }
                 );
+            mockRepo.Setup(repo => repo.GetPlayerFavorites(It.IsAny<long>())).Returns(
+                (long playerID) =>
+                {
+                    var eventsIDs = _mockFavoriteGames
+                                    .FindAll(x => x.PlayerID == playerID)
+                                    .Select(x => x.BoardGameID);
+                    return _mockBoardGames.FindAll(x => eventsIDs.Contains(x.ID));
+                }
+                );
             _mockRepo = mockRepo.Object;
 
             var mockUserRepo = new Mock<IUserRepository>();

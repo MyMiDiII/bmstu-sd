@@ -12,6 +12,5 @@
     public class UserIsNotPlayerException : PlayerException { }
     public class AlreadyExistsPlayerRegistraionException : PlayerException { }
     public class NotExistsPlayerRegistraionException : PlayerException { }
-    public class AlreadyExistsPlayerFavoriteGameException : PlayerException { }
     public class NotExistsPlayerFavoriteGameException : PlayerException { }
 }

@@ -10,16 +10,20 @@ namespace BusinessLogic.Services
         void CreateBoardGame(BoardGame boardGame);
         void UpdateBoardGame(BoardGame boardGame);
         void DeleteBoardGame(BoardGame boardGame);
+        void AddBoardGameToFavorite(BoardGame boardGame);
+        void DeleteBoardGameFromFavorite(BoardGame boardGame);
         List<BoardGameEvent> GetEventsByGame(BoardGame boardGame);
     }
 
     public class BoardGameService : IBoardGameService
     {
         private readonly IBoardGameRepository _boardGameRepository;
+        private readonly IPlayerService _playerService;
 
-        public BoardGameService(IBoardGameRepository boardGameRepository)
+        public BoardGameService(IBoardGameRepository boardGameRepository, IPlayerService playerService)
         {
             _boardGameRepository = boardGameRepository;
+            _playerService = playerService;
         }
 
         public List<BoardGame> GetBoardGames()
@@ -62,6 +66,26 @@ namespace BusinessLogic.Services
         private bool NotExist(long id)
         {
             return _boardGameRepository.GetByID(id) == null;
+        }
+
+        public void AddBoardGameToFavorite(BoardGame boardGame)
+        {
+            long playerID = _playerService.GetCurrentPlayerID();
+
+            if (_boardGameRepository.CheckGameInFavorites(boardGame.ID, playerID))
+                throw new AlreadyExistsFavoriteGameException();
+
+            _boardGameRepository.AddToFavorites(boardGame.ID, playerID);
+        }
+
+        public void DeleteBoardGameFromFavorite(BoardGame boardGame)
+        {
+            long playerID = _playerService.GetCurrentPlayerID();
+
+            if (_boardGameRepository.CheckGameInFavorites(boardGame.ID, playerID))
+                throw new NotExistsPlayerFavoriteGameException();
+
+            _boardGameRepository.DeleteFromFavorites(boardGame.ID, playerID);
         }
 
         public List<BoardGameEvent> GetEventsByGame(BoardGame boardGame)

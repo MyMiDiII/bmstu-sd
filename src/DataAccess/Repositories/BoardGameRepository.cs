@@ -116,6 +116,49 @@ namespace DataAccess.Repositories
                    .ToList();
         }
 
+        public void AddToEvent(long gameID, long eventID)
+        {
+            if (CheckGamePlaying(gameID, eventID))
+                throw new AlreadyExistsEventGameException();
+
+            var newEventGame = new EventGame(gameID, eventID);
+
+            try
+            {
+                _dbcontext.EventGameRelations.Add(newEventGame);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new AddEventGameException();
+            }
+        }
+
+        public void DeleteFromEvent(long gameID, long eventID)
+        {
+            try
+            {
+                var eventGame = _dbcontext.EventGameRelations
+                                .First(eg => eg.BoardGameID == gameID && eg.BoardGameEventID == eventID);
+
+                _dbcontext.EventGameRelations.Remove(eventGame);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new DeleteEventGameException();
+            }
+        }
+
+        public bool CheckGamePlaying(long gameID, long eventID)
+        {
+            return _dbcontext.EventGameRelations
+                   .Where(egr
+                          => egr.BoardGameID == gameID
+                          && egr.BoardGameEventID == eventID)
+                   .Any();
+        }
+
         public List<BoardGameEvent> GetGameEvents(long gameID)
         {
             return _dbcontext.Events
@@ -126,6 +169,49 @@ namespace DataAccess.Repositories
                     .Where(r => r.BoardGameID == gameID)
                     .Select(r => r.e)
                     .ToList();
+        }
+
+        public void AddToFavorites(long gameID, long playerID)
+        {
+            if (CheckGameInFavorites(gameID, playerID))
+                throw new AlreadyExistsFavoriteGameException();
+
+            var newFavorite = new FavoriteBoardGame(gameID, playerID);
+
+            try
+            {
+                _dbcontext.Favorites.Add(newFavorite);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new AddFavoriteGameException();
+            }
+        }
+
+        public void DeleteFromFavorites(long gameID, long playerID)
+        {
+            try
+            {
+                var playerGame = _dbcontext.Favorites
+                                .First(eg => eg.BoardGameID == gameID && eg.PlayerID == playerID);
+
+                _dbcontext.Favorites.Remove(playerGame);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new DeleteFavoriteGameException();
+            }
+        }
+
+        public bool CheckGameInFavorites(long gameID, long playerID)
+        {
+            return _dbcontext.Favorites
+                   .Where(egr
+                          => egr.BoardGameID == gameID
+                          && egr.PlayerID == playerID)
+                   .Any();
         }
     }
 }

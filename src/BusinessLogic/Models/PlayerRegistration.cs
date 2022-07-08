@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessLogic.Models
 {
-    public class BGERegistration
+    public class PlayerRegistration
     {
         [Key]
         [ForeignKey("BoardGameEvent")]
@@ -12,7 +12,7 @@ namespace BusinessLogic.Models
         [ForeignKey("Player")]
         public long PlayerID { get; set; }
 
-        public BGERegistration(long boardGameEventID, long playerID)
+        public PlayerRegistration(long boardGameEventID, long playerID)
         {
             BoardGameEventID = boardGameEventID;
             PlayerID = playerID;

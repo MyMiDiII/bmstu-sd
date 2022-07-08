@@ -13,7 +13,8 @@ namespace DataAccess
         public DbSet<Player> Players { get; set; }
 
         public DbSet<EventGame> EventGameRelations { get; set; }
-        public DbSet<BGERegistration> Registrations { get; set; }
+        public DbSet<PlayerRegistration> Registrations { get; set; }
+        public DbSet<FavoriteBoardGame> Favorites { get; set; }
 
         public BGEContext(DbContextOptions<BGEContext> options) : base(options) { }
     }

@@ -17,5 +17,12 @@ namespace DataAccess
         public DbSet<FavoriteBoardGame> Favorites { get; set; }
 
         public BGEContext(DbContextOptions<BGEContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<EventGame>().HasKey(eg => new { eg.BoardGameID, eg.BoardGameEventID });
+            builder.Entity<PlayerRegistration>().HasKey(pr => new { pr.BoardGameEventID, pr.PlayerID });
+            builder.Entity<FavoriteBoardGame>().HasKey(fbg => new { fbg.BoardGameID, fbg.PlayerID });
+        }
     }
 }

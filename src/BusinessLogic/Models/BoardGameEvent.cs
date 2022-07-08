@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessLogic.Models
 {
@@ -15,8 +16,11 @@ namespace BusinessLogic.Models
 
     public class BoardGameEvent
     {
+        [Key]
         public long ID { get; set; }
+        [Required]
         public string Title { get; set; }
+        [Required]
         public DateOnly Date { get; set; }
         public TimeOnly StartTime { get; set; }
         public uint Duration { get; set; }

@@ -96,11 +96,7 @@ namespace BusinessLogic.Services
         {
             long playerID = GetCurrentPlayerID();
 
-            var curRegistation = new BGERegistration()
-            {
-                BoardGameEventID = bgEvent.ID,
-                PlayerID = playerID,
-            };
+            var curRegistation = new BGERegistration(bgEvent.ID, playerID);
 
             if (_playerRepository.GetRegistrationID(curRegistation) != -1)
                 throw new AlreadyExistsPlayerRegistraionException();
@@ -112,11 +108,7 @@ namespace BusinessLogic.Services
         {
             long playerID = GetCurrentPlayerID();
 
-            var curRegistation = new BGERegistration()
-            {
-                BoardGameEventID = bgEvent.ID,
-                PlayerID = playerID,
-            };
+            var curRegistation = new BGERegistration(bgEvent.ID, playerID);
 
             if (_playerRepository.GetRegistrationID(curRegistation) == -1)
                 throw new NotExistsPlayerRegistraionException();

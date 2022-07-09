@@ -66,7 +66,8 @@ namespace BusinessLogicTests
             _mockEventGames = new List<EventGame> { new EventGame(1, 1) };
             _mockBGEvents = new List<BoardGameEvent>
             {
-                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 }
+                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 },
+                new BoardGameEvent("Second", new DateOnly(2001, 1, 2)) { ID = 2 }
             };
             _mockFavoriteGames = new List<FavoriteBoardGame>() { new FavoriteBoardGame(2, 1) };
 
@@ -128,6 +129,23 @@ namespace BusinessLogicTests
                 (long gameID, long playerID) =>
                 _mockFavoriteGames.RemoveAll(x => x.PlayerID == playerID
                                                && x.BoardGameID == gameID));
+            mockBGRepo.Setup(repo => repo.AddToEvent(It.IsAny<long>(), It.IsAny<long>())).Callback(
+                (long gameID, long eventID) =>
+                {
+                    var eventBoardGame = new EventGame(gameID, eventID);
+                    _mockEventGames.Add(eventBoardGame);
+                }
+                );
+            mockBGRepo.Setup(repo => repo.DeleteFromEvent(It.IsAny<long>(), It.IsAny<long>())).Callback(
+                (long gameID, long eventID) =>
+                _mockEventGames.RemoveAll(x => x.BoardGameEventID == eventID
+                                            && x.BoardGameID == gameID));
+            mockBGRepo.Setup(repo => repo.CheckGamePlaying(It.IsAny<long>(), It.IsAny<long>())).Returns(
+                (long gameID, long eventID) =>
+                {
+                    return _mockEventGames.Where(x => x.BoardGameID == gameID
+                                                   && x.BoardGameEventID == eventID).Any();
+                });
 
 
             _mockBGRepo = mockBGRepo.Object;
@@ -308,6 +326,34 @@ namespace BusinessLogicTests
 
             Assert.Equal(expectedCount, events.Count);
             Assert.Equal("First", events.First().Title);
+        }
+
+        [Fact]
+        public void AddBoardGameToEventTest()
+        {
+            var expectedCount = _mockEventGames.Count + 1;
+
+            var game = _mockBoardGames.First();
+            var bgEvent = _mockBGEvents.Last();
+
+            _boardGameService.AddBoardGameToEvent(game, bgEvent);
+
+            Assert.Equal(expectedCount, _mockEventGames.Count);
+            Assert.NotNull(_mockEventGames.Find(x => x.BoardGameEventID == bgEvent.ID
+                                                  && x.BoardGameID == game.ID));
+        }
+
+        [Fact]
+        public void DeleteBoardGameFromEventTest()
+        {
+            var expectedCount = _mockEventGames.Count - 1;
+
+            var game = _mockBoardGames.First();
+            var bgEvent = _mockBGEvents.First();
+
+            _boardGameService.DeleteBoardGameFromEvent(game, bgEvent);
+
+            Assert.Equal(expectedCount, _mockEventGames.Count);
         }
     }
 }

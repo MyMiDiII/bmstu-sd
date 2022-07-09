@@ -16,7 +16,9 @@
     public class AddEventGameException : BoardGameException { }
     public class DeleteEventGameException : BoardGameException { }
     public class AlreadyExistsEventGameException : BoardGameException { }
+    public class NotExistsEventGameException : BoardGameException { }
     public class AddFavoriteGameException : BoardGameException { }
     public class DeleteFavoriteGameException : BoardGameException { }
     public class AlreadyExistsFavoriteGameException : BoardGameException { }
+    public class NotExistsFavoriteGameException : BoardGameException { }
 }

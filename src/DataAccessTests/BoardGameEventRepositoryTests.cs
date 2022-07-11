@@ -43,7 +43,7 @@ namespace DataAccessTests
             context.EventGameRelations.AddRange(new EventGame(1, 1), new EventGame(2, 2));
 
             context.Players.AddRange(new Player("MyMiDi"), new Player("hamzreg"));
-            context.Registrations.AddRange(new PlayerRegistration(1, 2), new PlayerRegistration(2, 1));
+            context.Registrations.AddRange(new PlayerRegistration(2, 1), new PlayerRegistration(1, 2));
 
             context.SaveChanges();
         }

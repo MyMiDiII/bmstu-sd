@@ -6,16 +6,16 @@ namespace BusinessLogic.Models
     public class PlayerRegistration
     {
         [Key]
-        [ForeignKey("BoardGameEvent")]
-        public long BoardGameEventID { get; set; }
-        [Key]
         [ForeignKey("Player")]
         public long PlayerID { get; set; }
+        [Key]
+        [ForeignKey("BoardGameEvent")]
+        public long BoardGameEventID { get; set; }
 
-        public PlayerRegistration(long boardGameEventID, long playerID)
+        public PlayerRegistration(long playerID, long boardGameEventID)
         {
-            BoardGameEventID = boardGameEventID;
             PlayerID = playerID;
+            BoardGameEventID = boardGameEventID;
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Repositories;
 using BusinessLogic.Models;
+using BusinessLogic.Exceptions;
 
 namespace DataAccessTests
 {
@@ -27,6 +28,7 @@ namespace DataAccessTests
             context.Events.AddRange(new BoardGameEvent("Yay!", new DateOnly(2022, 7, 5)),
                                     new BoardGameEvent("No!", new DateOnly(2022, 7, 7)));
             context.EventGameRelations.AddRange(new EventGame(1, 1), new EventGame(2, 2)); 
+            context.Favorites.AddRange(new FavoriteBoardGame(1, 1), new FavoriteBoardGame(2, 2));
 
             context.SaveChanges();
         }
@@ -171,6 +173,45 @@ namespace DataAccessTests
         }
 
         [Fact]
+        public void BoardGameAddToEventTest()
+        {
+            var context = CreateContext();
+            var rep = CreateBoardGameRepository(context);
+
+            rep.AddToEvent(2, 1);
+
+            Assert.Equal(3, context.EventGameRelations.Count());
+            var added = context.EventGameRelations.Last();
+            Assert.Equal(2, added.BoardGameID);
+            Assert.Equal(1, added.BoardGameEventID);
+        }
+
+        [Fact]
+        public void BoardGameAddToEventExceptionTest()
+        {
+            var context = CreateContext();
+            var rep = CreateBoardGameRepository(context);
+
+            void action() => rep.AddToEvent(1, 1);
+
+            Assert.Throws<AlreadyExistsEventGameException>(action);
+        }
+
+        [Fact]
+        public void BoardGameDeleteFromEventTest()
+        {
+            var context = CreateContext();
+            var rep = CreateBoardGameRepository(context);
+
+            rep.DeleteFromEvent(1, 1);
+
+            Assert.Equal(1, context.EventGameRelations.Count());
+            var deleted = context.EventGameRelations.FirstOrDefault(x => x.BoardGameID == 1
+                                                                      && x.BoardGameEventID == 1);
+            Assert.Null(deleted);
+        }
+
+        [Fact]
         public void BoardGameGetEventsTest()
         {
             var context = CreateContext();
@@ -189,5 +230,45 @@ namespace DataAccessTests
                 }
             );
         }
+
+        [Fact]
+        public void BoardGameAddToFavoritesTest()
+        {
+            var context = CreateContext();
+            var rep = CreateBoardGameRepository(context);
+
+            rep.AddToFavorites(2, 1);
+
+            Assert.Equal(3, context.Favorites.Count());
+            var added = context.Favorites.Last();
+            Assert.Equal(2, added.BoardGameID);
+            Assert.Equal(1, added.PlayerID);
+        }
+
+        [Fact]
+        public void BoardGameAddToFavoritesExceptionTest()
+        {
+            var context = CreateContext();
+            var rep = CreateBoardGameRepository(context);
+
+            void action() => rep.AddToFavorites(1, 1);
+
+            Assert.Throws<AlreadyExistsFavoriteGameException>(action);
+        }
+
+        [Fact]
+        public void BoardGameDeleteFromFavoritesTest()
+        {
+            var context = CreateContext();
+            var rep = CreateBoardGameRepository(context);
+
+            rep.DeleteFromFavorites(1, 1);
+
+            Assert.Equal(1, context.Favorites.Count());
+            var deleted = context.Favorites.FirstOrDefault(x => x.BoardGameID == 1
+                                                             && x.PlayerID == 1);
+            Assert.Null(deleted);
+        }
+
     }
 }

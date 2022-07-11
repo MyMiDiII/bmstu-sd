@@ -73,8 +73,7 @@ namespace DataAccess.Repositories
         {
             return _dbcontext.Players
                    .Where(player => !player.Deleted
-                               && player.League != null
-                               && player.League.Contains(league, StringComparison.OrdinalIgnoreCase))
+                                 && player.League.Contains(league, StringComparison.OrdinalIgnoreCase))
                    .ToList();
         }
 

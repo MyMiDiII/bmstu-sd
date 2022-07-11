@@ -12,4 +12,7 @@
     public class UserIsNotPlayerException : PlayerException { }
     public class AlreadyExistsPlayerRegistraionException : PlayerException { }
     public class NotExistsPlayerRegistraionException : PlayerException { }
+    public class AddPlayerException : PlayerException { }
+    public class UpdatePlayerException : PlayerException { }
+    public class AlreadyDeletedPlayerException : PlayerException { }
 }

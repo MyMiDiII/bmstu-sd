@@ -75,8 +75,6 @@ namespace BusinessLogicTests
                 );
             mockRepo.Setup(repo => repo.Delete(It.IsAny<User>())).Callback(
                 (User user) => _mockUsers.RemoveAll(x => x.ID == user.ID));
-            mockRepo.Setup(repo => repo.ConnectUserToDataStore(It.IsAny<User>())).Returns(
-                (User user) => user.ID == 1);
             mockRepo.Setup(repo => repo.GetUserRoles(It.IsAny<long>())).Returns(
                 (long id) =>
                 {
@@ -240,16 +238,6 @@ namespace BusinessLogicTests
             void action() => _service.Login(request);
 
             Assert.Throws<IncorrectUserPasswordException>(action);
-        }
-
-        [Fact]
-        public void ThrowFailedConnectionExcLoginTest()
-        {
-            var request = new LoginRequest("amunra2", "123simple123");
-
-            void action() => _service.Login(request);
-
-            Assert.Throws<FailedConnectionToDataStoreException>(action);
         }
 
         [Fact]

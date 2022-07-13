@@ -7,6 +7,7 @@ namespace DataAccess
     public class BGEContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Organizer> Organizers { get; set; }
@@ -26,9 +27,8 @@ namespace DataAccess
             builder.Entity<PlayerRegistration>().HasKey(pr => new { pr.BoardGameEventID, pr.PlayerID });
             builder.Entity<FavoriteBoardGame>().HasKey(fbg => new { fbg.BoardGameID, fbg.PlayerID });
 
-            builder.Entity<User>().HasData(
-                new User("guest", "guest") { Roles = new List<Role> { new Role("guest") } }
-            );
+            builder.Entity<User>().HasData( new User("guest", "guest") { ID = 1 } );
+            builder.Entity<Role>().HasData( new Role("guest") { ID = 1, UserID = 1 } );
         }
     }
 }

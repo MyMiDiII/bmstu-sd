@@ -28,12 +28,26 @@ namespace DataAccess.Repositories
 
         public List<User> GetAll()
         {
-            return _dbcontext.Users.ToList();
+            var users = _dbcontext.Users.ToList();
+
+            foreach (var user in users)
+            {
+                user.Roles = _dbcontext.Roles.Where(r => r.UserID == user.ID).ToList();
+            }
+
+            return users;
         }
 
         public User? GetByID(long id)
         {
-            return _dbcontext.Users.Find(id);
+            var user = _dbcontext.Users.Find(id);
+
+            if (user == null)
+                return null;
+
+            user.Roles = _dbcontext.Roles.Where(r => r.UserID == user.ID).ToList();
+
+            return user;
         }
 
         public void Update(User elem)
@@ -89,7 +103,7 @@ namespace DataAccess.Repositories
         {
             try
             {
-                var roles = _dbcontext.Users.Single(user => user.ID == id).Roles;
+                var roles = _dbcontext.Roles.Where(role => role.UserID == id).ToList();
                 return roles;
             }
             catch
@@ -100,20 +114,29 @@ namespace DataAccess.Repositories
 
         public void AddWithBasicRole(User user)
         {
-            var newPlayer = new Player(user.Name);
-
-            try
+            using (var transaction = _dbcontext.Database.BeginTransaction())
             {
-                _dbcontext.Players.Add(newPlayer);
-                var roleID = _dbcontext.Players.Single(player => player.Name == user.Name).ID;
-                user.Roles.Add(new Role("player") { RoleID = roleID });
-                _dbcontext.Users.Add(user);
+                var newPlayer = new Player(user.Name);
 
-                _dbcontext.SaveChanges();
-            }
-            catch
-            {
-                throw new AddUserException();
+                try
+                {
+                    _dbcontext.Players.Add(newPlayer);
+                    _dbcontext.Users.Add(user);
+                    _dbcontext.SaveChanges();
+
+                    var roleID = _dbcontext.Players.Single(player => player.Name == user.Name).ID;
+                    var userID = _dbcontext.Users.Single(tmpUser => tmpUser.Name == user.Name).ID;
+
+                    _dbcontext.Roles.Add(new Role("player") { RoleID = roleID, UserID = userID });
+                    _dbcontext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw new AddUserException();
+                }
             }
         }
     }

@@ -103,9 +103,6 @@ namespace BusinessLogic.Services
             if (!_encryptionService.ValidatePassword(tmpUser.Password, existingUser.Password))
                 throw new IncorrectUserPasswordException();
 
-            if (!_userRepository.ConnectUserToDataStore(existingUser))
-                throw new FailedConnectionToDataStoreException();
-
             SetCurrentUser(existingUser);
         }
 

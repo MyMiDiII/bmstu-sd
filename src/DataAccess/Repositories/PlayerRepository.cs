@@ -66,14 +66,13 @@ namespace DataAccess.Repositories
         public Player? GetByName(string name)
         {
             return _dbcontext.Players
-                   .SingleOrDefault(player => player.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+                   .SingleOrDefault(player => player.Name.Contains(name));
         }
 
         public List<Player> GetByLeague(string league)
         {
             return _dbcontext.Players
-                   .Where(player => !player.Deleted
-                                 && player.League.Contains(league, StringComparison.OrdinalIgnoreCase))
+                   .Where(player => !player.Deleted && player.League == league)
                    .ToList();
         }
 

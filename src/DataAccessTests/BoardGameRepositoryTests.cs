@@ -1,5 +1,8 @@
-﻿using Xunit;
+﻿using System.Data.Common;
+
+using Xunit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 using DataAccess;
 using DataAccess.Repositories;
@@ -10,12 +13,16 @@ namespace DataAccessTests
 {
     public class BoardGameRepositoryTests
     {
+        private readonly DbConnection _dbconnection;
         private readonly DbContextOptions<BGEContext> _dbContextOptions;
 
         public BoardGameRepositoryTests()
         {
+            _dbconnection = new SqliteConnection("Filename=:memory:");
+            _dbconnection.Open();
+
             _dbContextOptions = new DbContextOptionsBuilder<BGEContext>()
-                .UseInMemoryDatabase("BoardGameTestDB")
+                .UseSqlite(_dbconnection)
                 .Options;
 
             using var context = new BGEContext(_dbContextOptions);
@@ -126,11 +133,11 @@ namespace DataAccessTests
         {
             var rep = CreateBoardGameRepository();
 
-            var games = rep.GetByTitle("игра");
+            var games = rep.GetByTitle("Игра");
 
             Assert.NotNull(games);
             Assert.NotEmpty(games);
-            var found = games.FirstOrDefault(g => g.Title== "Игра");
+            var found = games.FirstOrDefault(g => g.Title == "Игра");
             Assert.NotNull(found);
             Assert.Equal(1, found?.ID);
             Assert.Equal("Игра", found?.Title);
@@ -181,9 +188,9 @@ namespace DataAccessTests
             rep.AddToEvent(2, 1);
 
             Assert.Equal(3, context.EventGameRelations.Count());
-            var added = context.EventGameRelations.Last();
-            Assert.Equal(2, added.BoardGameID);
-            Assert.Equal(1, added.BoardGameEventID);
+            var added = context.EventGameRelations
+                        .FirstOrDefault(egr => egr.BoardGameID == 2 && egr.BoardGameEventID == 1);
+            Assert.NotNull(added);
         }
 
         [Fact]
@@ -240,9 +247,9 @@ namespace DataAccessTests
             rep.AddToFavorites(2, 1);
 
             Assert.Equal(3, context.Favorites.Count());
-            var added = context.Favorites.Last();
-            Assert.Equal(2, added.BoardGameID);
-            Assert.Equal(1, added.PlayerID);
+            var added = context.Favorites
+                        .FirstOrDefault(egr => egr.BoardGameID == 2 && egr.PlayerID == 1);
+            Assert.NotNull(added);
         }
 
         [Fact]

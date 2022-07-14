@@ -66,21 +66,21 @@ namespace DataAccess.Repositories
         public List<Venue> GetByName(string name)
         {
             return _dbcontext.Venues
-                   .Where(venue => !venue.Deleted && venue.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                   .Where(venue => !venue.Deleted && venue.Name.Contains(name))
                    .ToList();
         }
 
         public List<Venue> GetByAddress(string address)
         {
             return _dbcontext.Venues
-                   .Where(venue => !venue.Deleted && venue.Address.Contains(address, StringComparison.OrdinalIgnoreCase))
+                   .Where(venue => !venue.Deleted && venue.Address.Contains(address))
                    .ToList();
         }
 
         public List<Venue> GetByType(string type)
         {
             return _dbcontext.Venues
-                   .Where(venue => !venue.Deleted && venue.Type.Contains(type, StringComparison.OrdinalIgnoreCase))
+                   .Where(venue => !venue.Deleted && venue.Type.Contains(type))
                    .ToList();
         }
     }

@@ -1,5 +1,8 @@
-﻿using Xunit;
+﻿using System.Data.Common;
+
+using Xunit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 using DataAccess;
 using DataAccess.Repositories;
@@ -9,12 +12,16 @@ namespace DataAccessTests
 {
     public class BoardGameEventRepositoryTests
     {
+        private readonly DbConnection _dbconnection;
         private readonly DbContextOptions<BGEContext> _dbContextOptions;
 
         public BoardGameEventRepositoryTests()
         {
+            _dbconnection = new SqliteConnection("Filename=:memory:");
+            _dbconnection.Open();
+
             _dbContextOptions = new DbContextOptionsBuilder<BGEContext>()
-                .UseInMemoryDatabase("BoardGameEventTestDB")
+                .UseSqlite(_dbconnection)
                 .Options;
 
             using var context = new BGEContext(_dbContextOptions);
@@ -149,7 +156,7 @@ namespace DataAccessTests
         {
             var rep = CreateBoardGameEventRepository();
 
-            var events = rep.GetByTitle("ya");
+            var events = rep.GetByTitle("ay");
 
             Assert.NotNull(events);
             Assert.NotEmpty(events);

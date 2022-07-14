@@ -1,5 +1,8 @@
+using System.Data.Common;
+
 using Xunit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 using DataAccess;
 using DataAccess.Repositories;
@@ -9,12 +12,16 @@ namespace DataAccessTests
 {
     public class VenueRepositoryTests
     {
+        private readonly DbConnection _dbconnection;
         private readonly DbContextOptions<BGEContext> _dbContextOptions;
 
         public VenueRepositoryTests()
         {
+            _dbconnection = new SqliteConnection("Filename=:memory:");
+            _dbconnection.Open();
+
             _dbContextOptions = new DbContextOptionsBuilder<BGEContext>()
-                .UseInMemoryDatabase("VenueTestDB")
+                .UseSqlite(_dbconnection)
                 .Options;
 
             using var context = new BGEContext(_dbContextOptions);
@@ -106,7 +113,7 @@ namespace DataAccessTests
         {
             var rep = CreateVenueRepository();
 
-            var venues = rep.GetByType("ÊאÔו");
+            var venues = rep.GetByType("ךאפו");
 
             Assert.NotNull(venues);
             Assert.NotEmpty(venues);

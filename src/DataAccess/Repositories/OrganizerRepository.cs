@@ -66,14 +66,14 @@ namespace DataAccess.Repositories
         public List<Organizer> GetByName(string name)
         {
             return _dbcontext.Organizers
-                   .Where(organizer => !organizer.Deleted && organizer.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                   .Where(organizer => !organizer.Deleted && organizer.Name.Contains(name))
                    .ToList();
         }
 
         public List<Organizer> GetByAddress(string address)
         {
             return _dbcontext.Organizers
-                   .Where(organizer => !organizer.Deleted && organizer.Address.Contains(address, StringComparison.OrdinalIgnoreCase))
+                   .Where(organizer => !organizer.Deleted && organizer.Address.Contains(address))
                    .ToList();
         }
 

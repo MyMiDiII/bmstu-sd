@@ -84,7 +84,7 @@ namespace DataAccess.Repositories
         public User? GetByName(string name)
         {
             return _dbcontext.Users
-                   .SingleOrDefault(user => user.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+                   .SingleOrDefault(user => user.Name.Contains(name));
         }
 
         public User GetDefaultUser()
@@ -95,7 +95,12 @@ namespace DataAccess.Repositories
         public List<User> GetByRole(string role)
         {
             return _dbcontext.Users
-                   .Where(user => user.Roles.FirstOrDefault(r => r.RoleName == role) != null)
+                   .Join(_dbcontext.Roles,
+                         u => u.ID,
+                         r => r.UserID,
+                         (u, r) => new { u, r.RoleName })
+                   .Where(rl => rl.RoleName == role)
+                   .Select(rl => rl.u)
                    .ToList();
         }
 

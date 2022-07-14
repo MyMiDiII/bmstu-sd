@@ -40,8 +40,6 @@ namespace DataAccessTests
         private static UserRepository CreateUserRepository(BGEContext context) =>
             new(context);
 
-        public void Dispose() => _dbconnection.Dispose();
-
         [Fact]
         public void UserGetAllTest()
         {
@@ -56,7 +54,7 @@ namespace DataAccessTests
                     Assert.Equal(1, u.ID);
                     Assert.Equal("guest", u.Name);
                     Assert.Equal("guest", u.Password);
-                    //Assert.Single(u.Roles);
+                    Assert.Single(u.Roles);
                 },
                 u =>
                 {
@@ -83,7 +81,7 @@ namespace DataAccessTests
             Assert.Equal(1, user?.ID);
             Assert.Equal("guest", user?.Name);
             Assert.Equal("guest", user?.Password);
-            //Assert.Collection(user?.Roles, r => { Assert.Equal("guest", r.RoleName); } );
+            Assert.Collection(user?.Roles, r => { Assert.Equal("guest", r.RoleName); } );
         }
 
         [Fact]

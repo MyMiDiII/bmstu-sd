@@ -66,7 +66,7 @@ namespace DataAccess.Repositories
         public List<BoardGameEvent> GetByTitle(string title)
         {
             return _dbcontext.Events
-                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.Title.Contains(title, StringComparison.OrdinalIgnoreCase))
+                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.Title.Contains(title))
                    .ToList();
         }
 

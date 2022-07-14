@@ -66,7 +66,7 @@ namespace DataAccess.Repositories
         public List<BoardGame> GetByTitle(string title)
         {
             return _dbcontext.Games
-                   .Where(game => !game.Deleted && game.Title.Contains(title, StringComparison.OrdinalIgnoreCase))
+                   .Where(game => !game.Deleted && game.Title.Contains(title))
                    .ToList();
         }
 
@@ -75,7 +75,7 @@ namespace DataAccess.Repositories
             return _dbcontext.Games
                    .Where(game => !game.Deleted
                                && game.Produser != null
-                               && game.Produser.Contains(producer, StringComparison.OrdinalIgnoreCase))
+                               && game.Produser.Contains(producer))
                    .ToList();
         }
 

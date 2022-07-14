@@ -73,16 +73,14 @@ namespace DataAccess.Repositories
         public List<BoardGameEvent> GetByDate(DateOnly date)
         {
             return _dbcontext.Events
-                   .Where(bgEvent => !bgEvent.Deleted
-                                  && bgEvent.Date == date)
+                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.Date == date)
                    .ToList();
         }
 
         public List<BoardGameEvent> GetByStartTime(TimeOnly time)
         {
             return _dbcontext.Events
-                   .Where(bgEvent => !bgEvent.Deleted
-                                  && bgEvent.StartTime == time)
+                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.StartTime == time)
                    .ToList();
         }
 
@@ -103,8 +101,7 @@ namespace DataAccess.Repositories
         public List<BoardGameEvent> GetByRegistration(TimeOnly time)
         {
             return _dbcontext.Events
-                   .Where(bgEvent => !bgEvent.Deleted
-                                  && bgEvent.RegistrationTime <= time)
+                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.RegistrationTime <= time)
                    .ToList();
         }
 

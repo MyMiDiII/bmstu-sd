@@ -1,0 +1,35 @@
+﻿<Bar Breakpoint="Breakpoint.Desktop"
+     Background="Background.Primary"
+     ThemeContrast="ThemeContrast.Light">
+    <BarIcon IconName="customIcon" />
+    <BarBrand>
+        <BarItem>
+            <BarLink To="">
+                ИгроМир
+            </BarLink>
+        </BarItem>
+    </BarBrand>
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <Select TValue="string" >
+                    <SelectItem Value="1">Гость</SelectItem>
+                    <SelectItem Value="2">Игрок</SelectItem>
+                    <SelectItem Value="3">Организатор</SelectItem>
+                    <SelectItem Value="4">Администратор</SelectItem>
+                </Select>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <Button Color="Color.Primary">Регистрация</Button>
+                <Button Color="Color.Success">Вход</Button>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+
+@code {
+    RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" />;
+}

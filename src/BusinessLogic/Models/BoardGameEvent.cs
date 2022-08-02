@@ -28,10 +28,14 @@ namespace BusinessLogic.Models
         public bool Purchase { get; set; }
         public TimeOnly RegistrationTime { get; set; }
         public BoardGameEventState State { get; set; }
-        [ForeignKey("Organizer")]
+        [ForeignKey("OrganizerID")]
         public long OrganizerID { get; set; }
+        [ForeignKey("VenueID")]
         public long VenueID { get; set; }
         public bool Deleted { get; set; }
+
+        public virtual Organizer Organizer { get; set; }
+        public virtual Venue Venue { get; set; }
 
         public BoardGameEvent(string title, DateOnly date)
         {

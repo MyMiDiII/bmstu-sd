@@ -6,11 +6,14 @@ namespace BusinessLogic.Models
     public class FavoriteBoardGame
     {
         [Key]
-        [ForeignKey("BoardGame")]
+        [ForeignKey("BoardGameID")]
         public long BoardGameID { get; set; }
         [Key]
-        [ForeignKey("Player")]
+        [ForeignKey("PlayerID")]
         public long PlayerID { get; set; }
+
+        public virtual BoardGame BoardGame { get; set; }
+        public virtual Player Player { get; set; }
 
         public FavoriteBoardGame(long boardGameID, long playerID)
         {

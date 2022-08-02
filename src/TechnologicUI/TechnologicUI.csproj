@@ -17,6 +17,15 @@
     <PackageReference Include="Blazorise.Bootstrap" Version="1.0.6" />
     <PackageReference Include="Blazorise.Components" Version="1.0.6" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

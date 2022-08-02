@@ -30,8 +30,8 @@ namespace DataAccessTests
             context.Database.EnsureCreated();
 
             context.Users.AddRange(new User("MyMiDi", "123"), new User("???", "123"));
+            context.SaveChanges();
             context.Roles.AddRange(new Role("organizer") { UserID = 2 }, new Role("player") { UserID = 3 });
-
             context.SaveChanges();
         }
 

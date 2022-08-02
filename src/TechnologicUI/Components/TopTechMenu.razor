@@ -13,12 +13,11 @@
     <BarMenu>
         <BarStart>
             <BarItem>
-                <Select TValue="string" >
-                    <SelectItem Value="1">Гость</SelectItem>
-                    <SelectItem Value="2">Игрок</SelectItem>
-                    <SelectItem Value="3">Организатор</SelectItem>
-                    <SelectItem Value="4">Администратор</SelectItem>
-                </Select>
+                <SelectList TItem="string"
+                            TValue="string"
+                            TextField="@((item)=>item)"
+                            SelectedValue="@curRole"
+                            Data="@roles" />
             </BarItem>
         </BarStart>
         <BarEnd>
@@ -32,4 +31,7 @@
 
 @code {
     RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" />;
+
+    static List<string> roles = new List<string> { "Гость", "Игрок", "Организатор", "Администратор" };
+    string curRole = roles.First();
 }

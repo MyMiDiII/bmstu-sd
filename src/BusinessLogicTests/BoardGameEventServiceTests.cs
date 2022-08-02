@@ -20,7 +20,7 @@ namespace BusinessLogicTests
         private readonly List<BoardGame> _mockBoardGames;
         private readonly List<EventGame> _mockEventGames;
         private readonly List<Player> _mockPlayers;
-        private readonly List<BGERegistration> _mockRegistrations;
+        private readonly List<PlayerRegistration> _mockRegistrations;
 
         public BoardGameEventServiceTests()
         {
@@ -66,10 +66,7 @@ namespace BusinessLogicTests
                     Year = 2001,
                 }
             };
-            _mockEventGames = new List<EventGame>
-            {
-                new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
-            };
+            _mockEventGames = new List<EventGame> { new EventGame(1, 1) };
             _mockPlayers = new List<Player>
             {
                 new Player("MyMiDi")
@@ -79,10 +76,7 @@ namespace BusinessLogicTests
                     Rating = 100
                 }
             };
-            _mockRegistrations = new List<BGERegistration>()
-            {
-                new BGERegistration { ID = 1, PlayerID = 1, BoardGameEventID = 1}
-            };
+            _mockRegistrations = new List<PlayerRegistration>() { new PlayerRegistration(1, 1) };
 
             var mockRepo = new Mock<IBoardGameEventRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockBoardGameEvents);

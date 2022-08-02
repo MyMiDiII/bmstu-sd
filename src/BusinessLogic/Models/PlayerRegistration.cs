@@ -3,18 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessLogic.Models
 {
-    public class EventGame
+    public class PlayerRegistration
     {
         [Key]
-        [ForeignKey("BoardGame")]
-        public long BoardGameID { get; set; }
+        [ForeignKey("Player")]
+        public long PlayerID { get; set; }
         [Key]
         [ForeignKey("BoardGameEvent")]
         public long BoardGameEventID { get; set; }
 
-        public EventGame(long boardGameID, long boardGameEventID)
+        public PlayerRegistration(long playerID, long boardGameEventID)
         {
-            BoardGameID = boardGameID;
+            PlayerID = playerID;
             BoardGameEventID = boardGameEventID;
         }
     }

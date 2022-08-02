@@ -9,4 +9,7 @@
     
     public class AlreadyExistsBoardGameEventException : BoardGameEventException { }
     public class NotExistsBoardGameEventException : BoardGameEventException { }
+    public class AddBoardGameEventException : BoardGameEventException { }
+    public class UpdateBoardGameEventException : BoardGameEventException { }
+    public class AlreadyDeletedBoardGameEventException : BoardGameEventException { }
 }

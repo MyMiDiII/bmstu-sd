@@ -12,4 +12,7 @@
     public class NotExistsUserRolesException : UserException { }
     public class IncorrectUserPasswordException : UserException { }
     public class FailedConnectionToDataStoreException : UserException { }
+    public class AddUserException : UserException { }
+    public class UpdateUserException : UserException { }
+    public class DeleteUserException : UserException { }
 }

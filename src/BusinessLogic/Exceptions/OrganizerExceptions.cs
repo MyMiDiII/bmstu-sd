@@ -9,4 +9,7 @@
     
     public class AlreadyExistsOrganizerException : OrganizerException { }
     public class NotExistsOrganizerException : OrganizerException { }
+    public class AddOrganizerException : OrganizerException { }
+    public class UpdateOrganizerException : OrganizerException { }
+    public class AlreadyDeletedOrganizerException : OrganizerException { }
 }

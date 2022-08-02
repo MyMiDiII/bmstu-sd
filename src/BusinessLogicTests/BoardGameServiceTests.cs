@@ -13,12 +13,14 @@ namespace BusinessLogicTests
 {
     public class BoardGameServiceTests
     {
-        private readonly IBoardGameRepository _mockRepo;
-        private readonly IBoardGameService _service;
+        private readonly IBoardGameRepository _mockBGRepo;
+        private readonly IBoardGameService _boardGameService;
+        private readonly IPlayerService _playerService;
 
         private readonly List<BoardGame> _mockBoardGames;
         private readonly List<EventGame> _mockEventGames;
         private readonly List<BoardGameEvent> _mockBGEvents;
+        private readonly List<FavoriteBoardGame> _mockFavoriteGames;
 
         public BoardGameServiceTests()
         {
@@ -61,27 +63,26 @@ namespace BusinessLogicTests
                     MinDuration = 10
                 }
             };
-            _mockEventGames = new List<EventGame>
-            {
-                new EventGame { BoardGameEventID = 1, BoardGameID = 1 }
-            };
+            _mockEventGames = new List<EventGame> { new EventGame(1, 1) };
             _mockBGEvents = new List<BoardGameEvent>
             {
-                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 }
+                new BoardGameEvent("First", new DateOnly(2001, 1, 1)) { ID = 1 },
+                new BoardGameEvent("Second", new DateOnly(2001, 1, 2)) { ID = 2 }
             };
+            _mockFavoriteGames = new List<FavoriteBoardGame>() { new FavoriteBoardGame(2, 1) };
 
-            var mockRepo = new Mock<IBoardGameRepository>();
-            mockRepo.Setup(repo => repo.GetAll()).Returns(_mockBoardGames);
-            mockRepo.Setup(repo => repo.Add(It.IsAny<BoardGame>())).Callback(
+            var mockBGRepo = new Mock<IBoardGameRepository>();
+            mockBGRepo.Setup(repo => repo.GetAll()).Returns(_mockBoardGames);
+            mockBGRepo.Setup(repo => repo.Add(It.IsAny<BoardGame>())).Callback(
                 (BoardGame boardGame) =>
                 {
                     boardGame.ID = _mockBoardGames.Count + 1;
                     _mockBoardGames.Add(boardGame);
                 }
                 );
-            mockRepo.Setup(repo => repo.GetByID(It.IsAny<long>())).Returns(
+            mockBGRepo.Setup(repo => repo.GetByID(It.IsAny<long>())).Returns(
                 (long id) => _mockBoardGames.Find(x => x.ID == id));
-            mockRepo.Setup(repo => repo.Update(It.IsAny<BoardGame>())).Callback(
+            mockBGRepo.Setup(repo => repo.Update(It.IsAny<BoardGame>())).Callback(
                 (BoardGame boardGame) =>
                 {
                     _mockBoardGames
@@ -100,9 +101,9 @@ namespace BusinessLogicTests
                         });
                 }
                 );
-            mockRepo.Setup(repo => repo.Delete(It.IsAny<BoardGame>())).Callback(
+            mockBGRepo.Setup(repo => repo.Delete(It.IsAny<BoardGame>())).Callback(
                 (BoardGame boardGame) => _mockBoardGames.RemoveAll(x => x.ID == boardGame.ID));
-            mockRepo.Setup(repo => repo.GetGameEvents(It.IsAny<long>())).Returns(
+            mockBGRepo.Setup(repo => repo.GetGameEvents(It.IsAny<long>())).Returns(
                 (long gameID) =>
                 {
                     var eventsIDs = _mockEventGames
@@ -111,9 +112,51 @@ namespace BusinessLogicTests
                     return _mockBGEvents.FindAll(x => eventsIDs.Contains(x.ID));
                 }
                 );
+            mockBGRepo.Setup(repo => repo.CheckGameInFavorites(It.IsAny<long>(), It.IsAny<long>())).Returns(
+                (long gameID, long playerID) =>
+                {
+                    return _mockFavoriteGames.Where(x => x.BoardGameID == gameID
+                                              && x.PlayerID == playerID).Any();
+                });
+            mockBGRepo.Setup(repo => repo.AddToFavorites(It.IsAny<long>(), It.IsAny<long>())).Callback(
+                (long gameID, long playerID) =>
+                {
+                    var favoriteBoardGame = new FavoriteBoardGame(gameID, playerID);
+                    _mockFavoriteGames.Add(favoriteBoardGame);
+                }
+                );
+            mockBGRepo.Setup(repo => repo.DeleteFromFavorites(It.IsAny<long>(), It.IsAny<long>())).Callback(
+                (long gameID, long playerID) =>
+                _mockFavoriteGames.RemoveAll(x => x.PlayerID == playerID
+                                               && x.BoardGameID == gameID));
+            mockBGRepo.Setup(repo => repo.AddToEvent(It.IsAny<long>(), It.IsAny<long>())).Callback(
+                (long gameID, long eventID) =>
+                {
+                    var eventBoardGame = new EventGame(gameID, eventID);
+                    _mockEventGames.Add(eventBoardGame);
+                }
+                );
+            mockBGRepo.Setup(repo => repo.DeleteFromEvent(It.IsAny<long>(), It.IsAny<long>())).Callback(
+                (long gameID, long eventID) =>
+                _mockEventGames.RemoveAll(x => x.BoardGameEventID == eventID
+                                            && x.BoardGameID == gameID));
+            mockBGRepo.Setup(repo => repo.CheckGamePlaying(It.IsAny<long>(), It.IsAny<long>())).Returns(
+                (long gameID, long eventID) =>
+                {
+                    return _mockEventGames.Where(x => x.BoardGameID == gameID
+                                                   && x.BoardGameEventID == eventID).Any();
+                });
 
-            _mockRepo = mockRepo.Object;
-            _service = new BoardGameService(_mockRepo);
+
+            _mockBGRepo = mockBGRepo.Object;
+
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(repo => repo.GetDefaultUser()).Returns(
+                new User("test", "123") { Roles = new List<Role> { new Role("player") { RoleID = 1 } } });
+            var userService = new UserService(mockUserRepo.Object, new BCryptEntryptionService());
+
+            _playerService = new PlayerService(new Mock<IPlayerRepository>().Object, userService);
+            _boardGameService = new BoardGameService(_mockBGRepo, _playerService);
         }
 
         [Fact]
@@ -121,7 +164,7 @@ namespace BusinessLogicTests
         {
             var expectedCount = _mockBoardGames.Count;
 
-            var res = _service.GetBoardGames();
+            var res = _boardGameService.GetBoardGames();
 
             Assert.IsType<List<BoardGame>>(res);
             Assert.Equal(expectedCount, res.Count);
@@ -133,7 +176,7 @@ namespace BusinessLogicTests
         {
             var expectedCount = _mockBoardGames.Count;
             var expectedCount2 = expectedCount + 1;
-            var res = _service.GetBoardGames();
+            var res = _boardGameService.GetBoardGames();
             var boardGame = new BoardGame("Пандемия")
             {
                 Produser = "Hobby World",
@@ -148,9 +191,9 @@ namespace BusinessLogicTests
 
             Assert.Equal(expectedCount, res.Count);
 
-            _service.CreateBoardGame(boardGame);
+            _boardGameService.CreateBoardGame(boardGame);
 
-            res = _service.GetBoardGames();
+            res = _boardGameService.GetBoardGames();
 
             Assert.Equal(expectedCount2, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount2));
@@ -165,7 +208,7 @@ namespace BusinessLogicTests
                 Year = 2001,
             };
 
-            void action() => _service.CreateBoardGame(boardGame);
+            void action() => _boardGameService.CreateBoardGame(boardGame);
 
             Assert.Throws<AlreadyExistsBoardGameException>(action);
         }
@@ -187,12 +230,12 @@ namespace BusinessLogicTests
                 MinDuration = 30
             };
 
-            var res = _service.GetBoardGames();
+            var res = _boardGameService.GetBoardGames();
             Assert.Equal(expectedCount, res.Count);
 
-            _service.UpdateBoardGame(boardGame);
+            _boardGameService.UpdateBoardGame(boardGame);
 
-            res = _service.GetBoardGames();
+            res = _boardGameService.GetBoardGames();
 
             Assert.Equal(expectedCount, res.Count);
             Assert.All(res, item => Assert.InRange(item.ID, low: 1, high: expectedCount));
@@ -214,7 +257,7 @@ namespace BusinessLogicTests
         {
             var boardGame = new BoardGame("1") { ID = 100 };
 
-            void action() => _service.UpdateBoardGame(boardGame);
+            void action() => _boardGameService.UpdateBoardGame(boardGame);
 
             Assert.Throws<NotExistsBoardGameException>(action);
         }
@@ -225,12 +268,12 @@ namespace BusinessLogicTests
             var expectedCount = _mockBoardGames.Count;
             var boardGame = new BoardGame("1") { ID = 1 };
 
-            var res = _service.GetBoardGames();
+            var res = _boardGameService.GetBoardGames();
             Assert.Equal(expectedCount, res.Count);
 
-            _service.DeleteBoardGame(boardGame);
+            _boardGameService.DeleteBoardGame(boardGame);
 
-            res = _service.GetBoardGames();
+            res = _boardGameService.GetBoardGames();
 
             Assert.Equal(expectedCount - 1, res.Count);
             Assert.Null(_mockBoardGames.Find(x => x.ID == boardGame.ID));
@@ -241,9 +284,36 @@ namespace BusinessLogicTests
         {
             var boardGame = new BoardGame("1") { ID = 100 };
 
-            void action() => _service.DeleteBoardGame(boardGame);
+            void action() => _boardGameService.DeleteBoardGame(boardGame);
 
             Assert.Throws<NotExistsBoardGameException>(action);
+        }
+
+        [Fact]
+        public void AddBoardGameToFavoriteTest()
+        {
+            var expectedCount = _mockFavoriteGames.Count + 1;
+
+            var game = new BoardGame("123") { ID = 1 };
+
+            _boardGameService.AddBoardGameToFavorite(game);
+
+            Assert.Equal(expectedCount, _mockFavoriteGames.Count);
+            Assert.NotNull(_mockFavoriteGames.Find(x => x.PlayerID == 1
+                                                     && x.BoardGameID == game.ID));
+        }
+
+        [Fact]
+        public void DeleteBoardGameFromFavoriteTest()
+        {
+            _mockFavoriteGames.Add(new FavoriteBoardGame(1, 1));
+            var expectedCount = _mockFavoriteGames.Count - 1;
+
+            var game = new BoardGame("123") { ID = 1 };
+
+            _boardGameService.DeleteBoardGameFromFavorite(game);
+
+            Assert.Equal(expectedCount, _mockFavoriteGames.Count);
         }
 
         [Fact]
@@ -252,10 +322,38 @@ namespace BusinessLogicTests
             var expectedCount = 1;
             var game = new BoardGame("1") { ID = 1 };
 
-            var events = _service.GetEventsByGame(game);
+            var events = _boardGameService.GetEventsByGame(game);
 
             Assert.Equal(expectedCount, events.Count);
             Assert.Equal("First", events.First().Title);
+        }
+
+        [Fact]
+        public void AddBoardGameToEventTest()
+        {
+            var expectedCount = _mockEventGames.Count + 1;
+
+            var game = _mockBoardGames.First();
+            var bgEvent = _mockBGEvents.Last();
+
+            _boardGameService.AddBoardGameToEvent(game, bgEvent);
+
+            Assert.Equal(expectedCount, _mockEventGames.Count);
+            Assert.NotNull(_mockEventGames.Find(x => x.BoardGameEventID == bgEvent.ID
+                                                  && x.BoardGameID == game.ID));
+        }
+
+        [Fact]
+        public void DeleteBoardGameFromEventTest()
+        {
+            var expectedCount = _mockEventGames.Count - 1;
+
+            var game = _mockBoardGames.First();
+            var bgEvent = _mockBGEvents.First();
+
+            _boardGameService.DeleteBoardGameFromEvent(game, bgEvent);
+
+            Assert.Equal(expectedCount, _mockEventGames.Count);
         }
     }
 }

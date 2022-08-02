@@ -26,7 +26,7 @@ namespace BusinessLogic.Services
         public UserService(IUserRepository userRepository, IEncryptionService encryptionService)
         {
             _userRepository = userRepository;
-            _curUser = _userRepository.GetDefauldUser();
+            _curUser = _userRepository.GetDefaultUser();
             _encryptionService = encryptionService;
         }
 
@@ -102,9 +102,6 @@ namespace BusinessLogic.Services
 
             if (!_encryptionService.ValidatePassword(tmpUser.Password, existingUser.Password))
                 throw new IncorrectUserPasswordException();
-
-            if (!_userRepository.ConnectUserToDataStore(existingUser))
-                throw new FailedConnectionToDataStoreException();
 
             SetCurrentUser(existingUser);
         }

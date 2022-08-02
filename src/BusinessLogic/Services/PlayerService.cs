@@ -12,11 +12,10 @@ namespace BusinessLogic.Services
         void DeletePlayer(Player player);
         Player? GetPlayerByID(long id);
         Player? GetPlayerByName(string name);
+        long GetCurrentPlayerID();
         void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
         void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
         List<BoardGameEvent> GetCurrentPlayerEvents();
-        void AddBoardGameToFavorite(BoardGame boardGame);
-        void DeleteBoardGameFromFavorite(BoardGame boardGame);
         List<BoardGame> GetCurrentPlayerFavorites();
     }
 
@@ -82,7 +81,7 @@ namespace BusinessLogic.Services
             return _playerRepository.GetByName(name);
         }
 
-        private long GetCurrentPlayerID()
+        public long GetCurrentPlayerID()
         {
             long playerID = _userService.GetCurrentUserRoleID("player");
 
@@ -96,70 +95,26 @@ namespace BusinessLogic.Services
         {
             long playerID = GetCurrentPlayerID();
 
-            var curRegistation = new BGERegistration()
-            {
-                BoardGameEventID = bgEvent.ID,
-                PlayerID = playerID,
-            };
-
-            if (_playerRepository.GetRegistrationID(curRegistation) != -1)
+            if (_playerRepository.CheckPlayerRegistration(bgEvent.ID, playerID))
                 throw new AlreadyExistsPlayerRegistraionException();
 
-            _playerRepository.AddToEvent(curRegistation);
+            _playerRepository.AddToEvent(bgEvent.ID, playerID);
         }
 
         public void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent)
         {
             long playerID = GetCurrentPlayerID();
 
-            var curRegistation = new BGERegistration()
-            {
-                BoardGameEventID = bgEvent.ID,
-                PlayerID = playerID,
-            };
-
-            if (_playerRepository.GetRegistrationID(curRegistation) == -1)
+            if (!_playerRepository.CheckPlayerRegistration(bgEvent.ID, playerID))
                 throw new NotExistsPlayerRegistraionException();
 
-            _playerRepository.DeleteFromEvent(curRegistation);
+            _playerRepository.DeleteFromEvent(bgEvent.ID, playerID);
         }
 
         public List<BoardGameEvent> GetCurrentPlayerEvents()
         {
             long playerID = GetCurrentPlayerID();
             return _playerRepository.GetPlayerEvents(playerID);
-        }
-
-        public void AddBoardGameToFavorite(BoardGame boardGame)
-        {
-            long playerID = GetCurrentPlayerID();
-
-            var curFavorite = new FavoriteBoardGame()
-            {
-                BoardGameID = boardGame.ID,
-                PlayerID = playerID
-            };
-
-            if (_playerRepository.GetFavoriteID(curFavorite) != -1)
-                throw new AlreadyExistsPlayerFavoriteGameException();
-
-            _playerRepository.AddToPlayer(curFavorite);
-        }
-
-        public void DeleteBoardGameFromFavorite(BoardGame boardGame)
-        {
-            long playerID = GetCurrentPlayerID();
-
-            var curFavorite = new FavoriteBoardGame()
-            {
-                BoardGameID = boardGame.ID,
-                PlayerID = playerID
-            };
-
-            if (_playerRepository.GetFavoriteID(curFavorite) == -1)
-                throw new NotExistsPlayerFavoriteGameException();
-
-            _playerRepository.DeleteFromPlayer(curFavorite);
         }
 
         public List<BoardGame> GetCurrentPlayerFavorites()

@@ -32,7 +32,7 @@ namespace BusinessLogic.Models
         public long OrganizerID { get; set; }
         [ForeignKey("VenueID")]
         public long VenueID { get; set; }
-        public bool Deleted { get; set; }
+        public bool Deleted { get; set; } = false;
 
         public virtual Organizer Organizer { get; set; }
         public virtual Venue Venue { get; set; }
@@ -42,7 +42,6 @@ namespace BusinessLogic.Models
             Title = title;
             Date = date;
             State = BoardGameEventState.Planned;
-            Deleted = false;
         }
     }
 }

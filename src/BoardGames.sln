@@ -8,9 +8,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogicTests", "BusinessLogicTests\BusinessLogicTests.csproj", "{ECE3E0C6-5373-41BF-84E2-0232BF14089C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechnologicUI", "TechnologicUI\TechnologicUI.csproj", "{809D4060-4E05-4550-8924-01A063A6E534}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{ED29AF0D-EA71-4414-8D92-D2FC41DD419A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessTests", "DataAccessTests\DataAccessTests.csproj", "{FDD406EE-CDA4-4074-8D75-6AB5F511E8EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessTests", "DataAccessTests\DataAccessTests.csproj", "{FDD406EE-CDA4-4074-8D75-6AB5F511E8EB}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DataGeneration", "DataGeneration\DataGeneration.pyproj", "{8399343C-207F-4300-BA17-FC36C447E4C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +41,8 @@ Global
 		{FDD406EE-CDA4-4074-8D75-6AB5F511E8EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDD406EE-CDA4-4074-8D75-6AB5F511E8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDD406EE-CDA4-4074-8D75-6AB5F511E8EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8399343C-207F-4300-BA17-FC36C447E4C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8399343C-207F-4300-BA17-FC36C447E4C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

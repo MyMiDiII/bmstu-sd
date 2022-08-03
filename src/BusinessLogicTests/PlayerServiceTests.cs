@@ -57,7 +57,7 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 1,
-                    Produser = "Producer1",
+                    Producer = "Producer1",
                     Year = 2001,
                 }
             };

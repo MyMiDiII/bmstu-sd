@@ -29,7 +29,7 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 1,
-                    Produser = "Producer1",
+                    Producer = "Producer1",
                     Year = 2001,
                     MaxAge = 5,
                     MinAge = 0,
@@ -41,7 +41,7 @@ namespace BusinessLogicTests
                 new BoardGame("Title2")
                 {
                     ID = 2,
-                    Produser = "Producer2",
+                    Producer = "Producer2",
                     Year = 2011,
                     MaxAge = 99,
                     MinAge = 12,
@@ -53,7 +53,7 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 3,
-                    Produser = "Producer2",
+                    Producer = "Producer2",
                     Year = 2001,
                     MaxAge = 18,
                     MinAge = 12,
@@ -90,7 +90,7 @@ namespace BusinessLogicTests
                         .ForEach(x =>
                         {
                             x.Title = boardGame.Title;
-                            x.Produser = boardGame.Produser;
+                            x.Producer = boardGame.Producer;
                             x.Year = boardGame.Year;
                             x.MaxAge = boardGame.MaxAge;
                             x.MinAge = boardGame.MinAge;
@@ -179,7 +179,7 @@ namespace BusinessLogicTests
             var res = _boardGameService.GetBoardGames();
             var boardGame = new BoardGame("Пандемия")
             {
-                Produser = "Hobby World",
+                Producer = "Hobby World",
                 Year = 2014,
                 MaxAge = 99,
                 MinAge = 12,
@@ -204,7 +204,7 @@ namespace BusinessLogicTests
         {
             var boardGame = new BoardGame("Title1")
             {
-                Produser = "Producer1",
+                Producer = "Producer1",
                 Year = 2001,
             };
 
@@ -220,7 +220,7 @@ namespace BusinessLogicTests
             var boardGame = new BoardGame("Бункер")
             {
                 ID = 1,
-                Produser = "Экономикус",
+                Producer = "Экономикус",
                 Year = 2001,
                 MaxAge = 99,
                 MinAge = 18,
@@ -242,7 +242,7 @@ namespace BusinessLogicTests
             var newVal = res.Find(item => item.ID == boardGame.ID);
             Assert.Equal(newVal?.ID, boardGame.ID);
             Assert.Equal(newVal?.Title, boardGame.Title);
-            Assert.Equal(newVal?.Produser, boardGame.Produser);
+            Assert.Equal(newVal?.Producer, boardGame.Producer);
             Assert.Equal(newVal?.Year, boardGame.Year);
             Assert.Equal(newVal?.MinAge, boardGame.MinAge);
             Assert.Equal(newVal?.MaxAge, boardGame.MaxAge);

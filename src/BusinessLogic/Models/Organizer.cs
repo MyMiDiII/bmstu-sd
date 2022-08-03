@@ -13,13 +13,12 @@ namespace BusinessLogic.Models
         public string? Email { get; set; }
         public string? URL { get; set; }
         public string? PhoneNumber { get; set; }
-        public bool Deleted { get; set; }
+        public bool Deleted { get; set; } = false;
 
         public Organizer(string name, string address)
         {
             Name = name;
             Address = address;
-            Deleted = false;
         }
     }
 }

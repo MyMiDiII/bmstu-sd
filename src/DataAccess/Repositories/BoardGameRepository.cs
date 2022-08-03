@@ -74,8 +74,8 @@ namespace DataAccess.Repositories
         {
             return _dbcontext.Games
                    .Where(game => !game.Deleted
-                               && game.Produser != null
-                               && game.Produser.Contains(producer))
+                               && game.Producer != null
+                               && game.Producer.Contains(producer))
                    .ToList();
         }
 

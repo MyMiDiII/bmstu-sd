@@ -61,7 +61,7 @@ namespace BusinessLogic.Services
         {
              return _boardGameRepository.GetAll().Any(elem
                         => elem.Title == boardGame.Title
-                        && elem.Produser == boardGame.Produser
+                        && elem.Producer == boardGame.Producer
                         && elem.Year == boardGame.Year);
         }
 

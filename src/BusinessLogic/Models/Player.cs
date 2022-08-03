@@ -8,14 +8,13 @@ namespace BusinessLogic.Models
         public string Name { get; set; }
         public string League { get; set; }
         public uint Rating { get; set; }
-        public bool Deleted { get; set; }
+        public bool Deleted { get; set; } = false;
 
         public Player(string name)
         {
             Name = name;
             League = PlayerConfig.Leagues.First();
             Rating = 0;
-            Deleted = false;
         }
     }
 }

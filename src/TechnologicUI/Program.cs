@@ -5,6 +5,9 @@ using Blazorise.Icons.FontAwesome;
 using Microsoft.EntityFrameworkCore;
 
 using DataAccess;
+using BusinessLogic.Services;
+using BusinessLogic.IRepositories;
+using DataAccess.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,16 @@ builder.Services
     })
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
+
+// maybe scoped???
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IBoardGameService, BoardGameService>();
+builder.Services.AddTransient<IPlayerService, PlayerService>();
+builder.Services.AddTransient<IEncryptionService, BCryptEntryptionService>();
+
+builder.Services.AddTransient<IBoardGameRepository, BoardGameRepository>();
+builder.Services.AddTransient<IPlayerRepository, PlayerRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 
 builder.Configuration.AddJsonFile("dbsettings.json");
 builder.Services.AddDbContext<BGEContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

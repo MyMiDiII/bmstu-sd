@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Blazorise.Bootstrap" Version="1.0.6" />
     <PackageReference Include="Blazorise.Components" Version="1.0.6" />
+    <PackageReference Include="Blazorise.DataGrid" Version="1.0.6" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.7">
       <PrivateAssets>all</PrivateAssets>
@@ -26,6 +27,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="FrontendData\" />
   </ItemGroup>
 
 </Project>

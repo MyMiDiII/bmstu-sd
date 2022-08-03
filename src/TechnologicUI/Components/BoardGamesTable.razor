@@ -1,0 +1,21 @@
+﻿@using BusinessLogic.Models
+
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
+
+<DataGrid TItem="BoardGame"
+          Data="@games"
+          ShowPager
+          >
+    <DataGridCommandColumn />
+    <DataGridColumn Field="@nameof(BoardGame.Title)" Caption="Название" Editable />
+    <DataGridColumn Field="@nameof(BoardGame.Producer)" Caption="Производитель" Editable />
+</DataGrid>
+
+@code {
+    public List<BoardGame> games = new List<BoardGame>();
+
+    protected override void OnInitialized()
+    {
+        games = BoardGameService.GetBoardGames();
+    }
+}

@@ -5,10 +5,70 @@
 <DataGrid TItem="BoardGame"
           Data="@games"
           ShowPager
+          Striped
+          PageSize="6"
           >
-    <DataGridCommandColumn />
-    <DataGridColumn Field="@nameof(BoardGame.Title)" Caption="Название" Editable />
-    <DataGridColumn Field="@nameof(BoardGame.Producer)" Caption="Производитель" Editable />
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(BoardGame.Title)" Caption="Название" Editable />
+        <DataGridColumn Field="@nameof(BoardGame.Producer)" Caption="Производитель" Editable />
+        <DataGridColumn Field="@nameof(BoardGame.Year)" Caption="Год" Editable />
+        <DataGridColumn Caption="Возраст">
+            <DisplayTemplate>
+                @{
+                    var game = context as BoardGame;
+
+                    if (game?.MaxAge != 150)
+                    {
+                        @($"{game?.MinAge}-{game?.MaxAge}")
+                    }
+                    else
+                    {
+                        @($"{game?.MinAge}+")
+                    }
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Caption="Количество игроков">
+            <DisplayTemplate>
+                @{
+                    var game = context as BoardGame;
+
+                    if (game?.MaxPlayerNum == game?.MinPlayerNum)
+                    {
+                        @($"{game?.MaxPlayerNum}")
+                    }
+                    else if (game?.MaxPlayerNum == 100)
+                    {
+                        @($"{game?.MinPlayerNum}+")
+                    }
+                    else
+                    {
+                        @($"{game?.MinPlayerNum}-{game?.MaxPlayerNum}")
+                    }
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Caption="Длительность партии">
+            <DisplayTemplate>
+                @{
+                    var game = context as BoardGame;
+
+                    if (game?.MaxDuration == game?.MinDuration)
+                    {
+                        @($"{game?.MaxDuration}")
+                    }
+                    else if (game?.MaxDuration == 1440)
+                    {
+                        @($"{game?.MinDuration}+")
+                    }
+                    else
+                    {
+                        @($"{game?.MinDuration}-{game?.MaxDuration}")
+                    }
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
 </DataGrid>
 
 @code {

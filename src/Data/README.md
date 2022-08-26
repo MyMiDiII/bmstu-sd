@@ -1,7 +1,7 @@
 ﻿# Источники данных
 
 Информация о настольных играх, собранная в файле [games.csv](games.csv),
-получена автоматизированными средствами ([BoardGamesGen.py](../DataGeneration/BoardGAmesGen.py))
+получена автоматизированными средствами ([BoardGamesGen.py](../DataGeneration/BoardGamesGen.py))
 с сайта [GaGa.ru](https://gaga.ru/nastolnie-igri/).
 
 На момент копирования (26.08.2022):

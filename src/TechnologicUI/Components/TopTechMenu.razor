@@ -1,4 +1,8 @@
-﻿<Bar Breakpoint="Breakpoint.Desktop"
+﻿@using BusinessLogic.Models
+
+@inject BusinessLogic.Services.IUserService UserService
+
+<Bar Breakpoint="Breakpoint.Desktop"
      Background="Background.Primary"
      ThemeContrast="ThemeContrast.Light">
     <BarIcon IconName="customIcon" />
@@ -13,11 +17,10 @@
     <BarMenu>
         <BarStart>
             <BarItem>
-                <SelectList TItem="string"
+                <SelectList TItem="User"
                             TValue="string"
-                            TextField="@((item)=>item)"
-                            SelectedValue="@curRole"
-                            Data="@roles" />
+                            TextField="@((item)=>item.Name)"
+                            Data="@users" />
             </BarItem>
         </BarStart>
         <BarEnd>
@@ -30,8 +33,14 @@
 </Bar>
 
 @code {
-    RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" />;
+    RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" /> ;
 
-    static List<string> roles = new List<string> { "Гость", "Игрок", "Организатор", "Администратор" };
-    string curRole = roles.First();
+    List<User> users = new List<User>();
+    User? curUser;
+
+    protected override void OnInitialized()
+    {
+        users = UserService.GetUsers();
+        curUser = users.First();
+    }
 }

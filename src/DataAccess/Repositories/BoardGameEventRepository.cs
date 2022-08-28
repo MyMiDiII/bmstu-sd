@@ -98,13 +98,6 @@ namespace DataAccess.Repositories
                    .ToList();
         }
 
-        public List<BoardGameEvent> GetByRegistration(TimeOnly time)
-        {
-            return _dbcontext.Events
-                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.RegistrationTime <= time)
-                   .ToList();
-        }
-
         public List<BoardGameEvent> GetByPurchase(bool purchase)
         {
             return _dbcontext.Events

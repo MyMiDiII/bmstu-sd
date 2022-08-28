@@ -26,7 +26,8 @@ namespace BusinessLogic.Models
         public uint Duration { get; set; }
         public uint Cost { get; set; }
         public bool Purchase { get; set; }
-        public TimeOnly RegistrationTime { get; set; }
+        public DateTime BeginRegistration { get; set; }
+        public DateTime EndRegistration { get; set; }
         public BoardGameEventState State { get; set; }
         [ForeignKey("OrganizerID")]
         public long OrganizerID { get; set; }

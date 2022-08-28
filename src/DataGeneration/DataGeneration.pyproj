@@ -23,6 +23,8 @@
   <ItemGroup>
     <Compile Include="BoardGamesGen.py" />
     <Compile Include="DataGeneration.py" />
+    <Compile Include="OrganizersGen.py" />
+    <Compile Include="VenuesGen.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopyToDB.sql" />

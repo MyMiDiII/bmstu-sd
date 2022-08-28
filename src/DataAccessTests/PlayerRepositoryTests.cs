@@ -32,13 +32,20 @@ namespace DataAccessTests
 
             context.Games.AddRange(new BoardGame("Игра") { Year = 2002, MinAge = 0, MaxAge = 10 },
                                    new BoardGame("Game") { Year = 2001, MinAge = 5, MaxAge = 12 });
-            context.Events.AddRange(new BoardGameEvent("Yay!", new DateOnly(2022, 7, 5)),
-                                    new BoardGameEvent("No!", new DateOnly(2022, 7, 7)));
             context.Players.AddRange(new Player("MyMiDi") { League = "Бывалый", Rating = 1 },
                                      new Player("???") { League = "Просто зашел", Rating = 10} );
+            context.Organizers.AddRange(new Organizer("O1", "Москва"));
+            context.Venues.AddRange(new Venue("V1", "кафе", "Москва"));
+            context.SaveChanges();
+
+            context.Events.AddRange(new BoardGameEvent("Yay!", new DateOnly(2022, 7, 5))
+                                                        { OrganizerID = 1, VenueID = 1 },
+                                    new BoardGameEvent("No!", new DateOnly(2022, 7, 7))
+                                                       { OrganizerID = 1 , VenueID = 1 });
+            context.SaveChanges();
+
             context.Favorites.AddRange(new FavoriteBoardGame(1, 1), new FavoriteBoardGame(2, 2));
             context.Registrations.AddRange(new PlayerRegistration(1, 1), new PlayerRegistration(2, 2));
-
             context.SaveChanges();
         }
 

@@ -29,29 +29,37 @@ namespace DataAccessTests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
+            context.Organizers.AddRange(new Organizer("O1", "Москва"));
+            context.Venues.AddRange(new Venue("V1", "кафе", "Москва"));
             context.Games.AddRange(new BoardGame("Игра"),
                                    new BoardGame("Game"));
+            context.Players.AddRange(new Player("MyMiDi"), new Player("hamzreg"));
+            context.SaveChanges();
+
             context.Events.AddRange(
                 new BoardGameEvent("Yay!", new DateOnly(2022, 7, 5))
                 {
                     StartTime = new TimeOnly(19, 30),
                     Duration = 90,
                     Purchase = false,
-                    State = BoardGameEventState.Finished
+                    State = BoardGameEventState.Finished,
+                    OrganizerID = 1,
+                    VenueID = 1
                 },
                 new BoardGameEvent("No!", new DateOnly(2022, 7, 7))
                 {
                     StartTime = new TimeOnly(11, 00),
                     Duration = 300,
                     Purchase = true,
-                    State = BoardGameEventState.Cancelled
+                    State = BoardGameEventState.Cancelled,
+                    OrganizerID = 1,
+                    VenueID = 1
                 }
             );
+            context.SaveChanges();
+
             context.EventGameRelations.AddRange(new EventGame(1, 1), new EventGame(2, 2));
-
-            context.Players.AddRange(new Player("MyMiDi"), new Player("hamzreg"));
             context.Registrations.AddRange(new PlayerRegistration(2, 1), new PlayerRegistration(1, 2));
-
             context.SaveChanges();
         }
 
@@ -103,7 +111,8 @@ namespace DataAccessTests
         {
             var context = CreateContext();
             var rep = CreateBoardGameEventRepository(context);
-            var bgEvent = new BoardGameEvent("Играй!", new DateOnly(2022, 7, 9));
+            var bgEvent = new BoardGameEvent("Играй!", new DateOnly(2022, 7, 9))
+                                            { OrganizerID = 1, VenueID = 1 };
 
             rep.Add(bgEvent);
 
@@ -120,7 +129,8 @@ namespace DataAccessTests
         {
             var context = CreateContext();
             var rep = CreateBoardGameEventRepository(context);
-            var bgEvent = new BoardGameEvent("Играй!", new DateOnly(2022, 7, 9)) { ID = 2 };
+            var bgEvent = new BoardGameEvent("Играй!", new DateOnly(2022, 7, 9))
+                                             { ID = 2, OrganizerID = 1, VenueID = 1 };
 
             rep.Update(bgEvent);
 

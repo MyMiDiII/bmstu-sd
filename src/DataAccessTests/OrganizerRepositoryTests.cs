@@ -30,8 +30,11 @@ namespace DataAccessTests
             context.Database.EnsureCreated();
 
             context.Organizers.AddRange(new Organizer("O1", "Москва"));
-            context.Events.AddRange(new BoardGameEvent("Yay!", new DateOnly(2022, 7, 5)) { OrganizerID = 1 });
+            context.Venues.AddRange(new Venue("V1", "кафе", "Москва"));
+            context.SaveChanges();
 
+            context.Events.AddRange(new BoardGameEvent("Yay!", new DateOnly(2022, 7, 5))
+                                                       { OrganizerID = 1, VenueID = 1 });
             context.SaveChanges();
         }
 

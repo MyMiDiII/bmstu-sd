@@ -4,9 +4,6 @@ import random
 from faker import Faker
 from faker_e164.providers import E164Provider
 
-import mimesis as ms
-from mimesis.locales import Locale
-
 DATADIR       = '..\\Data\\'
 EXT           = '.csv'
 VENFILE       = DATADIR + 'venues' + EXT

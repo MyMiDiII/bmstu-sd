@@ -1,0 +1,34 @@
+﻿@using BusinessLogic.Models
+
+@inject BusinessLogic.Services.IOrganizerService OrganizerService
+
+<DataGrid TItem="Organizer"
+          Data="@organizers"
+          ShowPager
+          Striped
+          PageSize="6"
+          >
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(Organizer.Name)" Caption="Название" Editable />
+        <DataGridColumn Field="@nameof(Organizer.Address)" Caption="Адрес" Editable />
+        <DataGridColumn Caption="Контакты">
+            <DisplayTemplate>
+                @{ var org = context as Organizer; }
+                @org?.Email
+                <br />
+                <Link To="@org?.URL">@org?.URL</Link>
+                <br />
+                @org?.PhoneNumber
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+</DataGrid>
+
+@code {
+    public List<Organizer> organizers = new List<Organizer>();
+
+    protected override void OnInitialized()
+    {
+        organizers = OrganizerService.GetOrganizers();
+    }
+}

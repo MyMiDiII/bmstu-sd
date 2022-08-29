@@ -8,6 +8,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogicTests", "BusinessLogicTests\BusinessLogicTests.csproj", "{ECE3E0C6-5373-41BF-84E2-0232BF14089C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechnologicUI", "TechnologicUI\TechnologicUI.csproj", "{809D4060-4E05-4550-8924-01A063A6E534}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89562F50-72B4-45DD-B24E-1178244401EB} = {89562F50-72B4-45DD-B24E-1178244401EB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{ED29AF0D-EA71-4414-8D92-D2FC41DD419A}"
 EndProject

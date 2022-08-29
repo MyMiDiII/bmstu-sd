@@ -13,7 +13,7 @@ def fakerGenOrganizers(faker):
     with open(ORGFILE, "w", newline='') as file:
         writer = csv.writer(file, delimiter=',')
 
-        for i in range(ROWNUM):
+        for _ in range(ROWNUM):
 
             writer.writerow(
                 [

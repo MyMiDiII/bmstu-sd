@@ -25,6 +25,10 @@
     <Compile Include="BoardGamesGen.py" />
     <Compile Include="DataGeneration.py" />
     <Compile Include="OrganizersGen.py" />
+    <Compile Include="PlayersGen.py" />
+    <Compile Include="RelationsGen.py" />
+    <Compile Include="RolesGen.py" />
+    <Compile Include="UsersGen.py" />
     <Compile Include="VenuesGen.py" />
   </ItemGroup>
   <ItemGroup>

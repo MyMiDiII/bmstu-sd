@@ -51,7 +51,7 @@ def fakerGenEvents(faker):
                     faker.sentence(nb_words=3)[:-1],
                     eventDateTime.date(),
                     eventDateTime.time(),
-                    random.randint(3, 144) * 5,
+                    duration,
                     random.randint(0, 1000),
                     bool(random.randint(0, 1)),
                     beginRegDateTime,

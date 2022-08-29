@@ -18,7 +18,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{85A0FF87-EED6-41C3-A0D5-DEEF27A2F2FD}"
 	ProjectSection(SolutionItems) = preProject
 		Data\games.csv = Data\games.csv
+		Data\organizers.csv = Data\organizers.csv
 		Data\README.md = Data\README.md
+		Data\venues.csv = Data\venues.csv
 	EndProjectSection
 EndProject
 Global

@@ -21,6 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BGEventsGen.py" />
     <Compile Include="BoardGamesGen.py" />
     <Compile Include="DataGeneration.py" />
     <Compile Include="OrganizersGen.py" />

@@ -41,5 +41,3 @@ def generate_organizers(locale):
 if __name__ == "__main__":
     generate_organizers("ru");
 
-
-

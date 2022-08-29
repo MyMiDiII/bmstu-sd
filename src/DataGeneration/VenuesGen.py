@@ -51,10 +51,3 @@ def generate_venues(locale):
 
 if __name__ == "__main__":
     generate_venues("ru");
-
-
-
-
-
-
-

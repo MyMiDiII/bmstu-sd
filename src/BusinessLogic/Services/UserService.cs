@@ -12,6 +12,7 @@ namespace BusinessLogic.Services
         void DeleteUser(User user);
         long GetCurrentUserID();
         User GetCurrentUser();
+        User? GetUserByID(long id);
         long GetCurrentUserRoleID(string role);
         void Login(LoginRequest loginRequest);
         void Register(RegisterRequest registerRequest);
@@ -38,6 +39,11 @@ namespace BusinessLogic.Services
         public User GetCurrentUser()
         {
             return _curUser;
+        }
+
+        public User? GetUserByID(long id)
+        {
+            return _userRepository.GetByID(id);
         }
 
         public long GetCurrentUserRoleID(string roleName)

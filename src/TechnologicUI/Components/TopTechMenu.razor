@@ -18,8 +18,9 @@
         <BarStart>
             <BarItem>
                 <SelectList TItem="User"
-                            TValue="string"
+                            TValue="User"
                             TextField="@((item)=>item.Name)"
+                            SelectedValue="@curUser"
                             Data="@users" />
             </BarItem>
         </BarStart>
@@ -40,7 +41,10 @@
 
     protected override void OnInitialized()
     {
-        users = UserService.GetUsers();
+        for (int i = 1; i <= 4; ++i)
+        {
+            users.Add(UserService.GetUserByID(i) ?? new User("", ""));
+        }
         curUser = users.First();
     }
 }

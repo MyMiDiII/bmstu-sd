@@ -26,11 +26,13 @@ builder.Services
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBoardGameService, BoardGameService>();
 builder.Services.AddTransient<IOrganizerService, OrganizerService>();
+builder.Services.AddTransient<IVenueService, VenueService>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<IEncryptionService, BCryptEntryptionService>();
 
 builder.Services.AddTransient<IBoardGameRepository, BoardGameRepository>();
 builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
+builder.Services.AddTransient<IVenueRepository, VenueRepository>();
 builder.Services.AddTransient<IPlayerRepository, PlayerRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 

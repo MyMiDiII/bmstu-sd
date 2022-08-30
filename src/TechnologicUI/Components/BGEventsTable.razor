@@ -1,0 +1,118 @@
+﻿@using BusinessLogic.Models
+
+@inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService 
+
+<DataGrid TItem="BoardGameEvent"
+          Data="@BGevents"
+          PageSize="6"
+          ShowPager
+          Sortable
+          Striped
+          >
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(BoardGameEvent.Title)" Caption="Название" Editable />
+        <DataGridColumn Field="@nameof(BoardGameEvent.Date)" Caption="Дата" Editable />
+        <DataGridColumn Caption="Начало">
+            <DisplayTemplate>
+                @{
+                    var bgEvent = context as BoardGameEvent;
+                    var strTime = bgEvent?.StartTime.ToString("HH:mm");
+                }
+                @strTime
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Caption="Продолжительность">
+           <DisplayTemplate>
+                @{
+                    var duration = (context as BoardGameEvent)?.Duration;
+
+                    var hours = duration / 60;
+                    var minutes = duration % 60;
+
+                    if (hours != 0)
+                    {
+                        if (minutes != 0)
+                        {
+                            @($"{hours} ч. {minutes} мин.")
+                        }
+                        else
+                        {
+                            @($"{hours} ч.")
+                        }
+                    }
+                    else
+                    {
+                        @($"{minutes} мин.")
+                    }
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="@nameof(BoardGameEvent.Cost)" Caption="Стоимость" DisplayFormat="{0:C0}" Editable />
+        <DataGridColumn Caption="Покупки игр" Editable>
+           <DisplayTemplate>
+                @{
+                    var purchase = (context as BoardGameEvent)?.Purchase ?? false;
+                    var strPurchase = purchase ? "Есть" : "Нет";
+                }
+                @strPurchase
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="@nameof(BoardGameEvent.State)" Caption="Статус" Editable Sortable>
+           <DisplayTemplate>
+                @{
+                    var state = (context as BoardGameEvent)?.State ?? BoardGameEventState.Cancelled;
+
+                    switch (state)
+                    {
+                        case BoardGameEventState.Planned:
+                            <Badge Color="Color.Warning">Запланирована</Badge>
+                            break;
+                        case BoardGameEventState.Registration:
+                            <Badge Color="Color.Success">Регистрация</Badge>
+                            break;
+                        case BoardGameEventState.Ready:
+                            <Badge Color="Color.Info">Скоро начнется</Badge>
+                            break;
+                        case BoardGameEventState.Started:
+                            <Badge Color="Color.Secondary">Идет</Badge>
+                            break;
+                        case BoardGameEventState.Finished:
+                            <Badge Color="Color.Dark">Проведена</Badge>
+                            break;
+                        case BoardGameEventState.Cancelled:
+                            <Badge Color="Color.Danger">Отменена</Badge>
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+    <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
+    <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
+    <LastPageButtonTemplate><Icon Name="IconName.Forward" /></LastPageButtonTemplate>
+    <FirstPageButtonTemplate><Icon Name="IconName.Backward" /></FirstPageButtonTemplate>
+    <TotalItemsTemplate><Badge Color="Color.Primary">Всего @context.TotalItems игротек</Badge></TotalItemsTemplate>
+</DataGrid>
+
+<CardBody Flex="Flex.JustifyContent.Around">
+    <Badge Color="Color.Warning">Запланирована</Badge>
+    <Badge />
+    <Badge Color="Color.Success">Регистрация</Badge>
+    <Badge Color="Color.Info">Скоро начнется</Badge>
+    <Badge Color="Color.Secondary">Идет</Badge>
+    <Badge Color="Color.Dark">Проведена</Badge>
+    <Badge Color="Color.Danger">Отменена</Badge>
+</CardBody>
+
+@code {
+    public List<BoardGameEvent> BGevents = new List<BoardGameEvent>();
+    public int? eventNum;
+
+    protected override void OnInitialized()
+    {
+        BGevents = BoardGameEventService.GetBoardGameEvents();
+        eventNum = (int)BoardGameEventService.GetBoardGameEventsNum();
+    }
+}

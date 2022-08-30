@@ -15,7 +15,7 @@ BGEFILE       = DATADIR + 'events' + EXT
 ROWNUM = 1000
 
 class BGEstate(IntEnum):
-    Planned = auto()
+    Planned = 0
     Registration = auto()
     Ready = auto()
     Started = auto()

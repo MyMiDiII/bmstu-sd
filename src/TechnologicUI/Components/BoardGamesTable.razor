@@ -3,13 +3,22 @@
 @inject BusinessLogic.Services.IBoardGameService BoardGameService
 
 <DataGrid TItem="BoardGame"
-          Data="@games"
+          Data="@Games"
           ShowPager
           Striped
           PageSize="6"
           >
     <DataGridColumns>
-        <DataGridColumn Field="@nameof(BoardGame.Title)" Caption="Название" Editable />
+        <DataGridColumn Caption="Название" Editable >
+            <DisplayTemplate>
+                @{
+                    var game = context as BoardGame;
+                    var link = "/game/" + game?.ID.ToString();
+                    var title = game?.Title;
+                }
+                <Link To="@link" TextColor="TextColor.Dark">@title</Link>
+            </DisplayTemplate>
+        </DataGridColumn>
         <DataGridColumn Field="@nameof(BoardGame.Producer)" Caption="Производитель" Editable />
         <DataGridColumn Field="@nameof(BoardGame.Year)" Caption="Год" Editable />
         <DataGridColumn Caption="Возраст">
@@ -78,5 +87,5 @@
 
 @code {
     [Parameter]
-    public List<BoardGame> games { get; set; } = new List<BoardGame>();
+    public List<BoardGame> Games { get; set; } = new List<BoardGame>();
 }

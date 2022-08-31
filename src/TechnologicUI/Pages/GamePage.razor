@@ -1,0 +1,33 @@
+﻿@page "/game"
+@page "/game/{gameID:long}"
+
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
+
+<CardBody>
+    @if (Game is null)
+    {
+        <h1>Такой игры не существует</h1>
+    }
+    else
+    {
+        <h1>Настольная игра "@Game.Title"</h1>
+
+        <h3>Где можно поиграть</h3>
+        <BGEventsTable Events="@events"/>
+    }
+</CardBody>
+
+@code {
+    [Parameter]
+    public long gameID { get; set; } = 0;
+    public BoardGame? Game;
+    private List<BoardGameEvent> events = new List<BoardGameEvent>();
+
+    protected override void OnInitialized()
+    {
+        Game = BoardGameService.GetBoardGameByID(gameID);
+        if (Game is not null)
+            events = BoardGameService.GetEventsByGame(Game);
+        base.OnInitialized();
+    }
+}

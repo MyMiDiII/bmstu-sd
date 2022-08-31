@@ -1,9 +1,20 @@
 ﻿@page "/games"
 
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
+
 <PageTitle>Игры</PageTitle>
 
 <CardBody>
     <h2>Игры</h2>
-    <BoardGamesTable/>
+    <BoardGamesTable Games="@games"/>
 </CardBody>
 
+@code {
+    private List<BoardGame> games = new List<BoardGame>();
+
+    protected override void OnInitialized()
+    {
+        games = BoardGameService.GetBoardGames();
+        base.OnInitialized();
+    }
+}

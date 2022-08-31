@@ -7,7 +7,7 @@
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService 
 
 <DataGrid TItem="BoardGameEvent"
-          Data="@BGevents"
+          Data="@Events"
           PageSize="6"
           ShowPager
           Sortable
@@ -124,13 +124,6 @@
 @code {
     [Parameter]
     public bool ColorHint { get; set; } = false;
-
-    public List<BoardGameEvent> BGevents = new List<BoardGameEvent>();
-    public int? eventNum;
-
-    protected override void OnInitialized()
-    {
-        BGevents = BoardGameEventService.GetBoardGameEvents();
-        //eventNum = (int)BoardGameEventService.GetBoardGameEventsNum();
-    }
+    [Parameter]
+    public List<BoardGameEvent> Events { get; set; } = new List<BoardGameEvent>();
 }

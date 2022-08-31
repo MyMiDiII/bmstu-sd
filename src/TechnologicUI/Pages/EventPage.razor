@@ -1,7 +1,6 @@
 ﻿@page "/event"
 @page "/event/{eventID:long}"
 
-@using BusinessLogic.Models
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
 
 <CardBody>
@@ -14,7 +13,7 @@
         <h1>Игротека "@Event.Title"</h1>
 
         <h3>Игры, в которые здесь играют</h3>
-        <BoardGamesTable games="@games"/>
+        <BoardGamesTable Games="@games"/>
     }
 </CardBody>
 

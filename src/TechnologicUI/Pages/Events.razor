@@ -1,9 +1,21 @@
-﻿@page "/allevents"
+﻿@page "/events"
+
+@inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
 
 <PageTitle>Игротеки</PageTitle>
 
 <CardBody>
     <h2>Игротеки</h2>
-    <BGEventsTable />
+    <BGEventsTable Events="@events"/>
 </CardBody>
+
+@code {
+    private List<BoardGameEvent> events = new List<BoardGameEvent>();
+
+    protected override void OnInitialized()
+    {
+        events = BoardGameEventService.GetBoardGameEvents();
+        base.OnInitialized();
+    }
+}
 

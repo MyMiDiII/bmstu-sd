@@ -6,6 +6,7 @@ namespace BusinessLogic.Services
 {
     public interface IBoardGameService
     {
+        BoardGame? GetBoardGameByID(long id);
         List<BoardGame> GetBoardGames();
         void CreateBoardGame(BoardGame boardGame);
         void UpdateBoardGame(BoardGame boardGame);
@@ -26,6 +27,11 @@ namespace BusinessLogic.Services
         {
             _boardGameRepository = boardGameRepository;
             _playerService = playerService;
+        }
+
+        public BoardGame? GetBoardGameByID(long id)
+        {
+            return _boardGameRepository.GetByID(id);
         }
 
         public List<BoardGame> GetBoardGames()

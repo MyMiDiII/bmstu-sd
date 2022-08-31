@@ -1,5 +1,5 @@
 import csv
-import bcrypt
+from passlib.hash import bcrypt
 
 from faker import Faker
 
@@ -11,18 +11,31 @@ ROWNUM = 2000
 
 
 def fakerGenUsers(faker):
-    with open(PLAYERFILE, "a", newline='') as file:
+    with (open(PLAYERFILE, "w", newline='') as file,
+          open("passwords.csv", "w", newline='') as addfile):
         writer = csv.writer(file, delimiter=',')
-        writer.writerow(['admin', bcrypt.hashpw('admin'.encode('utf8'), bcrypt.gensalt())])
+        addwriter = csv.writer(addfile, delimiter=',')
+        writer.writerow(['guest', bcrypt.using(ident='2a').hash('guest'.encode('utf8'))])
+        writer.writerow(['admin', bcrypt.using(ident='2a').hash('admin'.encode('utf8'))])
+        writer.writerow(['player', bcrypt.using(ident='2a').hash('player'.encode('utf8'))])
+        writer.writerow(['organizer', bcrypt.using(ident='2a').hash('organizer'.encode('utf8'))])
+        addwriter.writerow(['guest', 'guest'])
+        addwriter.writerow(['admin', 'admin'])
+        addwriter.writerow(['player', 'player'])
+        addwriter.writerow(['organizer', 'organizer'])
 
-        #for _ in range(ROWNUM):
+        for i in range(ROWNUM):
+            print(i)
+            name = faker.user_name()
+            password = faker.password()
 
-        #    writer.writerow(
-        #        [
-        #            faker.user_name(),
-        #            bcrypt.hashpw(faker.password().encode('utf8'), bcrypt.gensalt()),
-        #        ]
-        #    )
+            addwriter.writerow([name, password])
+            writer.writerow(
+                [
+                    name,
+                    bcrypt.using(ident='2a').hash(password.encode('utf8'))
+                ]
+            )
 
 
 def generate_users(locale):

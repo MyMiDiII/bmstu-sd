@@ -12,10 +12,10 @@ def generate_data():
     #BGG.generate_boardgames()
     #OG.generate_organizers("ru")
     #VG.generate_venues("ru")
-    BGEG.generate_events("ru")
+    #BGEG.generate_events("ru")
     #PG.generate_players("en")
-    #UG.generate_users("en")
-    #RG.generate_roles()
+    UG.generate_users("en")
+    RG.generate_roles()
     #RLG.generate_relations()
 
 

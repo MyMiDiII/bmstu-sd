@@ -13,18 +13,16 @@ def generate_roles():
     with open(ROLEFILE, "w", newline='') as file:
         writer = csv.writer(file, delimiter=',')
 
-        writer.writerow(
-            [
-                "admin",
-                2,
-                0
-            ]
-        )
+        writer.writerow( [ "guest", 0, 1 ] )
+        writer.writerow( [ "admin", 0, 2 ] )
+        writer.writerow( [ "player", 1, 3 ] )
+        writer.writerow( [ "player", 2, 4 ] )
+        writer.writerow( [ "orginizer", 1, 4 ] )
 
-        usersIDs = list(range(3, 2003))
+        usersIDs = list(range(5, 2005))
         random.shuffle(usersIDs)
 
-        for i in range(PlayersGen.ROWNUM):
+        for i in range(3, PlayersGen.ROWNUM):
 
             writer.writerow(
                 [
@@ -36,7 +34,7 @@ def generate_roles():
 
         orgUsersIDs = random.sample(usersIDs, OrganizersGen.ROWNUM)
 
-        for i in range(OrganizersGen.ROWNUM):
+        for i in range(2, OrganizersGen.ROWNUM):
 
             writer.writerow(
                 [

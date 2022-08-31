@@ -5,6 +5,12 @@
         public string Name { get; set; }
         public string Password { get; set; }
 
+        public LoginRequest()
+        {
+            Name = "";
+            Password = "";
+        }
+
         public LoginRequest(string name, string password)
         {
             Name = name;

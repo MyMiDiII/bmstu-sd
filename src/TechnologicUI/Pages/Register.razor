@@ -1,0 +1,27 @@
+﻿@page "/register"
+
+@inject BusinessLogic.Services.IUserService UserService
+
+<Card Position="Position.Absolute.Top.Is50.Start.Is50.Translate.Middle">
+    <CardBody>
+        <Field>
+            <TextEdit @bind-Text="@registerRequest.Name" Placeholder="Имя пользователя" />
+        </Field>
+        <Field>
+            <TextEdit @bind-Text="@registerRequest.Password" Placeholder="Пароль" Role="TextRole.Password" />
+        </Field>
+@*        <Field>
+            <TextEdit @bind-Text="@registerRequest.Password" Placeholder="Подтверждение пароля" Role="TextRole.Password" />
+        </Field>
+*@        <Button Color="Color.Primary" Clicked="@OnRegisterClicked" Block>Регистрация</Button>
+    </CardBody>
+</Card>
+
+@code {
+    RegisterRequest registerRequest = new RegisterRequest();
+
+    void OnRegisterClicked()
+    {
+        UserService.Register(registerRequest);
+    }
+}

@@ -26,6 +26,8 @@ namespace BusinessLogic.Services
 
         public UserService(IUserRepository userRepository, IEncryptionService encryptionService)
         {
+            Console.WriteLine("new user service");
+
             _userRepository = userRepository;
             _curUser = _userRepository.GetDefaultUser();
             _encryptionService = encryptionService;

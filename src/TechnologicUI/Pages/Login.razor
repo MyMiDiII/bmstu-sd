@@ -1,0 +1,26 @@
+﻿@page "/login"
+
+@inject NavigationManager NavigationManager
+@inject BusinessLogic.Services.IUserService UserService
+
+<Card Position="Position.Absolute.Top.Is50.Start.Is50.Translate.Middle">
+    <CardBody>
+        <Field>
+            <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя" />
+        </Field>
+        <Field>
+            <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль" Role="TextRole.Password" />
+        </Field>
+        <Button Color="Color.Primary" Clicked="@OnLoginClicked" Block>Вход</Button>
+    </CardBody>
+</Card>
+
+@code {
+    LoginRequest loginRequest = new LoginRequest();
+
+    void OnLoginClicked()
+    {
+        UserService.Login(loginRequest);
+        NavigationManager.NavigateTo("events", true);
+    }
+}

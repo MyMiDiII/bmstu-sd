@@ -1,0 +1,34 @@
+﻿@page "/event"
+@page "/event/{eventID:long}"
+
+@using BusinessLogic.Models
+@inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
+
+<CardBody>
+    @if (Event is null)
+    {
+        <h1>Такой игротеки не существует</h1>
+    }
+    else
+    {
+        <h1>Игротека "@Event.Title"</h1>
+
+        <h3>Игры, в которые здесь играют</h3>
+        <BoardGamesTable games="@games"/>
+    }
+</CardBody>
+
+@code {
+    [Parameter]
+    public long eventID { get; set; } = 0;
+    public BoardGameEvent? Event;
+    private List<BoardGame> games = new List<BoardGame>();
+
+    protected override void OnInitialized()
+    {
+        Event = BoardGameEventService.GetBoardGameEventByID(eventID);
+        if (Event is not null)
+            games = BoardGameEventService.GetGamesByEvent(Event);
+        base.OnInitialized();
+    }
+}

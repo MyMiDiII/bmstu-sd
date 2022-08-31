@@ -69,13 +69,14 @@
             </DisplayTemplate>
         </DataGridColumn>
     </DataGridColumns>
+    <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
+    <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
+    <LastPageButtonTemplate><Icon Name="IconName.Forward" /></LastPageButtonTemplate>
+    <FirstPageButtonTemplate><Icon Name="IconName.Backward" /></FirstPageButtonTemplate>
+    <TotalItemsTemplate><Badge Color="Color.Primary">Всего @context.TotalItems игра</Badge></TotalItemsTemplate>
 </DataGrid>
 
 @code {
-    public List<BoardGame> games = new List<BoardGame>();
-
-    protected override void OnInitialized()
-    {
-        games = BoardGameService.GetBoardGames();
-    }
+    [Parameter]
+    public List<BoardGame> games { get; set; } = new List<BoardGame>();
 }

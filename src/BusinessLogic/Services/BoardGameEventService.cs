@@ -6,6 +6,7 @@ namespace BusinessLogic.Services
 {
     public interface IBoardGameEventService
     {
+        BoardGameEvent? GetBoardGameEventByID(long id);
         List<BoardGameEvent> GetBoardGameEvents();
         void CreateBoardGameEvent(BoardGameEvent boardGameEvent);
         void UpdateBoardGameEvent(BoardGameEvent boardGameEvent);
@@ -21,6 +22,11 @@ namespace BusinessLogic.Services
         public BoardGameEventService(IBoardGameEventRepository boardGameEventRepository)
         {
             _boardGameEventRepository = boardGameEventRepository;
+        }
+
+        public BoardGameEvent? GetBoardGameEventByID(long id)
+        {
+            return _boardGameEventRepository.GetByID(id);
         }
 
         public List<BoardGameEvent> GetBoardGameEvents()

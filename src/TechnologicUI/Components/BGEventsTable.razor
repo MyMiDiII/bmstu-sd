@@ -1,5 +1,9 @@
 ﻿@using BusinessLogic.Models
 
+@*@inject NavigationManager NavigationManager
+          RowDoubleClicked="@(() => NavigationManager.NavigateTo("/"))"
+*@
+
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService 
 
 <DataGrid TItem="BoardGameEvent"
@@ -10,7 +14,16 @@
           Striped
           >
     <DataGridColumns>
-        <DataGridColumn Field="@nameof(BoardGameEvent.Title)" Caption="Название" Editable />
+        <DataGridColumn Caption="Название" Editable >
+            <DisplayTemplate>
+                @{
+                    var bgEvent = context as BoardGameEvent;
+                    var link = "/event/" + bgEvent?.ID.ToString();
+                    var title = bgEvent?.Title;
+                }
+                <Link To="@link" TextColor="TextColor.Dark">@title</Link>
+            </DisplayTemplate>
+        </DataGridColumn>
         <DataGridColumn Field="@nameof(BoardGameEvent.Date)" Caption="Дата" Editable />
         <DataGridColumn Caption="Начало">
             <DisplayTemplate>
@@ -96,17 +109,22 @@
     <TotalItemsTemplate><Badge Color="Color.Primary">Всего @context.TotalItems игротек</Badge></TotalItemsTemplate>
 </DataGrid>
 
-<CardBody Flex="Flex.JustifyContent.Around">
-    <Badge Color="Color.Warning">Запланирована</Badge>
-    <Badge />
-    <Badge Color="Color.Success">Регистрация</Badge>
-    <Badge Color="Color.Info">Скоро начнется</Badge>
-    <Badge Color="Color.Secondary">Идет</Badge>
-    <Badge Color="Color.Dark">Проведена</Badge>
-    <Badge Color="Color.Danger">Отменена</Badge>
-</CardBody>
+@if (ColorHint)
+{
+    <CardBody Flex="Flex.JustifyContent.Around">
+        <Badge Color="Color.Warning">Запланирована</Badge>
+        <Badge Color="Color.Success">Регистрация</Badge>
+        <Badge Color="Color.Info">Скоро начнется</Badge>
+        <Badge Color="Color.Secondary">Идет</Badge>
+        <Badge Color="Color.Dark">Проведена</Badge>
+        <Badge Color="Color.Danger">Отменена</Badge>
+    </CardBody>
+}
 
 @code {
+    [Parameter]
+    public bool ColorHint { get; set; } = false;
+
     public List<BoardGameEvent> BGevents = new List<BoardGameEvent>();
     public int? eventNum;
 

@@ -3,24 +3,119 @@
 @inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
-<Card Position="Position.Absolute.Top.Is50.Start.Is50.Translate.Middle">
+<Card Position="Position.Absolute.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is25">
     <CardBody>
-        <Field>
-            <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя" />
-        </Field>
-        <Field>
-            <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль" Role="TextRole.Password" />
-        </Field>
+        <Validations @ref="@loginValidations" ValidateOnLoad=false>
+            <Validation @ref="@nameValidation" Validator="ValidateName">
+                <Field>
+                    <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя">
+                       <Feedback>
+                            <ValidationNone></ValidationNone>
+                            <ValidationSuccess></ValidationSuccess>
+                            <ValidationError>@nameErrMsg</ValidationError>
+                        </Feedback>
+                    </TextEdit>
+                </Field>
+            </Validation>
+            <Validation @ref="@passwordValidation" Validator="ValidatePassword">
+                <Field>
+                    <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль"
+                              Role="TextRole.Password">
+                       <Feedback>
+                            <ValidationNone></ValidationNone>
+                            <ValidationSuccess></ValidationSuccess>
+                            <ValidationError>@passwordErrMsg</ValidationError>
+                        </Feedback>
+                    </TextEdit>
+                </Field>
+            </Validation>
+        </Validations>
         <Button Color="Color.Primary" Clicked="@OnLoginClicked" Block>Вход</Button>
     </CardBody>
 </Card>
+<MessageAlert />
 
 @code {
     LoginRequest loginRequest = new LoginRequest();
 
-    void OnLoginClicked()
+    Validations? loginValidations;
+
+    Validation? nameValidation;
+    bool rightName = true;
+    string nameErrMsg = "";
+
+    Validation? passwordValidation;
+    bool rightPassword = true;
+    string passwordErrMsg = "";
+
+    async Task OnLoginClicked()
     {
-        UserService.Login(loginRequest);
-        NavigationManager.NavigateTo("events", true);
+        if ( await loginValidations.ValidateAll() )
+        {
+            try
+            {
+                UserService.Login(loginRequest);
+                NavigationManager.NavigateTo("events", true);
+                await loginValidations.ClearAll();
+            }
+            catch(NotExistsUserException)
+            {
+                rightName = false;
+                await loginValidations.ValidateAll();
+            }
+            catch(IncorrectUserPasswordException)
+            {
+                rightPassword = false;
+                await loginValidations.ValidateAll();
+            }
+        }
+    }
+
+    void ValidateName(ValidatorEventArgs e)
+    {
+        if (!rightName)
+        {
+            e.Status = ValidationStatus.Error;
+            nameErrMsg = "Пользователя с таким именем не существует";
+            rightName = true;
+        }
+        else
+        {
+            var name = Convert.ToString(e.Value);
+
+            if (string.IsNullOrEmpty(name))
+            {
+                e.Status = ValidationStatus.Error;
+                nameErrMsg = "Введите имя пользователя";
+            }
+            else
+            {
+                e.Status = ValidationStatus.Success;
+            }
+        }
+    }
+
+    void ValidatePassword(ValidatorEventArgs e)
+    {
+        if (!rightPassword)
+        {
+            e.Status = ValidationStatus.Error;
+            passwordErrMsg = "Неверный пароль";
+            rightPassword = true;
+        }
+        else
+        {
+            var password = Convert.ToString(e.Value);
+
+            if (string.IsNullOrEmpty(password))
+            {
+                e.Status = ValidationStatus.Error;
+                passwordErrMsg = "Введите пароль";
+            }
+            else
+            {
+                e.Status = ValidationStatus.Success;
+            }
+        }
     }
 }

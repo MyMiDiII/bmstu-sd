@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\**" />
-    <Content Remove="Data\**" />
-    <EmbeddedResource Remove="Data\**" />
-    <None Remove="Data\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Blazorise.Bootstrap" Version="1.0.6" />
     <PackageReference Include="Blazorise.Components" Version="1.0.6" />
     <PackageReference Include="Blazorise.DataGrid" Version="1.0.6" />
@@ -27,10 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="FrontendData\" />
   </ItemGroup>
 
 </Project>

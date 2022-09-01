@@ -1,9 +1,7 @@
-﻿@using BusinessLogic.Models
+﻿@inject BusinessLogic.Services.IBoardGameService BoardGameService
 
-@inject BusinessLogic.Services.IBoardGameService BoardGameService
-
-<DataGrid TItem="BoardGame"
-          Data="@Games"
+<DataGrid TItem="BoardGameView"
+          Data="@viewGames"
           ShowPager
           Striped
           PageSize="6"
@@ -12,71 +10,18 @@
         <DataGridColumn Caption="Название" Editable >
             <DisplayTemplate>
                 @{
-                    var game = context as BoardGame;
+                    var game = context as BoardGameView;
                     var link = "/game/" + game?.ID.ToString();
                     var title = game?.Title;
                 }
                 <Link To="@link" TextColor="TextColor.Dark">@title</Link>
             </DisplayTemplate>
         </DataGridColumn>
-        <DataGridColumn Field="@nameof(BoardGame.Producer)" Caption="Производитель" Editable />
-        <DataGridColumn Field="@nameof(BoardGame.Year)" Caption="Год" Editable />
-        <DataGridColumn Caption="Возраст">
-            <DisplayTemplate>
-                @{
-                    var game = context as BoardGame;
-
-                    if (game?.MaxAge != 150)
-                    {
-                        @($"{game?.MinAge}-{game?.MaxAge}")
-                    }
-                    else
-                    {
-                        @($"{game?.MinAge}+")
-                    }
-                }
-            </DisplayTemplate>
-        </DataGridColumn>
-        <DataGridColumn Caption="Количество игроков">
-            <DisplayTemplate>
-                @{
-                    var game = context as BoardGame;
-
-                    if (game?.MaxPlayerNum == game?.MinPlayerNum)
-                    {
-                        @($"{game?.MaxPlayerNum}")
-                    }
-                    else if (game?.MaxPlayerNum == 100)
-                    {
-                        @($"{game?.MinPlayerNum}+")
-                    }
-                    else
-                    {
-                        @($"{game?.MinPlayerNum}-{game?.MaxPlayerNum}")
-                    }
-                }
-            </DisplayTemplate>
-        </DataGridColumn>
-        <DataGridColumn Caption="Длительность партии">
-            <DisplayTemplate>
-                @{
-                    var game = context as BoardGame;
-
-                    if (game?.MaxDuration == game?.MinDuration)
-                    {
-                        @($"{game?.MaxDuration}")
-                    }
-                    else if (game?.MaxDuration == 1440)
-                    {
-                        @($"{game?.MinDuration}+")
-                    }
-                    else
-                    {
-                        @($"{game?.MinDuration}-{game?.MaxDuration}")
-                    }
-                }
-            </DisplayTemplate>
-        </DataGridColumn>
+        <DataGridColumn Field="@nameof(BoardGameView.Producer)" Caption="Производитель" Editable />
+        <DataGridColumn Field="@nameof(BoardGameView.Year)" Caption="Год" Editable />
+        <DataGridColumn Field="@nameof(BoardGameView.AgeView)" Caption="Возраст" />
+        <DataGridColumn Field="@nameof(BoardGameView.PlayersView)" Caption="Количество игроков" />
+        <DataGridColumn Field="@nameof(BoardGameView.DurationView)" Caption="Длительность партии" />
     </DataGridColumns>
     <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
     <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
@@ -88,4 +33,15 @@
 @code {
     [Parameter]
     public List<BoardGame> Games { get; set; } = new List<BoardGame>();
+
+    private List<BoardGameView> viewGames = new List<BoardGameView>();
+
+    protected override void OnInitialized()
+    {
+        foreach(var game in Games)
+        {
+            viewGames.Add(new BoardGameView(game));
+        }
+        base.OnInitialized();
+    }
 }

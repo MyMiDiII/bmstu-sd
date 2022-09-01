@@ -83,8 +83,7 @@ namespace DataAccess.Repositories
 
         public User? GetByName(string name)
         {
-            return _dbcontext.Users
-                   .SingleOrDefault(user => user.Name.Contains(name));
+            return _dbcontext.Users.FirstOrDefault(user => user.Name == name);
         }
 
         public User GetDefaultUser()

@@ -13,6 +13,7 @@ namespace BusinessLogic.Services
         long GetCurrentUserID();
         User GetCurrentUser();
         User? GetUserByID(long id);
+        User? GetUserByName(string name);
         long GetCurrentUserRoleID(string role);
         void Login(LoginRequest loginRequest);
         void Register(RegisterRequest registerRequest);
@@ -46,6 +47,11 @@ namespace BusinessLogic.Services
         public User? GetUserByID(long id)
         {
             return _userRepository.GetByID(id);
+        }
+
+        public User? GetUserByName(string name)
+        {
+            return _userRepository.GetByName(name);
         }
 
         public long GetCurrentUserRoleID(string roleName)

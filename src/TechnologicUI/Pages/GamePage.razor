@@ -3,31 +3,76 @@
 
 @inject BusinessLogic.Services.IBoardGameService BoardGameService
 
-<CardBody>
-    @if (Game is null)
-    {
-        <h1>Такой игры не существует</h1>
+<style>
+    body {
+        background-color: #A3D4F5;
     }
-    else
-    {
-        <h1>Настольная игра "@Game.Title"</h1>
+</style>
 
-        <h3>Где можно поиграть</h3>
-        <BGEventsTable Events="@events"/>
-    }
-</CardBody>
+<Card Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is75">
+    <CardBody >
+        @if (Game is null)
+        {
+            <h1>Такой игры не существует</h1>
+        }
+        else
+        {
+            <h1>Настольная игра "@Game.Title"</h1>
+
+            <CardDeck>
+                <Card Shadow="Shadow.Small">
+                    <CardBody Flex="Flex.JustifyContent.Around">
+                        <Icon Name="IconName.Baby" IconSize="IconSize.x3"></Icon>
+                        <Card TextAlignment="TextAlignment.Center" Border="Border.Is0">
+                            <h1>@Game.AgeView</h1>
+                        </Card>
+                    </CardBody>
+                </Card>
+                <Card Shadow="Shadow.Small">
+                    <CardBody Flex="Flex.JustifyContent.Around">
+                        <Icon Name="IconName.UserFriends" IconSize="IconSize.x3"></Icon>
+                        <Card TextAlignment="TextAlignment.Center" Border="Border.Is0">
+                            <h1>@Game.PlayersView</h1>
+                        </Card>
+                    </CardBody>
+                </Card>
+                <Card Shadow="Shadow.Small">
+                    <CardBody Flex="Flex.JustifyContent.Around">
+                            <Icon Name="IconName.Hourglass" IconSize="IconSize.x3"></Icon>
+                        <Card TextAlignment="TextAlignment.Center" Border="Border.Is0">
+                            <h1>@Game.DurationView</h1>
+                        </Card>
+                    </CardBody>
+                </Card>
+            </CardDeck>
+            <p/>
+            <h3>Игротеки по этой игре</h3>
+            <BGEventsTable PageSize=2 Events="@events"/>
+
+            <LayoutFooter Position="Position.Absolute.Bottom.Is0">
+                @Game.Producer
+                @Game.Year
+            </LayoutFooter>
+        }
+    </CardBody>
+</Card>
 
 @code {
     [Parameter]
     public long gameID { get; set; } = 0;
-    public BoardGame? Game;
+    public BoardGameView? Game;
     private List<BoardGameEvent> events = new List<BoardGameEvent>();
 
     protected override void OnInitialized()
     {
-        Game = BoardGameService.GetBoardGameByID(gameID);
-        if (Game is not null)
-            events = BoardGameService.GetEventsByGame(Game);
+        var game = BoardGameService.GetBoardGameByID(gameID);
+
+        if (game is not null)
+        {
+            Game = new BoardGameView(game);
+            events = BoardGameService.GetEventsByGame(game);
+        }
+
         base.OnInitialized();
     }
 }

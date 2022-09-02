@@ -8,10 +8,11 @@
 
 <DataGrid TItem="EventView"
           Data="@viewEvents"
-          PageSize="6"
+          PageSize="@PageSize"
           ShowPager
           Sortable
           Striped
+          Responsive
           >
     <DataGridColumns>
         <DataGridColumn Caption="Название" Editable >
@@ -65,6 +66,8 @@
     public bool ColorHint { get; set; } = false;
     [Parameter]
     public List<BoardGameEvent> Events { get; set; } = new List<BoardGameEvent>();
+    [Parameter]
+    public int PageSize { get; set; } = 6;
 
     private List<EventView> viewEvents = new List<EventView>();
 

@@ -33,6 +33,8 @@
 @code {
     [Parameter]
     public List<BoardGame> Games { get; set; } = new List<BoardGame>();
+    [Parameter]
+    public int PageSize { get; set; } = 6;
 
     private List<BoardGameView> viewGames = new List<BoardGameView>();
 

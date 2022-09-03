@@ -1,33 +1,162 @@
 ﻿@page "/event"
 @page "/event/{eventID:long}"
 
+@*TODO: links to venue and organizer*@
+
+@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
 
-<CardBody>
-    @if (Event is null)
-    {
-        <h1>Такой игротеки не существует</h1>
+<style>
+    body {
+        background-color: #A3D4F5;
     }
-    else
-    {
-        <h1>Игротека "@Event.Title"</h1>
+    .card-pointer {
+        cursor: pointer;
+    }
+</style>
 
-        <h3>Игры, в которые здесь играют</h3>
-        <BoardGamesTable Games="@games"/>
-    }
-</CardBody>
+
+<Card Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is75">
+    <CardBody>
+        @if (Event is null)
+        {
+            <h1>Такой игротеки не существует</h1>
+        }
+        else
+        {
+            <Div Flex="Flex.JustifyContent.Between">
+                <h1>Игротека "@Event.Title"</h1>
+                <Card Border="Border.Is0">
+                    <Badge Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle"
+                           Color="@Event.StateColor" Pill>@Event.StateName</Badge>
+                </Card>
+            </Div>
+
+            @if (Event.Purchase)
+            {
+                <Div>
+                    <Badge Color="Color.Success">
+                        <Icon Name="IconName.Check"/>
+                    </Badge>
+                    На этой игротеке можно приобрести игры
+                </Div>
+            }
+
+            <p/>
+            <Row Border="Border.Is0" Style="height: 250px">
+                <Column ColumnSize="ColumnSize.Is3" Height="Height.Is100" Border="Border.Is1">
+                    <Div Flex="Flex.JustifyContent.Between">
+                        <h3>Регистрация</h3>
+                    </Div>
+                    <Div Position="Position.Absolute.Bottom.Is0.Translate.MiddleY">
+                        <Div>Начало:</Div>
+                        <Heading Size="HeadingSize.Is5">@Event.BeginRegistration</Heading>
+                        <Div>Конец:</Div>
+                        <Heading Size="HeadingSize.Is5">@Event.EndRegistration</Heading>
+                        <Div Flex="Flex.JustifyContent.Start.AlignItems.Center">
+                            Статус:
+                            <Card Margin="Margin.Is1" Border="Border.Is0">
+                                <Badge Color="@Event.RegisterColor" Pill>@Event.RegisterName</Badge>
+                            </Card>
+                        </Div>
+                    </Div>
+                    <Div Position="Position.Absolute.Bottom.Is0">
+                        <Button Color="Color.Primary" Size="Size.Medium">Зарегистрироваться</Button>
+                    </Div>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is4" Height="Height.Is100" Border="Border.Is1">
+                    <Row Flex="Flex.AlignContent.Start" Border="Border.Is1" Padding="Padding.Is0">
+                        <Card Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.CalendarDay" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.Date</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </Row>
+                    <Row Flex="Flex.AlignContent.Center" Border="Border.Is1" Padding="Padding.Is0">
+                        <Card Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.Clock" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.StartTimeView</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </Row>
+                    <Row Flex="Flex.AlignContent.End" Border="Border.Is1" Padding="Padding.Is0">
+                        <Card Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.Hourglass" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.DurationView</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </Row>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is5" Height="Height.Is100" Border="Border.Is1">
+                    <Row Height="Height.Is50" Flex="Flex.AlignContent.Start" Padding="Padding.Is0"
+                         Border="Border.Is1">
+                        <Card Flex="Flex.AlignContent.Start" @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
+                            <CardBody Flex="Flex.JustifyContent.Between.AlignContent.Center" Border="Border.Is1">
+                                <Icon Border="Border.Is1" Name="IconName.Hotel" IconSize="IconSize.x3"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Flex="Flex.AlignContent.Center" Width="Width.Is75" Height="Height.Is50"
+                                      Border="Border.Is1">
+                                   <h5>@Event?.Venue?.Name</h5>
+                                   <h7>@Event?.Venue?.Address</h7>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </Row>
+                    <Row Height="Height.Is50" Flex="Flex.AlignContent.End" Padding="Padding.Is0"
+                         Border="Border.Is1">
+                        <Card @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
+                            <CardBody Flex="Flex.JustifyContent.Between" Border="Border.Is1">
+                                <Icon Border="Border.Is1" Name="IconName.UserTie" IconSize="IconSize.x3"></Icon>
+                                <Card Flex="Flex.AlignContent.Center" TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is1">
+                                   <h4>@Event?.Organizer?.Name</h4>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </Row>
+                </Column>
+            </Row>
+            <p/>
+            <h3>Игры, в которые здесь играют</h3>
+            <BoardGamesTable PageSize="2" Full=false Games="@games"/>
+        }
+    </CardBody>
+</Card>
 
 @code {
     [Parameter]
     public long eventID { get; set; } = 0;
-    public BoardGameEvent? Event;
+    public EventView? Event;
     private List<BoardGame> games = new List<BoardGame>();
 
     protected override void OnInitialized()
     {
-        Event = BoardGameEventService.GetBoardGameEventByID(eventID);
-        if (Event is not null)
-            games = BoardGameEventService.GetGamesByEvent(Event);
+        var bgEvent = BoardGameEventService.GetBoardGameEventByID(eventID);
+        if (bgEvent is not null)
+        {
+            games = BoardGameEventService.GetGamesByEvent(bgEvent);
+            var organizer = BoardGameEventService.GetOrganizerByEvent(bgEvent);
+            var venue = BoardGameEventService.GetVenueByEvent(bgEvent);
+            Event = new EventView(bgEvent, organizer, venue);
+        }
         base.OnInitialized();
+    }
+
+    void go()
+    {
+        NavigationManager.NavigateTo("/");
     }
 }

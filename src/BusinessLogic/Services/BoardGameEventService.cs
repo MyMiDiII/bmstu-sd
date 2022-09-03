@@ -13,15 +13,23 @@ namespace BusinessLogic.Services
         void DeleteBoardGameEvent(BoardGameEvent boardGameEvent);
         List<BoardGame> GetGamesByEvent(BoardGameEvent boardGameEvent);
         List<Player> GetPlayersByEvent(BoardGameEvent boardGameEvent);
+        Organizer? GetOrganizerByEvent(BoardGameEvent boardGameEvent);
+        Venue? GetVenueByEvent(BoardGameEvent boardGameEvent);
     }
 
     public class BoardGameEventService : IBoardGameEventService
     {
         private readonly IBoardGameEventRepository _boardGameEventRepository;
+        private readonly IOrganizerRepository _organizerRepository;
+        private readonly IVenueRepository _venueRepository;
 
-        public BoardGameEventService(IBoardGameEventRepository boardGameEventRepository)
+        public BoardGameEventService(IBoardGameEventRepository boardGameEventRepository,
+                                     IOrganizerRepository organizerRepository,
+                                     IVenueRepository venueRepository)
         {
             _boardGameEventRepository = boardGameEventRepository;
+            _organizerRepository = organizerRepository;
+            _venueRepository = venueRepository;
         }
 
         public BoardGameEvent? GetBoardGameEventByID(long id)
@@ -82,5 +90,14 @@ namespace BusinessLogic.Services
             return _boardGameEventRepository.GetEventPlayers(bgEvent.ID);
         }
 
+        public Organizer? GetOrganizerByEvent(BoardGameEvent boardGameEvent)
+        {
+            return _organizerRepository.GetByID(boardGameEvent.OrganizerID);
+        }
+
+        public Venue? GetVenueByEvent(BoardGameEvent boardGameEvent)
+        {
+            return _venueRepository.GetByID(boardGameEvent.VenueID);
+        }
     }
 }

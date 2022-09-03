@@ -4,7 +4,7 @@
           Data="@viewGames"
           ShowPager
           Striped
-          PageSize="6"
+          PageSize="@PageSize"
           >
     <DataGridColumns>
         <DataGridColumn Caption="Название" Editable >
@@ -17,11 +17,17 @@
                 <Link To="@link" TextColor="TextColor.Dark">@title</Link>
             </DisplayTemplate>
         </DataGridColumn>
-        <DataGridColumn Field="@nameof(BoardGameView.Producer)" Caption="Производитель" Editable />
-        <DataGridColumn Field="@nameof(BoardGameView.Year)" Caption="Год" Editable />
+        @if (Full)
+        {
+            <DataGridColumn Field="@nameof(BoardGameView.Producer)" Caption="Производитель" Editable />
+            <DataGridColumn Field="@nameof(BoardGameView.Year)" Caption="Год" Editable />
+        }
         <DataGridColumn Field="@nameof(BoardGameView.AgeView)" Caption="Возраст" />
         <DataGridColumn Field="@nameof(BoardGameView.PlayersView)" Caption="Количество игроков" />
-        <DataGridColumn Field="@nameof(BoardGameView.DurationView)" Caption="Длительность партии" />
+        @if (Full)
+        {
+            <DataGridColumn Field="@nameof(BoardGameView.DurationView)" Caption="Длительность партии" />
+        }
     </DataGridColumns>
     <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
     <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
@@ -35,6 +41,8 @@
     public List<BoardGame> Games { get; set; } = new List<BoardGame>();
     [Parameter]
     public int PageSize { get; set; } = 6;
+    [Parameter]
+    public bool Full { get; set; } = true;
 
     private List<BoardGameView> viewGames = new List<BoardGameView>();
 

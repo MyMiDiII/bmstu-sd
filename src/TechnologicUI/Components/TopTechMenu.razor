@@ -1,5 +1,6 @@
 ﻿@using BusinessLogic.Models
 
+@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
 <Bar Breakpoint="Breakpoint.Desktop"
@@ -34,8 +35,8 @@
             <BarItem>
                 @if (curUser.Name == "guest")
                 {
-                    <Button Color="Color.Primary" Type="ButtonType.Link" To="/register">Регистрация</Button>
-                    <Button Color="Color.Success" Type="ButtonType.Link" To="/login">Вход</Button>
+                    <Button Color="Color.Primary" Clicked="@OnRegClicked">Регистрация</Button>
+                    <Button Color="Color.Success" Clicked="@OnLoginClicked">Вход</Button>
                 }
                 else
                 {
@@ -46,11 +47,38 @@
     </BarMenu>
 </Bar>
 
+<Modal @bind-Visible="@loginVisible">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Вход</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Login/>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+<Modal @bind-Visible="@registerVisible">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Регистрация</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Register/>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
 @code {
     RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" /> ;
 
     List<User> users = new List<User>();
     User curUser;
+
+    bool loginVisible = false;
+    bool registerVisible = false;
 
     protected override void OnInitialized()
     {
@@ -59,6 +87,20 @@
             users.Add(UserService.GetUserByID(i) ?? new User("", ""));
         }
         curUser = UserService.GetCurrentUser();
+    }
+
+    Task OnLoginClicked()
+    {
+        loginVisible = true;
+
+        return Task.CompletedTask;
+    }
+
+    Task OnRegClicked()
+    {
+        registerVisible = true;
+
+        return Task.CompletedTask;
     }
 
     public void Logout()

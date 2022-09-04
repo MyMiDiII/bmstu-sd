@@ -1,39 +1,32 @@
-﻿@page "/login"
-
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
-<Card Position="Position.Absolute.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is25">
-    <CardBody>
-        <Validations @ref="@loginValidations" ValidateOnLoad=false>
-            <Validation @ref="@nameValidation" Validator="ValidateName">
-                <Field>
-                    <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя">
-                       <Feedback>
-                            <ValidationNone></ValidationNone>
-                            <ValidationSuccess></ValidationSuccess>
-                            <ValidationError>@nameErrMsg</ValidationError>
-                        </Feedback>
-                    </TextEdit>
-                </Field>
-            </Validation>
-            <Validation @ref="@passwordValidation" Validator="ValidatePassword">
-                <Field>
-                    <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль"
-                              Role="TextRole.Password">
-                       <Feedback>
-                            <ValidationNone></ValidationNone>
-                            <ValidationSuccess></ValidationSuccess>
-                            <ValidationError>@passwordErrMsg</ValidationError>
-                        </Feedback>
-                    </TextEdit>
-                </Field>
-            </Validation>
-        </Validations>
-        <Button Color="Color.Primary" Clicked="@OnLoginClicked" Block>Вход</Button>
-    </CardBody>
-</Card>
-<MessageAlert />
+<Validations @ref="@loginValidations" ValidateOnLoad=false>
+    <Validation @ref="@nameValidation" Validator="ValidateName">
+        <Field>
+            <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя">
+               <Feedback>
+                    <ValidationNone></ValidationNone>
+                    <ValidationSuccess></ValidationSuccess>
+                    <ValidationError>@nameErrMsg</ValidationError>
+                </Feedback>
+            </TextEdit>
+        </Field>
+    </Validation>
+    <Validation @ref="@passwordValidation" Validator="ValidatePassword">
+        <Field>
+            <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль"
+                      Role="TextRole.Password">
+               <Feedback>
+                    <ValidationNone></ValidationNone>
+                    <ValidationSuccess></ValidationSuccess>
+                    <ValidationError>@passwordErrMsg</ValidationError>
+                </Feedback>
+            </TextEdit>
+        </Field>
+    </Validation>
+</Validations>
+<Button Color="Color.Primary" Clicked="@OnLoginClicked" Block>Вход</Button>
 
 @code {
     LoginRequest loginRequest = new LoginRequest();
@@ -55,7 +48,7 @@
             try
             {
                 UserService.Login(loginRequest);
-                NavigationManager.NavigateTo("events", true);
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
                 await loginValidations.ClearAll();
             }
             catch(NotExistsUserException)

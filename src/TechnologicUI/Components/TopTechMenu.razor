@@ -40,7 +40,15 @@
                 }
                 else
                 {
-                    <Button Color="Color.Primary" onclick="@Logout">@curUser.Name</Button>
+                    <BarDropdown>
+                        <BarDropdownToggle>С возвращением, @curUser.Name!</BarDropdownToggle>
+                        <BarDropdownMenu Width="Width.Is100">
+                            <BarDropdownItem Clicked="@GoToMyGames">Мои настолки</BarDropdownItem>
+                            <BarDropdownItem Clicked="@GoToMyEvents">Мои игротеки</BarDropdownItem>
+                            <BarDropdownDivider/>
+                            <BarDropdownItem Clicked="@Logout">Выход</BarDropdownItem>
+                        </BarDropdownMenu>
+                    </BarDropdown>
                 }
             </BarItem>
         </BarEnd>
@@ -89,5 +97,15 @@
         UserService.Login(req);
         curUser = UserService.GetCurrentUser();
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    public void GoToMyEvents()
+    {
+        NavigationManager.NavigateTo("my-events", true);
+    }
+
+    public void GoToMyGames()
+    {
+        NavigationManager.NavigateTo("my-games", true);
     }
 }

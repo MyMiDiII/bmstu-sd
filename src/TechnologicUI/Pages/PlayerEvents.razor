@@ -1,0 +1,22 @@
+﻿@page "/my-events"
+
+@inject BusinessLogic.Services.IPlayerService PlayerService
+
+<PageTitle>Мои игротеки</PageTitle>
+
+<CardBody>
+    <h2>Мои игротеки</h2>
+    <BGEventsTable Events="@events"/>
+</CardBody>
+
+@code {
+    private List<BoardGameEvent> events = new List<BoardGameEvent>();
+
+    protected override void OnInitialized()
+    {
+        events = PlayerService.GetCurrentPlayerEvents();
+        base.OnInitialized();
+    }
+}
+
+

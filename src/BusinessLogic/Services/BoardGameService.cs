@@ -13,6 +13,7 @@ namespace BusinessLogic.Services
         void DeleteBoardGame(BoardGame boardGame);
         void AddBoardGameToFavorite(BoardGame boardGame);
         void DeleteBoardGameFromFavorite(BoardGame boardGame);
+        bool CheckBoardGameInCurrentUserFavorites(BoardGame boardGame);
         List<BoardGameEvent> GetEventsByGame(BoardGame boardGame);
         void AddBoardGameToEvent(BoardGame boardGame, BoardGameEvent bgEvent);
         void DeleteBoardGameFromEvent(BoardGame boardGame, BoardGameEvent bgEvent);
@@ -94,6 +95,12 @@ namespace BusinessLogic.Services
                 throw new NotExistsFavoriteGameException();
 
             _boardGameRepository.DeleteFromFavorites(boardGame.ID, playerID);
+        }
+
+        public bool CheckBoardGameInCurrentUserFavorites(BoardGame boardGame)
+        {
+            long playerID = _playerService.GetCurrentPlayerID();
+            return _boardGameRepository.CheckGameInFavorites(boardGame.ID, playerID);
         }
 
         public List<BoardGameEvent> GetEventsByGame(BoardGame boardGame)

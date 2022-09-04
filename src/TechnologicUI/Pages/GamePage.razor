@@ -1,7 +1,11 @@
 ﻿@page "/game"
 @page "/game/{gameID:long}"
 
+@* TODO: Modals *@
+
 @inject BusinessLogic.Services.IBoardGameService BoardGameService
+@inject BusinessLogic.Services.IPlayerService PlayerService
+@inject BusinessLogic.Services.IUserService UserService
 
 <style>
     body {
@@ -17,8 +21,36 @@
         }
         else
         {
-            <h1>Настольная игра "@Game.Title"</h1>
+            <table width="100%">
+                <tr>
+                    <td width="90%">
+                        <h1>Настольная игра "@Game.Title"</h1>
+                    </td>
+                    <td width="10%">
+                        @if (UserService.GetCurrentUserRoleName() == "player"
+                             && BoardGameService.CheckBoardGameInCurrentUserFavorites(game))
+                        {
+                            <Tooltip Text="Удалить из Моих Настолок">
+                                <Button Color="Color.Danger" Size="Size.ExtraLarge"
+                                        Clicked="@DeleteFromFavorites">
+                                    <Icon Name="IconName.Heart"/>
+                                </Button>
+                            </Tooltip>
+                        }
+                        else
+                        {
+                            <Tooltip Text="В Мои Настолки">
+                                <Button Color="Color.Dark" Size="Size.ExtraLarge" Outline
+                                        Clicked="@AddToFavorites">
+                                    <Icon Name="IconName.Heart"/>
+                                </Button>
+                            </Tooltip>
+                        }
+                    </td>
+                </tr>
+            </table>
 
+            <p/>
             <CardDeck>
                 <Card Shadow="Shadow.Small">
                     <CardBody Flex="Flex.JustifyContent.Around">
@@ -62,17 +94,47 @@
     public long gameID { get; set; } = 0;
     public BoardGameView? Game;
     private List<BoardGameEvent> events = new List<BoardGameEvent>();
+    private BoardGame game;
+
+    [Inject] private IMessageService MessageService { get; set; }
 
     protected override void OnInitialized()
     {
-        var game = BoardGameService.GetBoardGameByID(gameID);
+        var tmpGame = BoardGameService.GetBoardGameByID(gameID);
 
-        if (game is not null)
+        if (tmpGame is not null)
         {
+            game = tmpGame;
             Game = new BoardGameView(game);
             events = BoardGameService.GetEventsByGame(game);
         }
 
         base.OnInitialized();
+    }
+
+    Task AddToFavorites()
+    {
+        if (UserService.GetCurrentUserRoleName() != "player")
+        {
+        }
+        else
+        {
+            BoardGameService.AddBoardGameToFavorite(game);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    Task DeleteFromFavorites()
+    {
+        //confModalVisible = true;
+        BoardGameService.DeleteBoardGameFromFavorite(game);
+
+        return Task.CompletedTask;
+    }
+
+    private void UnReg()
+    {
+        ;
     }
 }

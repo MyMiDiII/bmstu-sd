@@ -43,12 +43,10 @@
             }
 
             <p/>
-            <Row Border="Border.Is0" Style="height: 250px">
-                <Column ColumnSize="ColumnSize.Is3" Height="Height.Is100" Border="Border.Is1">
-                    <Div Flex="Flex.JustifyContent.Between">
+            <table width="100%">
+                <tr>
+                    <td rowspan="6" width="22%">
                         <h3>Регистрация</h3>
-                    </Div>
-                    <Div Position="Position.Absolute.Bottom.Is0.Translate.MiddleY">
                         <Div>Начало:</Div>
                         <Heading Size="HeadingSize.Is5">@Event.BeginRegistration</Heading>
                         <Div>Конец:</Div>
@@ -59,14 +57,41 @@
                                 <Badge Color="@Event.RegisterColor" Pill>@Event.RegisterName</Badge>
                             </Card>
                         </Div>
-                    </Div>
-                    <Div Position="Position.Absolute.Bottom.Is0">
+                        <p/>
                         <Button Color="Color.Primary" Size="Size.Medium">Зарегистрироваться</Button>
-                    </Div>
-                </Column>
-
-                <Column ColumnSize="ColumnSize.Is4" Height="Height.Is100" Border="Border.Is1">
-                    <Row Flex="Flex.AlignContent.Start" Border="Border.Is1" Padding="Padding.Is0">
+                    </td>
+                    <td rowspan="6" width="1%">
+                    </td>
+                    <td rowspan="2" width="32%" style="vertical-align:top">
+                       <Card Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.Clock" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.StartTimeView</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                    <td rowspan="6" width="1%">
+                    </td>
+                    <td rowspan="3" width="37%" style="vertical-align:center">
+                        <Card Flex="Flex.AlignSelf.Stretch" @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
+                            <CardBody Flex="Flex.JustifyContent.Between.AlignContent.Center" Border="Border.Is0">
+                                <Icon Border="Border.Is0" Name="IconName.Hotel" IconSize="IconSize.x3"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Flex="Flex.AlignContent.Center" Width="Width.Is75" Height="Height.Is50"
+                                      Border="Border.Is0">
+                                   <h5>@Event?.Venue?.Name</h5>
+                                   <h7>@Event?.Venue?.Address</h7>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                    <td rowspan ="2">
                         <Card Shadow="Shadow.Small">
                             <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
                                 <Icon Name="IconName.CalendarDay" IconSize="IconSize.x2"></Icon>
@@ -76,20 +101,24 @@
                                 </Card>
                             </CardBody>
                         </Card>
-                    </Row>
-                    <Row Flex="Flex.AlignContent.Center" Border="Border.Is1" Padding="Padding.Is0">
-                        <Card Shadow="Shadow.Small">
-                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
-                                <Icon Name="IconName.Clock" IconSize="IconSize.x2"></Icon>
-                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="3" style="vertical-align:center">
+                        <Card @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
+                            <CardBody Flex="Flex.JustifyContent.Between" Border="Border.Is0">
+                                <Icon Border="Border.Is0" Name="IconName.UserTie" IconSize="IconSize.x3"></Icon>
+                                <Card Flex="Flex.AlignContent.Center" TextAlignment="TextAlignment.Center" Width="Width.Is75"
                                       Border="Border.Is0">
-                                   <h3>@Event.StartTimeView</h3>
+                                   <h4>@Event?.Organizer?.Name</h4>
                                 </Card>
                             </CardBody>
                         </Card>
-                    </Row>
-                    <Row Flex="Flex.AlignContent.End" Border="Border.Is1" Padding="Padding.Is0">
-                        <Card Shadow="Shadow.Small">
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan ="2" style="vertical-align:bottom">
+                        <Card Height="Height.Is25" Shadow="Shadow.Small">
                             <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
                                 <Icon Name="IconName.Hourglass" IconSize="IconSize.x2"></Icon>
                                 <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
@@ -98,37 +127,12 @@
                                 </Card>
                             </CardBody>
                         </Card>
-                    </Row>
-                </Column>
+                    </td>
+                </tr>
+                <tr>
+                </tr>
+            </table>
 
-                <Column ColumnSize="ColumnSize.Is5" Height="Height.Is100" Border="Border.Is1">
-                    <Row Height="Height.Is50" Flex="Flex.AlignContent.Start" Padding="Padding.Is0"
-                         Border="Border.Is1">
-                        <Card Flex="Flex.AlignContent.Start" @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
-                            <CardBody Flex="Flex.JustifyContent.Between.AlignContent.Center" Border="Border.Is1">
-                                <Icon Border="Border.Is1" Name="IconName.Hotel" IconSize="IconSize.x3"></Icon>
-                                <Card TextAlignment="TextAlignment.Center" Flex="Flex.AlignContent.Center" Width="Width.Is75" Height="Height.Is50"
-                                      Border="Border.Is1">
-                                   <h5>@Event?.Venue?.Name</h5>
-                                   <h7>@Event?.Venue?.Address</h7>
-                                </Card>
-                            </CardBody>
-                        </Card>
-                    </Row>
-                    <Row Height="Height.Is50" Flex="Flex.AlignContent.End" Padding="Padding.Is0"
-                         Border="Border.Is1">
-                        <Card @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
-                            <CardBody Flex="Flex.JustifyContent.Between" Border="Border.Is1">
-                                <Icon Border="Border.Is1" Name="IconName.UserTie" IconSize="IconSize.x3"></Icon>
-                                <Card Flex="Flex.AlignContent.Center" TextAlignment="TextAlignment.Center" Width="Width.Is75"
-                                      Border="Border.Is1">
-                                   <h4>@Event?.Organizer?.Name</h4>
-                                </Card>
-                            </CardBody>
-                        </Card>
-                    </Row>
-                </Column>
-            </Row>
             <p/>
             <h3>Игры, в которые здесь играют</h3>
             <BoardGamesTable PageSize="2" Full=false Games="@games"/>

@@ -87,6 +87,7 @@ namespace BusinessLogic.Services
         void SetCurrentUser(User user, string roleName)
         {
             user.Roles = _userRepository.GetUserRoles(user.ID);
+            _curUser = user;
             user.CurRoleName = GetCurrentUserRole(roleName) == null
                                ? user.Roles[0].RoleName : roleName;
             _curUser = user;

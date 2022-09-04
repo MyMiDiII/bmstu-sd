@@ -15,6 +15,7 @@ namespace BusinessLogic.Services
         long GetCurrentPlayerID();
         void RegisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
         void UnregisterCurrentPlayerForEvent(BoardGameEvent bgEvent);
+        bool CheckCurrentPlayerRegistration(BoardGameEvent bgEvent);
         List<BoardGameEvent> GetCurrentPlayerEvents();
         List<BoardGame> GetCurrentPlayerFavorites();
     }
@@ -109,6 +110,12 @@ namespace BusinessLogic.Services
                 throw new NotExistsPlayerRegistraionException();
 
             _playerRepository.DeleteFromEvent(bgEvent.ID, playerID);
+        }
+
+        public bool CheckCurrentPlayerRegistration(BoardGameEvent bgEvent)
+        {
+            long playerID = GetCurrentPlayerID();
+            return _playerRepository.CheckPlayerRegistration(bgEvent.ID, playerID);
         }
 
         public List<BoardGameEvent> GetCurrentPlayerEvents()

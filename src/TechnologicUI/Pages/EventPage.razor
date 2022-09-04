@@ -5,6 +5,7 @@
 
 @inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
+@inject BusinessLogic.Services.IPlayerService PlayerService
 @inject BusinessLogic.Services.IUserService UserService
 
 <style>
@@ -54,14 +55,25 @@
                         <Div Flex="Flex.JustifyContent.Start.AlignItems.Center">
                             Статус:
                             <Card Margin="Margin.Is1" Border="Border.Is0">
-                                <Badge Color="@Event.RegisterColor" Pill>@Event.RegisterName</Badge>
+                                <Badge Color="@stateColor" Pill>@stateText</Badge>
                             </Card>
                         </Div>
                         <p/>
-                        <Button Color="Color.Primary" Size="Size.Medium" Disabled="regBtnDisabled"
-                                Clicked="@OnRegBtnClicked" Block>
-                            @regBtnText
-                        </Button>
+                        @if (UserService.GetCurrentUserRoleName() == "player"
+                             && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
+                         {
+                            <Button Color="Color.Danger" Size="Size.Medium"
+                                    Clicked="@OnUnRegBtnClicked" Block>
+                                    Отменить
+                            </Button>
+                         }
+                         else
+                         {
+                            <Button Color="Color.Primary" Size="Size.Medium" Disabled="@regBtnDisabled"
+                                    Clicked="@OnRegBtnClicked" Block>
+                                @regBtnText
+                            </Button>
+                         }
                     </td>
                     <td rowspan="6" width="1%">
                     </td>
@@ -168,6 +180,29 @@
     </ModalContent>
 </Modal>
 
+<Modal @bind-Visible="@confModalVisible">
+    <ModalContent Centered>
+        <ModalHeader>
+            <Icon IconSize="IconSize.x2" Name="IconName.ExclamationTriangle"/>
+            ㅤ
+            ㅤ
+            ㅤ
+            <ModalTitle>Внимание!</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            Если время регистрации уже закончилось, Вы не сможете снова зарегистрироваться!
+            Проверьте время окончания регистрации перед отменой
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
+            <Button Color="Color.Danger" Clicked="@UnReg">
+                Отменить
+            </Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
 <Login @ref="@loginModal"/>
 <Register @ref="@registerModal"/>
 
@@ -177,38 +212,86 @@
 
     public EventView? Event;
     private List<BoardGame> games = new List<BoardGame>();
+    private BoardGameEvent bgEvent;
 
-    private bool regBtnDisabled = true;
-    private string regBtnText= "Не доступна";
+    private bool regBtnDisabled= true;
+    private string regBtnText = "Не доступна";
+
+    private string stateText;
+    private Color stateColor;
 
     private bool modalVisible = false;
+    private bool confModalVisible = false;
     private Login? loginModal;
     private Register? registerModal;
 
+    [Inject] private IMessageService MessageService { get; set; }
+
     protected override void OnInitialized()
     {
-        var bgEvent = BoardGameEventService.GetBoardGameEventByID(eventID);
-        if (bgEvent is not null)
+        var tmpEvent = BoardGameEventService.GetBoardGameEventByID(eventID);
+        if (tmpEvent is not null)
         {
+            bgEvent = tmpEvent;
             games = BoardGameEventService.GetGamesByEvent(bgEvent);
             var organizer = BoardGameEventService.GetOrganizerByEvent(bgEvent);
             var venue = BoardGameEventService.GetVenueByEvent(bgEvent);
             Event = new EventView(bgEvent, organizer, venue);
 
-            if (Event.RegisterName == "Идет")
+            if (UserService.GetCurrentUserRoleName() == "player"
+                && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
+            {
+                regBtnDisabled = false;
+                stateText = "Пройдена";
+                stateColor = Color.Success;
+            }
+            else
+            {
+                stateText = Event.RegisterName;
+                stateColor = Event.RegisterColor;
+            }
+
+            if (stateText == "Идет")
             {
                 regBtnDisabled = false;
                 regBtnText = "Зарегистрироваться";
             }
         }
+
         base.OnInitialized();
     }
 
     Task OnRegBtnClicked()
     {
-        modalVisible = true;
+        if (UserService.GetCurrentUserRoleName() != "player")
+        {
+            modalVisible = true;
+        }
+        else
+        {
+            PlayerService.RegisterCurrentPlayerForEvent(bgEvent);
+            stateText = "Пройдена";
+            stateColor = Color.Success;
+            MessageService.Info("Вы успешно зарегистрированы на игротеку!");
+        }
 
         return Task.CompletedTask;
+    }
+
+    Task OnUnRegBtnClicked()
+    {
+        confModalVisible = true;
+
+        return Task.CompletedTask;
+    }
+
+    private void UnReg()
+    {
+        confModalVisible = false;
+        PlayerService.UnregisterCurrentPlayerForEvent(bgEvent);
+        stateText = Event?.RegisterName ?? "";
+        stateColor = Event?.RegisterColor ?? Color.Primary;
+        MessageService.Info("Регистрация отменена");
     }
 
     private Task LoginHideModal()
@@ -230,6 +313,7 @@
     private Task HideModal()
     {
         modalVisible = false;
+        confModalVisible = false;
 
         return Task.CompletedTask;
     }

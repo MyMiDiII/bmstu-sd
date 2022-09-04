@@ -88,6 +88,6 @@
         var req = new LoginRequest("guest", "guest");
         UserService.Login(req);
         curUser = UserService.GetCurrentUser();
-        StateHasChanged();
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 }

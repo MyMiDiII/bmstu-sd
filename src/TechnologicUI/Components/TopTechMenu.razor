@@ -47,29 +47,9 @@
     </BarMenu>
 </Bar>
 
-<Modal @bind-Visible="@loginVisible">
-    <ModalContent Centered>
-        <ModalHeader>
-            <ModalTitle>Вход</ModalTitle>
-            <CloseButton />
-        </ModalHeader>
-        <ModalBody>
-            <Login/>
-        </ModalBody>
-    </ModalContent>
-</Modal>
+<Login @ref=@loginModal/>
 
-<Modal @bind-Visible="@registerVisible">
-    <ModalContent Centered>
-        <ModalHeader>
-            <ModalTitle>Регистрация</ModalTitle>
-            <CloseButton />
-        </ModalHeader>
-        <ModalBody>
-            <Register/>
-        </ModalBody>
-    </ModalContent>
-</Modal>
+<Register @ref=@registerModal/>
 
 @code {
     RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" /> ;
@@ -77,8 +57,8 @@
     List<User> users = new List<User>();
     User curUser;
 
-    bool loginVisible = false;
-    bool registerVisible = false;
+    private Login? loginModal;
+    private Register? registerModal;
 
     protected override void OnInitialized()
     {
@@ -91,14 +71,14 @@
 
     Task OnLoginClicked()
     {
-        loginVisible = true;
+        loginModal?.Show();
 
         return Task.CompletedTask;
     }
 
     Task OnRegClicked()
     {
-        registerVisible = true;
+        registerModal?.Show();
 
         return Task.CompletedTask;
     }

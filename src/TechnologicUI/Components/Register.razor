@@ -1,49 +1,66 @@
 ﻿@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
-<Validations @ref="@regValidations" ValidateOnLoad=false>
-    <Validation Validator="ValidateName">
-        <Field>
-            <TextEdit @bind-Text="@registerRequest.Name" Placeholder="Имя пользователя">
-               <Feedback>
-                    <ValidationNone></ValidationNone>
-                    <ValidationSuccess></ValidationSuccess>
-                    <ValidationError>Поле пустое, или пользователь с таким
-                                     именем уже существует</ValidationError>
-                </Feedback>
-            </TextEdit>
-        </Field>
-    </Validation>
-    <Validation Validator="ValidatePassword">
-        <Field>
-            <TextEdit @bind-Text="@registerRequest.Password" Placeholder="Пароль"
-                      Role="TextRole.Password">
-               <Feedback>
-                    <ValidationNone></ValidationNone>
-                    <ValidationSuccess></ValidationSuccess>
-                    <ValidationError>Придумайте пароль!</ValidationError>
-                </Feedback>
-            </TextEdit>
-        </Field>
-    </Validation>
-    <Validation @ref="@rePassValid" Validator="ValidateRePassword">
-        <Field>
-            <TextEdit Placeholder="Подтверждение пароля" Role="TextRole.Password">
-               <Feedback>
-                    <ValidationNone></ValidationNone>
-                    <ValidationSuccess></ValidationSuccess>
-                    <ValidationError>Пароли не совпадают!</ValidationError>
-                </Feedback>
-            </TextEdit>
-        </Field>
-    </Validation>
-</Validations>
-<Button Color="Color.Primary" Clicked="@OnRegisterClicked" Block>Регистрация</Button>
+<Modal @ref="@registerModal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Регистрация</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Validations @ref="@regValidations" ValidateOnLoad=false>
+                <Validation Validator="ValidateName">
+                    <Field>
+                        <TextEdit @bind-Text="@registerRequest.Name" Placeholder="Имя пользователя">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Поле пустое, или пользователь с таким
+                                                 именем уже существует</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation Validator="ValidatePassword">
+                    <Field>
+                        <TextEdit @bind-Text="@registerRequest.Password" Placeholder="Пароль"
+                                  Role="TextRole.Password">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Придумайте пароль!</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation @ref="@rePassValid" Validator="ValidateRePassword">
+                    <Field>
+                        <TextEdit Placeholder="Подтверждение пароля" Role="TextRole.Password">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Пароли не совпадают!</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+            </Validations>
+            <Button Color="Color.Primary" Clicked="@OnRegisterClicked" Block>Регистрация</Button>
+        </ModalBody>
+    </ModalContent>
+</Modal>
 
 @code {
+    private Modal? registerModal;
+
     RegisterRequest registerRequest = new RegisterRequest();
     Validations? regValidations;
     Validation? rePassValid;
+
+    public void Show()
+    {
+        registerModal?.Show();
+    }
 
     async Task OnRegisterClicked()
     {

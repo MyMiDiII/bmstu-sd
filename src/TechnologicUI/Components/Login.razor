@@ -1,34 +1,46 @@
 ﻿@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
-<Validations @ref="@loginValidations" ValidateOnLoad=false>
-    <Validation @ref="@nameValidation" Validator="ValidateName">
-        <Field>
-            <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя">
-               <Feedback>
-                    <ValidationNone></ValidationNone>
-                    <ValidationSuccess></ValidationSuccess>
-                    <ValidationError>@nameErrMsg</ValidationError>
-                </Feedback>
-            </TextEdit>
-        </Field>
-    </Validation>
-    <Validation @ref="@passwordValidation" Validator="ValidatePassword">
-        <Field>
-            <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль"
-                      Role="TextRole.Password">
-               <Feedback>
-                    <ValidationNone></ValidationNone>
-                    <ValidationSuccess></ValidationSuccess>
-                    <ValidationError>@passwordErrMsg</ValidationError>
-                </Feedback>
-            </TextEdit>
-        </Field>
-    </Validation>
-</Validations>
-<Button Color="Color.Primary" Clicked="@OnLoginClicked" Block>Вход</Button>
+<Modal @ref="@loginModal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Вход</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Validations @ref="@loginValidations" ValidateOnLoad=false>
+                <Validation @ref="@nameValidation" Validator="ValidateName">
+                    <Field>
+                        <TextEdit @bind-Text="@loginRequest.Name" Placeholder="Имя пользователя">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>@nameErrMsg</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation @ref="@passwordValidation" Validator="ValidatePassword">
+                    <Field>
+                        <TextEdit @bind-Text="@loginRequest.Password" Placeholder="Пароль"
+                                  Role="TextRole.Password">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>@passwordErrMsg</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+            </Validations>
+            <Button Color="Color.Primary" Clicked="@OnLoginClicked" Block>Вход</Button>
+        </ModalBody>
+    </ModalContent>
+</Modal>
 
 @code {
+    private Modal? loginModal;
+
     LoginRequest loginRequest = new LoginRequest();
 
     Validations? loginValidations;
@@ -40,6 +52,11 @@
     Validation? passwordValidation;
     bool rightPassword = true;
     string passwordErrMsg = "";
+
+    public void Show()
+    {
+        loginModal?.Show();
+    }
 
     async Task OnLoginClicked()
     {

@@ -5,6 +5,7 @@
 
 @inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
+@inject BusinessLogic.Services.IUserService UserService
 
 <style>
     body {
@@ -14,7 +15,6 @@
         cursor: pointer;
     }
 </style>
-
 
 <Card Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is75">
     <CardBody>
@@ -58,7 +58,10 @@
                             </Card>
                         </Div>
                         <p/>
-                        <Button Color="Color.Primary" Size="Size.Medium">Зарегистрироваться</Button>
+                        <Button Color="Color.Primary" Size="Size.Medium" Disabled="regBtnDisabled"
+                                Clicked="@OnRegBtnClicked" Block>
+                            @regBtnText
+                        </Button>
                     </td>
                     <td rowspan="6" width="1%">
                     </td>
@@ -75,7 +78,7 @@
                     </td>
                     <td rowspan="6" width="1%">
                     </td>
-                    <td rowspan="3" width="37%" style="vertical-align:center">
+                    <td rowspan="3" width="37%">
                         <Card Flex="Flex.AlignSelf.Stretch" @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
                             <CardBody Flex="Flex.JustifyContent.Between.AlignContent.Center" Border="Border.Is0">
                                 <Icon Border="Border.Is0" Name="IconName.Hotel" IconSize="IconSize.x3"></Icon>
@@ -104,7 +107,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td rowspan="3" style="vertical-align:center">
+                    <td rowspan="3">
                         <Card @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
                             <CardBody Flex="Flex.JustifyContent.Between" Border="Border.Is0">
                                 <Icon Border="Border.Is0" Name="IconName.UserTie" IconSize="IconSize.x3"></Icon>
@@ -140,11 +143,47 @@
     </CardBody>
 </Card>
 
+<Modal @bind-Visible="@modalVisible">
+    <ModalContent Centered>
+        <ModalHeader>
+            <Icon IconSize="IconSize.x2" Name="IconName.Info"/>
+            ㅤ
+            ㅤ
+            ㅤ
+            <ModalTitle>Только для игроков</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            Для регистрации на игротеку необходимо зарегистрироваться или войти!
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
+            <Button Color="Color.Primary" Clicked="@RegisterHideModal">
+                Регистрация
+            </Button>
+            <Button Color="Color.Success" Clicked="@LoginHideModal">
+                Вход
+            </Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+<Login @ref="@loginModal"/>
+<Register @ref="@registerModal"/>
+
 @code {
     [Parameter]
     public long eventID { get; set; } = 0;
+
     public EventView? Event;
     private List<BoardGame> games = new List<BoardGame>();
+
+    private bool regBtnDisabled = true;
+    private string regBtnText= "Не доступна";
+
+    private bool modalVisible = false;
+    private Login? loginModal;
+    private Register? registerModal;
 
     protected override void OnInitialized()
     {
@@ -155,8 +194,44 @@
             var organizer = BoardGameEventService.GetOrganizerByEvent(bgEvent);
             var venue = BoardGameEventService.GetVenueByEvent(bgEvent);
             Event = new EventView(bgEvent, organizer, venue);
+
+            if (Event.RegisterName == "Идет")
+            {
+                regBtnDisabled = false;
+                regBtnText = "Зарегистрироваться";
+            }
         }
         base.OnInitialized();
+    }
+
+    Task OnRegBtnClicked()
+    {
+        modalVisible = true;
+
+        return Task.CompletedTask;
+    }
+
+    private Task LoginHideModal()
+    {
+        modalVisible = false;
+        loginModal?.Show();
+
+        return Task.CompletedTask;
+    }
+
+    private Task RegisterHideModal()
+    {
+        modalVisible = false;
+        registerModal?.Show();
+
+        return Task.CompletedTask;
+    }
+
+    private Task HideModal()
+    {
+        modalVisible = false;
+
+        return Task.CompletedTask;
     }
 
     void go()

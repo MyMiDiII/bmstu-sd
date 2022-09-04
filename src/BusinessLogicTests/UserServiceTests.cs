@@ -50,6 +50,7 @@ namespace BusinessLogicTests
 
             var mockRepo = new Mock<IUserRepository>();
             mockRepo.Setup(repo => repo.GetAll()).Returns(_mockUsers);
+            mockRepo.Setup(repo => repo.GetDefaultUser()).Returns(_mockUsers[3]);
             mockRepo.Setup(repo => repo.Add(It.IsAny<User>())).Callback(
                 (User user) =>
                 {

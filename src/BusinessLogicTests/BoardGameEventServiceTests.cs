@@ -128,7 +128,9 @@ namespace BusinessLogicTests
                 });
 
             _mockRepo = mockRepo.Object;
-            _service = new BoardGameEventService(_mockRepo);
+            var mockOrgRepo = new Mock<IOrganizerRepository>().Object;
+            var mockVenRepo= new Mock<IVenueRepository>().Object;
+            _service = new BoardGameEventService(_mockRepo, mockOrgRepo, mockVenRepo);
         }
 
         [Fact]

@@ -12,6 +12,8 @@ namespace BusinessLogic.Services
         void DeleteUser(User user);
         long GetCurrentUserID();
         User GetCurrentUser();
+        string? SetCurrentUserRole(string roleName);
+        string GetCurrentUserRoleName();
         User? GetUserByID(long id);
         User? GetUserByName(string name);
         long GetCurrentUserRoleID(string role);
@@ -27,10 +29,9 @@ namespace BusinessLogic.Services
 
         public UserService(IUserRepository userRepository, IEncryptionService encryptionService)
         {
-            Console.WriteLine("new user service");
-
             _userRepository = userRepository;
             _curUser = _userRepository.GetDefaultUser();
+            _curUser.CurRoleName = "guest";
             _encryptionService = encryptionService;
         }
 
@@ -60,9 +61,34 @@ namespace BusinessLogic.Services
             return role == null ? -1 : role.RoleID;
         }
 
-        private void SetCurrentUser(User user)
+        private Role? GetCurrentUserRole(string roleName)
+        {
+            return _curUser.Roles.Find(x => x.RoleName == roleName);
+        }
+
+        public string GetCurrentUserRoleName()
+        {
+            return _curUser.CurRoleName;
+        }
+
+        public string? SetCurrentUserRole(string roleName)
+        {
+            var role = GetCurrentUserRole(roleName);
+
+            if (role != null)
+            {
+                _curUser.CurRoleName = role.RoleName;
+                return role.RoleName;
+            }
+
+            return null;
+        }
+
+        void SetCurrentUser(User user, string roleName)
         {
             user.Roles = _userRepository.GetUserRoles(user.ID);
+            user.CurRoleName = GetCurrentUserRole(roleName) == null
+                               ? user.Roles[0].RoleName : roleName;
             _curUser = user;
         }
 
@@ -117,7 +143,7 @@ namespace BusinessLogic.Services
             if (!_encryptionService.ValidatePassword(tmpUser.Password, existingUser.Password))
                 throw new IncorrectUserPasswordException();
 
-            SetCurrentUser(existingUser);
+            SetCurrentUser(existingUser, "player");
         }
 
         public void Register(RegisterRequest registerRequest)

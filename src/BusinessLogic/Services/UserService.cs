@@ -17,6 +17,7 @@ namespace BusinessLogic.Services
         User? GetUserByID(long id);
         User? GetUserByName(string name);
         long GetCurrentUserRoleID(string role);
+        bool CheckUserRole(string role);
         void Login(LoginRequest loginRequest);
         void Register(RegisterRequest registerRequest);
     }
@@ -130,6 +131,11 @@ namespace BusinessLogic.Services
         private bool NotExist(long id)
         {
             return _userRepository.GetByID(id) == null;
+        }
+
+        public bool CheckUserRole(string role)
+        {
+            return _curUser.Roles.FirstOrDefault(item => item.RoleName == role) is not null;
         }
 
         public void Login(LoginRequest loginRequest)

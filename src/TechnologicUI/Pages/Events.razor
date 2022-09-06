@@ -10,7 +10,7 @@
         <h2>Игротеки</h2>
         @if (UserService.GetCurrentUserRoleName() == "organizer")
         {
-            <p>Организатор!!!</p>
+            <Button Height="Height.Is75" Color="Color.Success" Clicked="@OnNewEventClicked">Провести Игротеку</Button>
         }
         else
         {
@@ -47,6 +47,10 @@
         {
             orgModal?.Show();
         }
+    }
+
+    private void OnNewEventClicked()
+    {
     }
 }
 

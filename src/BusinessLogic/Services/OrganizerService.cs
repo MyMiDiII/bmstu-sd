@@ -13,6 +13,7 @@ namespace BusinessLogic.Services
         void UpdateOrganizer(Organizer organizer);
         void DeleteOrganizer(Organizer organizer);
         List<BoardGameEvent> GetEventsByOrganizer(Organizer organizer);
+        List<BoardGameEvent> GetCurrentOrganizerEvents();
     }
 
     public class OrganizerService : IOrganizerService
@@ -83,6 +84,11 @@ namespace BusinessLogic.Services
         public List<BoardGameEvent> GetEventsByOrganizer(Organizer organizer)
         {
             return _organizerRepository.GetOrganizerEvents(organizer.ID);
+        }
+
+        public List<BoardGameEvent> GetCurrentOrganizerEvents()
+        {
+            return _organizerRepository.GetOrganizerEvents(_userService.GetCurrentUserRoleID("organizer"));
         }
     }
 }

@@ -9,6 +9,7 @@ namespace BusinessLogic.Services
         List<Organizer> GetOrganizers();
         Organizer? GetOrganizerByID(long id);
         void CreateOrganizer(Organizer organizer);
+        void CreateOrganizerWithUserRole(Organizer organizer);
         void UpdateOrganizer(Organizer organizer);
         void DeleteOrganizer(Organizer organizer);
         List<BoardGameEvent> GetEventsByOrganizer(Organizer organizer);
@@ -17,10 +18,12 @@ namespace BusinessLogic.Services
     public class OrganizerService : IOrganizerService
     {
         private readonly IOrganizerRepository _organizerRepository;
+        private readonly IUserService _userService;
 
-        public OrganizerService(IOrganizerRepository organizerRepository)
+        public OrganizerService(IOrganizerRepository organizerRepository, IUserService userService)
         {
             _organizerRepository = organizerRepository;
+            _userService = userService;
         }
 
         public List<Organizer> GetOrganizers()
@@ -39,6 +42,14 @@ namespace BusinessLogic.Services
                 throw new AlreadyExistsOrganizerException();
 
             _organizerRepository.Add(organizer);
+        }
+
+        public void CreateOrganizerWithUserRole(Organizer organizer)
+        {
+            if (Exist(organizer))
+                throw new AlreadyExistsOrganizerException();
+
+            _organizerRepository.AddWithUserRole(organizer, _userService.GetCurrentUserID());
         }
 
         public void UpdateOrganizer(Organizer organizer)

@@ -26,6 +26,31 @@ namespace DataAccess.Repositories
             }
         }
 
+        public void AddWithUserRole(Organizer elem, long userID)
+        {
+            using (var transaction = _dbcontext.Database.BeginTransaction())
+            {
+                try
+                {
+                    _dbcontext.Organizers.Add(elem);
+                    _dbcontext.SaveChanges();
+
+                    var orgID = _dbcontext.Organizers.Single(tmpOrg => tmpOrg.Name == elem.Name
+                                                                    && tmpOrg.Address == elem.Address).ID;
+
+                    _dbcontext.Roles.Add(new Role("organizer") { RoleID = orgID, UserID = userID });
+                    _dbcontext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw new AddUserException();
+                }
+            }
+        }
+
         public List<Organizer> GetAll()
         {
             return _dbcontext.Organizers.Where(organizer => !organizer.Deleted).ToList();

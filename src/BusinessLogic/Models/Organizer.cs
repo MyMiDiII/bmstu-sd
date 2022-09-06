@@ -15,6 +15,12 @@ namespace BusinessLogic.Models
         public string? PhoneNumber { get; set; }
         public bool Deleted { get; set; } = false;
 
+        public Organizer()
+        {
+            Name = "";
+            Address = "";
+        }
+
         public Organizer(string name, string address)
         {
             Name = name;

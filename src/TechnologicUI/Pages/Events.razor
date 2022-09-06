@@ -1,21 +1,52 @@
 ﻿@page "/events"
 
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
+@inject BusinessLogic.Services.IUserService UserService
 
 <PageTitle>Игротеки</PageTitle>
 
 <CardBody>
-    <h2>Игротеки</h2>
+    <Div Flex="Flex.JustifyContent.Between">
+        <h2>Игротеки</h2>
+        @if (UserService.GetCurrentUserRoleName() == "organizer")
+        {
+            <p>Организатор!!!</p>
+        }
+        else
+        {
+            <Button Height="Height.Is75" Color="Color.Success" Clicked="@OnOrgBtnClicked">Стать организатором</Button>
+        }
+    </Div>
     <BGEventsTable Events="@events"/>
 </CardBody>
 
+<RegLoginModal @ref="@regLoginModal"
+    InfoText="Для того, чтобы стать организатором, нужно сначала зарегистрироваться или войти!" />
+
+<OrganizerRegModal @ref="@orgModal"/>
+
 @code {
     private List<BoardGameEvent> events = new List<BoardGameEvent>();
+
+    private RegLoginModal? regLoginModal;
+    private OrganizerRegModal? orgModal;
 
     protected override void OnInitialized()
     {
         events = BoardGameEventService.GetBoardGameEvents();
         base.OnInitialized();
+    }
+
+    private void OnOrgBtnClicked()
+    {
+        if (UserService.GetCurrentUserRoleName() == "guest")
+        {
+            regLoginModal?.Show();
+        }
+        else
+        {
+            orgModal?.Show();
+        }
     }
 }
 

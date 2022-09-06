@@ -17,13 +17,14 @@
     <BarToggler />
     <BarMenu>
         <BarStart>
-            <BarItem>
+@*            <BarItem>
                 <SelectList TItem="User"
                             TValue="User"
                             TextField="@((item)=>item.Name)"
                             SelectedValue="@curUser"
                             Data="@users" />
             </BarItem>
+*@
             <BarItem>
                 <BarLink To="/events" TextColor="TextColor.White">Игротеки</BarLink>
             </BarItem>

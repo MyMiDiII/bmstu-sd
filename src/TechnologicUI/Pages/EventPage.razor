@@ -155,31 +155,6 @@
     </CardBody>
 </Card>
 
-<Modal @bind-Visible="@modalVisible">
-    <ModalContent Centered>
-        <ModalHeader>
-            <Icon IconSize="IconSize.x2" Name="IconName.Info"/>
-            ㅤ
-            ㅤ
-            ㅤ
-            <ModalTitle>Только для игроков</ModalTitle>
-            <CloseButton />
-        </ModalHeader>
-        <ModalBody>
-            Для регистрации на игротеку необходимо зарегистрироваться или войти!
-        </ModalBody>
-        <ModalFooter>
-            <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
-            <Button Color="Color.Primary" Clicked="@RegisterHideModal">
-                Регистрация
-            </Button>
-            <Button Color="Color.Success" Clicked="@LoginHideModal">
-                Вход
-            </Button>
-        </ModalFooter>
-    </ModalContent>
-</Modal>
-
 <Modal @bind-Visible="@confModalVisible">
     <ModalContent Centered>
         <ModalHeader>
@@ -203,8 +178,8 @@
     </ModalContent>
 </Modal>
 
-<Login @ref="@loginModal"/>
-<Register @ref="@registerModal"/>
+<RegLoginModal @ref="@regLoginModal" Title="Только для игроков"
+               InfoText="Для регистрации на игротеку необходимо зарегистрироваться или войти!"/>
 
 @code {
     [Parameter]
@@ -220,10 +195,8 @@
     private string stateText;
     private Color stateColor;
 
-    private bool modalVisible = false;
+    private RegLoginModal? regLoginModal;
     private bool confModalVisible = false;
-    private Login? loginModal;
-    private Register? registerModal;
 
     [Inject] private IMessageService MessageService { get; set; }
 
@@ -238,34 +211,40 @@
             var venue = BoardGameEventService.GetVenueByEvent(bgEvent);
             Event = new EventView(bgEvent, organizer, venue);
 
-            if (UserService.GetCurrentUserRoleName() == "player"
-                && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
-            {
-                regBtnDisabled = false;
-                stateText = "Пройдена";
-                stateColor = Color.Success;
-            }
-            else
-            {
-                stateText = Event.RegisterName;
-                stateColor = Event.RegisterColor;
-            }
+            RegComponentsInit();
 
-            if (stateText == "Идет")
-            {
-                regBtnDisabled = false;
-                regBtnText = "Зарегистрироваться";
-            }
         }
 
         base.OnInitialized();
+    }
+
+    private void RegComponentsInit()
+    {
+        if (UserService.GetCurrentUserRoleName() == "player"
+            && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
+        {
+            regBtnDisabled = false;
+            stateText = "Пройдена";
+            stateColor = Color.Success;
+        }
+        else
+        {
+            stateText = Event?.RegisterName ?? "";
+            stateColor = Event?.RegisterColor ?? "";
+        }
+
+        if (stateText == "Идет")
+        {
+            regBtnDisabled = false;
+            regBtnText = "Зарегистрироваться";
+        }
     }
 
     Task OnRegBtnClicked()
     {
         if (UserService.GetCurrentUserRoleName() != "player")
         {
-            modalVisible = true;
+            regLoginModal?.Show();
         }
         else
         {
@@ -289,30 +268,12 @@
     {
         confModalVisible = false;
         PlayerService.UnregisterCurrentPlayerForEvent(bgEvent);
-        stateText = Event?.RegisterName ?? "";
-        stateColor = Event?.RegisterColor ?? Color.Primary;
+        RegComponentsInit();
         MessageService.Info("Регистрация отменена");
-    }
-
-    private Task LoginHideModal()
-    {
-        modalVisible = false;
-        loginModal?.Show();
-
-        return Task.CompletedTask;
-    }
-
-    private Task RegisterHideModal()
-    {
-        modalVisible = false;
-        registerModal?.Show();
-
-        return Task.CompletedTask;
     }
 
     private Task HideModal()
     {
-        modalVisible = false;
         confModalVisible = false;
 
         return Task.CompletedTask;

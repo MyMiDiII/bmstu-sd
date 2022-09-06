@@ -1,0 +1,67 @@
+﻿<Modal @ref="@modal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <Icon IconSize="IconSize.x2" Name="IconName.Info"/>
+            ㅤ
+            ㅤ
+            ㅤ
+            <ModalTitle>@Title</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            @InfoText
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
+            <Button Color="Color.Primary" Clicked="@RegisterHideModal">
+                Регистрация
+            </Button>
+            <Button Color="Color.Success" Clicked="@LoginHideModal">
+                Вход
+            </Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+<Login @ref="@loginModal"/>
+<Register @ref="@registerModal"/>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+    [Parameter]
+    public string InfoText { get; set; } = "";
+
+    private Modal? modal;
+    private Login? loginModal;
+    private Register? registerModal;
+
+    public void Show()
+    {
+        modal?.Show();
+    }
+
+    private Task LoginHideModal()
+    {
+        modal?.Hide();
+        loginModal?.Show();
+
+        return Task.CompletedTask;
+    }
+
+    private Task RegisterHideModal()
+    {
+        modal?.Hide();
+        registerModal?.Show();
+
+        return Task.CompletedTask;
+    }
+
+    private Task HideModal()
+    {
+        modal?.Hide();
+
+        return Task.CompletedTask;
+    }
+
+}

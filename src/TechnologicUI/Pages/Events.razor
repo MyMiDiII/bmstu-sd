@@ -1,5 +1,6 @@
 ﻿@page "/events"
 
+@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
 @inject BusinessLogic.Services.IUserService UserService
 
@@ -31,6 +32,8 @@
     private RegLoginModal? regLoginModal;
     private OrganizerRegModal? orgModal;
 
+    [Inject] private IMessageService MessageService { get; set; }
+
     protected override void OnInitialized()
     {
         events = BoardGameEventService.GetBoardGameEvents();
@@ -42,6 +45,11 @@
         if (UserService.GetCurrentUserRoleName() == "guest")
         {
             regLoginModal?.Show();
+        }
+        else if (UserService.CheckUserRole("organizer"))
+        {
+            UserService.SetCurrentUserRole("organizer");
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
         else
         {

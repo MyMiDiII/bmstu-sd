@@ -1,0 +1,407 @@
+﻿@using System.Text.RegularExpressions;
+
+@inject NavigationManager NavigationManager
+
+@inject BusinessLogic.Services.IOrganizerService OrganizerService
+@inject BusinessLogic.Services.IUserService UserService 
+@inject BusinessLogic.Services.IVenueService VenueService 
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
+
+<Modal @ref="@modal">
+    <ModalContent Size="ModalSize.Large" Centered>
+        <ModalHeader>
+            <ModalTitle>@Title</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <h5>Основная информация</h5>
+            <Validations @ref="@eventValidations" ValidateOnLoad=false>
+                <Fields>
+                    <Validation Validator="ValidationRule.IsNotEmpty">
+                        <Field>
+                            <FieldLabel>
+                                Название
+                            </FieldLabel>
+                            <FieldBody>
+                                <TextEdit @bind-Text="@bgEvent.Title">
+                                   <Feedback> 
+                                        <ValidationNone></ValidationNone>
+                                        <ValidationSuccess></ValidationSuccess>
+                                        <ValidationError>Название не может быть пустым</ValidationError>
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                    <Validation Validator="@ValidateDate">
+                        <Field>
+                            <FieldLabel>
+                                Дата проведения
+                            </FieldLabel>
+                            <DatePicker @bind-Date="@eventDate"
+                                        TValue="DateOnly?" DisplayFormat="dd.MM.Y">
+                               <Feedback>
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError>@dateErrorText</ValidationError>
+                                </Feedback>
+                            </DatePicker>
+                        </Field>
+                    </Validation>
+                    <Validation Validator="ValidateDuration">
+                        <Field>
+                            <FieldLabel>
+                                Продолжительность, мин
+                            </FieldLabel>
+                            <NumericPicker @bind-Value="@bgEvent.Duration" TValue="uint" Decimals="0" Step="1" Min="1">
+                            </NumericPicker>
+                        </Field>
+                    </Validation>
+                </Fields>
+                <Fields>
+                    <Validation Validator="ValidateCost">
+                        <Field>
+                            <FieldLabel>
+                                Стоимость
+                            </FieldLabel>
+                            <NumericPicker Decimals="0" TValue="uint" CurrencySymbol=" ₽"
+                                           CurrencySymbolPlacement="CurrencySymbolPlacement.Suffix">
+                               <Feedback>
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError></ValidationError>
+                                </Feedback>
+                            </NumericPicker>
+                        </Field>
+                    </Validation>
+                    <Validation Validator="@ValidateTime">
+                        <Field>
+                            <FieldLabel>
+                                Время начала
+                            </FieldLabel>
+                            <TimePicker TValue="TimeSpan?" @bind-Time="@timeSpan" TimeAs24hr>
+                               <Feedback>
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError>Обязательное поле</ValidationError>
+                                </Feedback>
+                            </TimePicker>
+                        </Field>
+                    </Validation>
+                    <Field>
+                        <FieldLabel>
+                            Возможность покупки игр
+                        </FieldLabel>
+                        <Check TValue="bool">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Обязательное поле</ValidationError>
+                            </Feedback>
+                        </Check>
+                    </Field>
+                </Fields>
+                <Fields>
+                    <Field Width="Width.Is25">
+                        <FieldLabel Width="Width.Is100">
+                            <Div Flex="Flex.JustifyContent.Between">
+                                Место проведения
+                                @if (!venueValid)
+                                {
+                                    <Div TextColor="TextColor.Danger">Обязательное поле</Div>
+                                }
+                            </Div>
+                        </FieldLabel>
+                        <Div>
+                            <RadzenListBox TValue="long"
+                                           Data="@venues"
+                                           TextProperty="Name"
+                                           ValueProperty="ID"
+                                           AllowVirtualization="true"
+                                           Style="height: 200px; width: 100%"
+                                           @bind-Value="bgEvent.VenueID"
+                                           Change="@OnVenueChanged"
+                            />
+                        </Div>
+                    </Field>
+                    <Field>
+                        <FieldLabel Width="Width.Is100">
+                            <Div Flex="Flex.JustifyContent.Between">
+                                Игры
+                                @if (!gamesValid)
+                                {
+                                    <Div TextColor="TextColor.Danger">Обязательное поле</Div>
+                                }
+                            </Div>
+                        </FieldLabel>
+                        <div style="position: relative; width: 100%; height: 200px; overflow: hidden;">
+                            <RadzenListBox @bind-Value=@selectedGamesIDs
+                                           Data="@games"
+                                           TextProperty="Title"
+                                           ValueProperty="ID"
+                                           Multiple="true"
+                                           AllowVirtualization="true"
+                                           Style="height: 240px; width: 100%; position: absolute; bottom: 0"
+                                           Change="@OnGamesChanged"
+                            />
+                        </div>
+                   </Field>
+                </Fields>
+                <h5>Регистрация</h5>
+                <Fields>
+                    <Validation Validator="@ValidateBeginDateTime">
+                        <Field>
+                            <FieldLabel>
+                                Начало
+                            </FieldLabel>
+                            <DatePicker TValue="DateTime?"
+                                      @bind-Date="@begin"
+                                      InputMode="DateInputMode.DateTime" TimeAs24hr
+                                      DisplayFormat="dd.MM.Y HH:mm">
+                               <Feedback>
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError>@beginErrorText</ValidationError>
+                                </Feedback>
+                            </DatePicker>
+                        </Field>
+                    </Validation>
+                    <Validation Validator="@ValidateEndDateTime">
+                        <Field>
+                            <FieldLabel>
+                                Окончание
+                            </FieldLabel>
+                            <DatePicker TValue="DateTime?"
+                                      @bind-Date="@end"
+                                      InputMode="DateInputMode.DateTime" TimeAs24hr
+                                      DisplayFormat="dd.MM.Y HH:mm">
+                               <Feedback>
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError>@endErrorText</ValidationError>
+                                </Feedback>
+                            </DatePicker>
+                        </Field>
+                    </Validation>
+                </Fields>
+            </Validations>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
+                <Button Color="Color.Primary" Clicked="@OnConfirmBtnClicked">
+                    Создать игротеку
+                </Button>
+            </ModalFooter>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    private Modal? modal;
+    private Validations? eventValidations;
+
+    private BoardGameEvent bgEvent = new BoardGameEvent()
+        {
+            Duration = 1,
+            Cost = 0,
+            VenueID = 0,
+        };
+
+    private TimeSpan? timeSpan;
+    private DateOnly? eventDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+    private DateTime? begin = DateTime.Today;
+    private DateTime? end = DateTime.Today;
+
+    private List<Venue> venues = new List<Venue>();
+    private List<BoardGame> games = new List<BoardGame>();
+
+    private Venue? selectedVenue;
+    private List<long> selectedGamesIDs = new List<long>();
+
+    private string dateErrorText = "";
+    private string beginErrorText = "";
+    private string endErrorText = "";
+    private bool venueValid = true;
+    private bool gamesValid = true;
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine(DateOnly.FromDateTime(DateTime.Today));
+        Console.WriteLine((DateOnly?) bgEvent.Date);
+        venues = VenueService.GetVenues();
+        games = BoardGameService.GetBoardGames();
+        base.OnInitialized();
+    }
+
+    public void Show()
+    {
+        modal?.Show();
+    }
+
+    private Task HideModal()
+    {
+        modal?.Hide();
+
+        return Task.CompletedTask;
+    }
+
+    private async Task OnConfirmBtnClicked()
+    {
+        eventValidations.ValidateAll();
+
+        if (bgEvent.VenueID == 0)
+        {
+            venueValid = false;
+        }
+
+        if (selectedGamesIDs.Count == 0)
+        {
+            gamesValid = false;
+        }
+
+        StateHasChanged();
+        //if (await orgRegValidations.ValidateAll())
+        //{
+        //    try
+        //    {
+        //        OrganizerService.CreateOrganizerWithUserRole(organizer);
+        //        UserService.SetCurrentUserRole("organizer");
+        //        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        //        await orgRegValidations?.ClearAll();
+        //    }
+        //    catch(AlreadyExistsOrganizerException)
+        //    {
+        //        nameFreeOrg = false;
+        //        addressFreeOrg = false;
+        //        nameErrorText = "";
+        //        addressErrorText = "Организатор с таким названием и адресом уже существует";
+        //        allUpdating = true;
+        //        await orgRegValidations?.ValidateAll();
+        //        allUpdating = false;
+        //    }
+        //}
+    }
+
+    private void ValidateDate(ValidatorEventArgs e)
+    {
+        var date = (e.Value as DateOnly?[])[0];
+
+        if (date is null)
+        {
+            dateErrorText = "Обязательное поле";
+            e.Status = ValidationStatus.Error;
+        }
+        else if (date <= DateOnly.FromDateTime(DateTime.Today))
+        {
+            dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
+            e.Status = ValidationStatus.Error;
+        }
+        else
+        {
+            e.Status = ValidationStatus.Success;
+        }
+    }
+
+    private void ValidateDuration(ValidatorEventArgs e)
+    {
+        var duration = (uint) e.Value;
+        e.Status = duration == 0 ? ValidationStatus.Error : ValidationStatus.Success;
+    }
+
+    private void ValidateCost(ValidatorEventArgs e)
+    {
+        var duration = (uint) e.Value;
+        e.Status = ValidationStatus.Success;
+    }
+
+    private void ValidateTime(ValidatorEventArgs e)
+    {
+        var time = e.Value;
+        e.Status = time is null ? ValidationStatus.Error : ValidationStatus.Success;
+    }
+
+    private void ValidateVenue(ValidatorEventArgs e)
+    {
+        e.Status = bgEvent.VenueID == 0 ? ValidationStatus.Error : ValidationStatus.Success;
+    }
+
+    private void ValidateBeginDateTime(ValidatorEventArgs e)
+    {
+        var dateTime = (e.Value as DateTime?[])[0];
+        var eventDateTime = new DateTime(
+            eventDate?.Year ?? 0,
+            eventDate?.Month ?? 0,
+            eventDate?.Day ?? 0,
+            timeSpan?.Hours ?? 0,
+            timeSpan?.Minutes ?? 0,
+            0
+        );
+
+        if (dateTime is null)
+        {
+            beginErrorText = "Обязательное поле";
+            e.Status = ValidationStatus.Error;
+        }
+        else if (dateTime >= eventDateTime)
+        {
+            beginErrorText = "Регистрация должна начаться раньше начала игротеки";
+            e.Status = ValidationStatus.Error;
+        }
+        else
+        {
+            e.Status = ValidationStatus.Success;
+        }
+    }
+
+    private void ValidateEndDateTime(ValidatorEventArgs e)
+    {
+        var dateTime = (e.Value as DateTime?[])[0];
+        var eventDateTime = new DateTime(
+            eventDate?.Year ?? 0,
+            eventDate?.Month ?? 0,
+            eventDate?.Day ?? 0,
+            timeSpan?.Hours ?? 0,
+            timeSpan?.Minutes ?? 0,
+            0
+        );
+
+        if (dateTime is null)
+        {
+            endErrorText = "Обязательное поле";
+            e.Status = ValidationStatus.Error;
+        }
+        else if (dateTime >= eventDateTime)
+        {
+            endErrorText = "Регистрация должна закончиться раньше начала игротеки";
+            e.Status = ValidationStatus.Error;
+        }
+        else if (dateTime <= begin)
+        {
+            endErrorText = "Регистрация не может закончиться раньше, чем началась";
+            e.Status = ValidationStatus.Error;
+        }
+        else if (dateTime <= DateTime.Now)
+        {
+            endErrorText = "При таких данных регистрация не состоится";
+            e.Status = ValidationStatus.Error;
+        }
+        else
+        {
+            e.Status = ValidationStatus.Success;
+        }
+    }
+
+    private void OnVenueChanged(object venue)
+    {
+        venueValid = true;
+        StateHasChanged();
+    }
+
+    private void OnGamesChanged(object games)
+    {
+        gamesValid = true;
+        StateHasChanged();
+    }
+}

@@ -9,6 +9,9 @@
 <DataGrid TItem="EventView"
           Data="@viewEvents"
           PageSize="@PageSize"
+          Editable="@Editable"
+          CommandMode="DataGridCommandMode.ButtonRow"
+          @bind-SelectedRow="@selectedEvent"
           ShowPager
           Sortable
           Striped
@@ -42,6 +45,16 @@
             </DisplayTemplate>
         </DataGridColumn>
     </DataGridColumns>
+    <ButtonRowTemplate>
+        @if (Editable)
+        {
+            <Button Color="Color.Success" Clicked="@OnNewEventBtnClicked">Новая игротека</Button>
+            <Button Color="Color.Primary" Clicked="@OnEditEventBtnClicked"
+                    Disabled="@(selectedEvent is null)">Изменить</Button>
+            <Button Color="Color.Danger" Clicked="@OnCancelEventBtnClicked"
+                    Disabled="@(selectedEvent is null)">Отменить</Button>
+        }
+    </ButtonRowTemplate>
     <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
     <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
     <LastPageButtonTemplate><Icon Name="IconName.Forward" /></LastPageButtonTemplate>
@@ -61,6 +74,8 @@
     </CardBody>
 }
 
+<EventModal Title="Новая игротека" @ref="@newEventModal"/>
+
 @code {
     [Parameter]
     public bool ColorHint { get; set; } = false;
@@ -68,8 +83,15 @@
     public List<BoardGameEvent> Events { get; set; } = new List<BoardGameEvent>();
     [Parameter]
     public int PageSize { get; set; } = 6;
+    [Parameter]
+    public bool Editable { get; set; } = false;
+
+    private EventModal? newEventModal;
 
     private List<EventView> viewEvents = new List<EventView>();
+    private EventView? selectedEvent;
+
+    [Inject] private IMessageService MessageService { get; set; }
 
     protected override void OnInitialized()
     {
@@ -78,5 +100,20 @@
             viewEvents.Add(new EventView(bgEvent));
         }
         base.OnInitialized();
+    }
+
+    private void OnNewEventBtnClicked()
+    {
+        newEventModal?.Show();
+    }
+
+    private void OnEditEventBtnClicked()
+    {
+        MessageService.Info("");
+    }
+
+    private void OnCancelEventBtnClicked()
+    {
+        MessageService.Info("Cancel!!!");
     }
 }

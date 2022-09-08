@@ -38,6 +38,12 @@ namespace BusinessLogic.Models
         public virtual Organizer Organizer { get; set; }
         public virtual Venue Venue { get; set; }
 
+        public BoardGameEvent()
+        {
+            Title = "";
+            Date = new DateOnly();
+        }
+
         public BoardGameEvent(string title, DateOnly date)
         {
             Title = title;

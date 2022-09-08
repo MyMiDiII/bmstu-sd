@@ -104,6 +104,8 @@
     private Login? loginModal;
     private Register? registerModal;
 
+    [Inject] private IMessageService MessageService { get; set; }
+
     protected override void OnInitialized()
     {
         for (int i = 1; i <= 4; ++i)
@@ -148,11 +150,15 @@
     public void ChangeRoleToOrganizer()
     {
         UserService.SetCurrentUserRole("organizer");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        MessageService.Info("Вы переключились на профиль организатора");
     }
 
     public void ChangeRoleToPlayer()
     {
         UserService.SetCurrentUserRole("player");
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        MessageService.Info("Вы переключились на профиль игрока");
     }
 
     public void GoToMyOrgEvents()

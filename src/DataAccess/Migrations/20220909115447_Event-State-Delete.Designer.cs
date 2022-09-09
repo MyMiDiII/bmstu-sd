@@ -3,6 +3,7 @@ using System;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(BGEContext))]
-    partial class BGEContextModelSnapshot : ModelSnapshot
+    [Migration("20220909115447_Event-State-Delete")]
+    partial class EventStateDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,9 +105,6 @@ namespace DataAccess.Migrations
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()

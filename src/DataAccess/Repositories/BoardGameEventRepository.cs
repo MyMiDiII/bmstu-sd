@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
@@ -34,7 +35,24 @@ namespace DataAccess.Repositories
 
         public List<BoardGameEvent> GetAll()
         {
-            return _dbcontext.Events.Where(bgEvent => !bgEvent.Deleted).ToList();
+            var state = _dbcontext.Events.FromSqlRaw(
+               "select e.\"ID\", e.\"Title\", e.\"Date\", e.\"StartTime\", e.\"Duration\"," +
+               "e.\"Cost\", e.\"Purchase\", e.\"OrganizerID\", e.\"VenueID\"," +
+               "e.\"Deleted\", e.\"BeginRegistration\", e.\"EndRegistration\"," +
+               "e.\"Cancelled\", get_event_state(e.\"Date\", e.\"StartTime\", e.\"Duration\"," +
+               "                                 e.\"BeginRegistration\", e.\"EndRegistration\"," +
+               "                                 e.\"Cancelled\", e.\"Deleted\") as \"State\"" +
+               "from \"Events\" e " +
+               "where e.\"Deleted\" != true;").ToList();
+            //bgEvent.Date,
+            //bgEvent.StartTime,
+            //bgEvent.Duration,
+            //bgEvent.BeginRegistration,
+            //bgEvent.EndRegistration,
+            //bgEvent.Cancelled,
+            //bgEvent.Deleted
+
+            return state;
         }
 
         public BoardGameEvent? GetByID(long id)

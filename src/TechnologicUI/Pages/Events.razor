@@ -36,6 +36,7 @@
 
     protected override void OnInitialized()
     {
+        StateHasChanged();
         events = BoardGameEventService.GetBoardGameEvents();
         base.OnInitialized();
     }

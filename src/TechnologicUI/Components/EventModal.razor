@@ -322,11 +322,11 @@
             dateErrorText = "Обязательное поле";
             e.Status = ValidationStatus.Error;
         }
-        else if (date <= DateOnly.FromDateTime(DateTime.Today))
-        {
-            dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
-            e.Status = ValidationStatus.Error;
-        }
+        //else if (date <= DateOnly.FromDateTime(DateTime.Today))
+        //{
+        //    dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
+        //    e.Status = ValidationStatus.Error;
+        //}
         else
         {
             e.Status = ValidationStatus.Success;
@@ -411,11 +411,11 @@
             endErrorText = "Регистрация не может закончиться раньше, чем началась";
             e.Status = ValidationStatus.Error;
         }
-        else if (dateTime <= DateTime.Now)
-        {
-            endErrorText = "При таких данных регистрация не состоится";
-            e.Status = ValidationStatus.Error;
-        }
+        //else if (dateTime <= DateTime.Now)
+        //{
+        //    endErrorText = "При таких данных регистрация не состоится";
+        //    e.Status = ValidationStatus.Error;
+        //}
         else
         {
             e.Status = ValidationStatus.Success;

@@ -25,25 +25,25 @@ namespace BusinessLogic.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private User _curUser;
+        private readonly CurUserService _curUserService;
         private readonly IEncryptionService _encryptionService;
 
-        public UserService(IUserRepository userRepository, IEncryptionService encryptionService)
+        public UserService(IUserRepository userRepository, CurUserService curUserService,
+                           IEncryptionService encryptionService)
         {
             _userRepository = userRepository;
-            _curUser = _userRepository.GetDefaultUser();
-            _curUser.CurRoleName = "guest";
+            _curUserService = curUserService;
             _encryptionService = encryptionService;
         }
 
         public long GetCurrentUserID()
         {
-            return _curUser.ID;
+            return _curUserService.GetCurrentUserID();
         }
 
         public User GetCurrentUser()
         {
-            return _curUser;
+            return _curUserService.GetCurrentUser();
         }
 
         public User? GetUserByID(long id)
@@ -58,40 +58,24 @@ namespace BusinessLogic.Services
 
         public long GetCurrentUserRoleID(string roleName)
         {
-            var role = _curUser.Roles.Find(x => x.RoleName == roleName);
+            var role = _curUserService.GetCurrentUser().Roles.Find(x => x.RoleName == roleName);
             return role == null ? -1 : role.RoleID;
-        }
-
-        private Role? GetCurrentUserRole(string roleName)
-        {
-            return _curUser.Roles.Find(x => x.RoleName == roleName);
         }
 
         public string GetCurrentUserRoleName()
         {
-            return _curUser.CurRoleName;
+            return _curUserService.GetCurrentUserRoleName();
         }
 
         public string? SetCurrentUserRole(string roleName)
         {
-            var role = GetCurrentUserRole(roleName);
-
-            if (role != null)
-            {
-                _curUser.CurRoleName = role.RoleName;
-                return role.RoleName;
-            }
-
-            return null;
+            return _curUserService.SetCurrentUserRole(roleName);
         }
 
-        void SetCurrentUser(User user, string roleName)
+        public void SetCurrentUser(User user, string roleName)
         {
             user.Roles = _userRepository.GetUserRoles(user.ID);
-            _curUser = user;
-            user.CurRoleName = GetCurrentUserRole(roleName) == null
-                               ? user.Roles[0].RoleName : roleName;
-            _curUser = user;
+            _curUserService.SetCurrentUser(user, roleName);
         }
 
         public List<User> GetUsers()
@@ -135,7 +119,7 @@ namespace BusinessLogic.Services
 
         public bool CheckUserRole(string role)
         {
-            return _curUser.Roles.FirstOrDefault(item => item.RoleName == role) is not null;
+            return _curUserService.CheckUserRole(role);
         }
 
         public void Login(LoginRequest loginRequest)

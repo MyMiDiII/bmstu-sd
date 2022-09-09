@@ -23,15 +23,16 @@ builder.Services
     .AddFontAwesomeIcons();
 
 // maybe scoped???
-builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<CurUserService>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBoardGameService, BoardGameService>();
 builder.Services.AddTransient<IBoardGameEventService, BoardGameEventService>();
 builder.Services.AddTransient<IOrganizerService, OrganizerService>();
 builder.Services.AddTransient<IVenueService, VenueService>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
-builder.Services.AddSingleton<IEncryptionService, BCryptEntryptionService>();
+builder.Services.AddTransient<IEncryptionService, BCryptEntryptionService>();
 
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IBoardGameRepository, BoardGameRepository>();
 builder.Services.AddTransient<IBoardGameEventRepository, BoardGameEventRepository>();
 builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
@@ -40,7 +41,7 @@ builder.Services.AddTransient<IPlayerRepository, PlayerRepository>();
 
 builder.Configuration.AddJsonFile("dbsettings.json");
 builder.Services.AddDbContext<BGEContext>(options => options.UseNpgsql(
-      builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Singleton);
+      builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient);
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);

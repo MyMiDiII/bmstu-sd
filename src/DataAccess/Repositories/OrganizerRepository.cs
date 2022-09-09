@@ -2,6 +2,7 @@
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
@@ -107,9 +108,10 @@ namespace DataAccess.Repositories
 
         public List<BoardGameEvent> GetOrganizerEvents(long organizerID)
         {
-            return _dbcontext.Events
-                   .Where(bgEvent => bgEvent.OrganizerID == organizerID)
-                   .ToList();
+            var events = _dbcontext.Events.FromSqlRaw(
+               "select * from get_organizer_events_with_states({0})", organizerID).ToList();
+
+            return events;
         }
     }
 }

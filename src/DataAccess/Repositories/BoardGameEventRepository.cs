@@ -35,24 +35,10 @@ namespace DataAccess.Repositories
 
         public List<BoardGameEvent> GetAll()
         {
-            var state = _dbcontext.Events.FromSqlRaw(
-               "select e.\"ID\", e.\"Title\", e.\"Date\", e.\"StartTime\", e.\"Duration\"," +
-               "e.\"Cost\", e.\"Purchase\", e.\"OrganizerID\", e.\"VenueID\"," +
-               "e.\"Deleted\", e.\"BeginRegistration\", e.\"EndRegistration\"," +
-               "e.\"Cancelled\", get_event_state(e.\"Date\", e.\"StartTime\", e.\"Duration\"," +
-               "                                 e.\"BeginRegistration\", e.\"EndRegistration\"," +
-               "                                 e.\"Cancelled\", e.\"Deleted\") as \"State\"" +
-               "from \"Events\" e " +
-               "where e.\"Deleted\" != true;").ToList();
-            //bgEvent.Date,
-            //bgEvent.StartTime,
-            //bgEvent.Duration,
-            //bgEvent.BeginRegistration,
-            //bgEvent.EndRegistration,
-            //bgEvent.Cancelled,
-            //bgEvent.Deleted
+            var events = _dbcontext.Events.FromSqlRaw(
+               "select * from get_events_with_states()").ToList();
 
-            return state;
+            return events;
         }
 
         public BoardGameEvent? GetByID(long id)

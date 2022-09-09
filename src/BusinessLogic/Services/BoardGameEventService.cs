@@ -8,7 +8,7 @@ namespace BusinessLogic.Services
     {
         BoardGameEvent? GetBoardGameEventByID(long id);
         List<BoardGameEvent> GetBoardGameEvents();
-        void CreateBoardGameEvent(BoardGameEvent boardGameEvent);
+        long CreateBoardGameEvent(BoardGameEvent boardGameEvent);
         void UpdateBoardGameEvent(BoardGameEvent boardGameEvent);
         void DeleteBoardGameEvent(BoardGameEvent boardGameEvent);
         List<BoardGame> GetGamesByEvent(BoardGameEvent boardGameEvent);
@@ -42,12 +42,12 @@ namespace BusinessLogic.Services
             return _boardGameEventRepository.GetAll();
         }
 
-        public void CreateBoardGameEvent(BoardGameEvent boardGameEvent)
+        public long CreateBoardGameEvent(BoardGameEvent boardGameEvent)
         {
             if (Exist(boardGameEvent))
                 throw new AlreadyExistsBoardGameEventException();
 
-            _boardGameEventRepository.Add(boardGameEvent);
+            return _boardGameEventRepository.Add(boardGameEvent);
         }
 
         public void UpdateBoardGameEvent(BoardGameEvent boardGameEvent)

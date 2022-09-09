@@ -6,8 +6,9 @@
 @inject BusinessLogic.Services.IUserService UserService 
 @inject BusinessLogic.Services.IVenueService VenueService 
 @inject BusinessLogic.Services.IBoardGameService BoardGameService
+@inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
 
-<Modal @ref="@modal">
+<Modal @ref="@modal" RenderMode="ModalRenderMode.LazyReload">
     <ModalContent Size="ModalSize.Large" Centered>
         <ModalHeader>
             <ModalTitle>@Title</ModalTitle>
@@ -65,7 +66,8 @@
                                 Стоимость
                             </FieldLabel>
                             <NumericPicker Decimals="0" TValue="uint" CurrencySymbol=" ₽"
-                                           CurrencySymbolPlacement="CurrencySymbolPlacement.Suffix">
+                                           CurrencySymbolPlacement="CurrencySymbolPlacement.Suffix"
+                                           @bind-Value="@bgEvent.Cost">
                                <Feedback>
                                     <ValidationNone></ValidationNone>
                                     <ValidationSuccess></ValidationSuccess>
@@ -92,7 +94,7 @@
                         <FieldLabel>
                             Возможность покупки игр
                         </FieldLabel>
-                        <Check TValue="bool">
+                        <Check TValue="bool" @bind-Checked="@bgEvent.Purchase">
                            <Feedback>
                                 <ValidationNone></ValidationNone>
                                 <ValidationSuccess></ValidationSuccess>
@@ -202,17 +204,16 @@
     private Modal? modal;
     private Validations? eventValidations;
 
-    private BoardGameEvent bgEvent = new BoardGameEvent()
-        {
-            Duration = 1,
-            Cost = 0,
-            VenueID = 0,
-        };
+    [Parameter]
+    public BoardGameEvent? Event { get; set; }
+    [Parameter]
+    public EventCallback<BoardGameEvent?> EventChanged { get; set; }
 
+    private BoardGameEvent bgEvent;
     private TimeSpan? timeSpan;
-    private DateOnly? eventDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
-    private DateTime? begin = DateTime.Today;
-    private DateTime? end = DateTime.Today;
+    private DateOnly? eventDate;
+    private DateTime? begin;
+    private DateTime? end;
 
     private List<Venue> venues = new List<Venue>();
     private List<BoardGame> games = new List<BoardGame>();
@@ -226,17 +227,34 @@
     private bool venueValid = true;
     private bool gamesValid = true;
 
+    [Inject] private IMessageService MessageService { get; set; }
+
     protected override void OnInitialized()
     {
-        Console.WriteLine(DateOnly.FromDateTime(DateTime.Today));
-        Console.WriteLine((DateOnly?) bgEvent.Date);
         venues = VenueService.GetVenues();
         games = BoardGameService.GetBoardGames();
         base.OnInitialized();
     }
 
+    private void Init()
+    {
+        bgEvent = Event ?? new BoardGameEvent()
+                           {
+                               Duration = 1,
+                               Cost = 0,
+                               VenueID = 0,
+                           };
+        timeSpan = TimeSpan.FromTicks((Event?.StartTime)?.Ticks ?? 0);
+        eventDate = Event?.Date ?? DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+        begin = Event?.BeginRegistration ?? DateTime.Today;
+        end = Event?.EndRegistration ?? DateTime.Today;
+        selectedGamesIDs = Event is not null ? BoardGameEventService.GetGamesByEvent(bgEvent)
+                                               .Select((item) => (item.ID)).ToList() : new List<long>();
+    }
+
     public void Show()
     {
+        Init();
         modal?.Show();
     }
 
@@ -249,8 +267,6 @@
 
     private async Task OnConfirmBtnClicked()
     {
-        eventValidations.ValidateAll();
-
         if (bgEvent.VenueID == 0)
         {
             venueValid = false;
@@ -261,27 +277,40 @@
             gamesValid = false;
         }
 
-        StateHasChanged();
-        //if (await orgRegValidations.ValidateAll())
-        //{
-        //    try
-        //    {
-        //        OrganizerService.CreateOrganizerWithUserRole(organizer);
-        //        UserService.SetCurrentUserRole("organizer");
-        //        NavigationManager.NavigateTo(NavigationManager.Uri, true);
-        //        await orgRegValidations?.ClearAll();
-        //    }
-        //    catch(AlreadyExistsOrganizerException)
-        //    {
-        //        nameFreeOrg = false;
-        //        addressFreeOrg = false;
-        //        nameErrorText = "";
-        //        addressErrorText = "Организатор с таким названием и адресом уже существует";
-        //        allUpdating = true;
-        //        await orgRegValidations?.ValidateAll();
-        //        allUpdating = false;
-        //    }
-        //}
+        if ( await eventValidations.ValidateAll() && venueValid && gamesValid)
+        {
+            try
+            {
+                if (begin is not null)
+                    bgEvent.BeginRegistration = (DateTime) begin;
+
+                if (eventDate is not null)
+                    bgEvent.Date = (DateOnly)eventDate;
+
+                if (end is not null)
+                    bgEvent.EndRegistration = (DateTime) end;
+
+                bgEvent.OrganizerID = UserService.GetCurrentUserRoleID("organizer");
+
+                if (timeSpan is not null)
+                    bgEvent.StartTime = TimeOnly.FromTimeSpan((TimeSpan) timeSpan);
+
+                bgEvent.State = BoardGameEventState.Planned;
+
+                long id = BoardGameEventService.CreateBoardGameEvent(bgEvent);
+                BoardGameService.AddBoardGamesToEvent(selectedGamesIDs, new BoardGameEvent() {ID = id});
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
+                await eventValidations?.ClearAll();
+            }
+            catch(AlreadyExistsBoardGameEventException)
+            {
+                await MessageService.Error("Игротека уже существует!");
+            }
+        }
+        else
+        {
+            StateHasChanged();
+        }
     }
 
     private void ValidateDate(ValidatorEventArgs e)
@@ -324,7 +353,7 @@
 
     private void ValidateVenue(ValidatorEventArgs e)
     {
-        e.Status = bgEvent.VenueID == 0 ? ValidationStatus.Error : ValidationStatus.Success;
+        e.Status = Event.VenueID == 0 ? ValidationStatus.Error : ValidationStatus.Success;
     }
 
     private void ValidateBeginDateTime(ValidatorEventArgs e)

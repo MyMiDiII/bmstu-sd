@@ -42,6 +42,9 @@ builder.Configuration.AddJsonFile("dbsettings.json");
 builder.Services.AddDbContext<BGEContext>(options => options.UseNpgsql(
       builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Singleton);
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

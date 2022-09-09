@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace DataAccess.Repositories
 {
@@ -13,12 +14,14 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(Organizer elem)
+        public long Add(Organizer elem)
         {
             try
             {
                 _dbcontext.Organizers.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
             catch
             {

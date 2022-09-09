@@ -13,15 +13,21 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(BoardGameEvent elem)
+        public long Add(BoardGameEvent elem)
         {
             try
             {
                 _dbcontext.Events.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("BEGIN");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException.Message);
+                Console.WriteLine("END");
                 throw new AddBoardGameEventException();
             }
         }

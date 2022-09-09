@@ -2,7 +2,7 @@
 {
     public interface IRepository<T>
     {
-        void Add(T elem);
+        long Add(T elem);
         List<T> GetAll();
         T? GetByID(long id);
         void Update(T elem);

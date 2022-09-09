@@ -16,6 +16,7 @@ namespace BusinessLogic.Services
         bool CheckBoardGameInCurrentUserFavorites(BoardGame boardGame);
         List<BoardGameEvent> GetEventsByGame(BoardGame boardGame);
         void AddBoardGameToEvent(BoardGame boardGame, BoardGameEvent bgEvent);
+        void AddBoardGamesToEvent(List<long> boardGameIDs, BoardGameEvent bgEvent);
         void DeleteBoardGameFromEvent(BoardGame boardGame, BoardGameEvent bgEvent);
     }
 
@@ -114,6 +115,11 @@ namespace BusinessLogic.Services
                 throw new AlreadyExistsEventGameException();
 
             _boardGameRepository.AddToEvent(boardGame.ID, bgEvent.ID);
+        }
+
+        public void AddBoardGamesToEvent(List<long> boardGamesIDs, BoardGameEvent bgEvent)
+        {
+            _boardGameRepository.AddManyToEvent(boardGamesIDs, bgEvent.ID);
         }
 
         public void DeleteBoardGameFromEvent(BoardGame boardGame, BoardGameEvent bgEvent)

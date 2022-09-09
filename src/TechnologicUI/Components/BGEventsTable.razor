@@ -16,6 +16,7 @@
           Sortable
           Striped
           Responsive
+          RowClicked="@OnSelectedRowChange"
           >
     <DataGridColumns>
         <DataGridColumn Caption="Название" Editable >
@@ -75,6 +76,7 @@
 }
 
 <EventModal Title="Новая игротека" @ref="@newEventModal"/>
+<EventModal Title="Изменение информации об игротеке" @ref="@editEventModal" @bind-Event=@trueSelectedEvent/>
 
 @code {
     [Parameter]
@@ -87,9 +89,11 @@
     public bool Editable { get; set; } = false;
 
     private EventModal? newEventModal;
+    private EventModal? editEventModal;
 
     private List<EventView> viewEvents = new List<EventView>();
     private EventView? selectedEvent;
+    private BoardGameEvent? trueSelectedEvent;
 
     [Inject] private IMessageService MessageService { get; set; }
 
@@ -109,11 +113,17 @@
 
     private void OnEditEventBtnClicked()
     {
-        MessageService.Info("");
+        editEventModal?.Show();
     }
 
     private void OnCancelEventBtnClicked()
     {
         MessageService.Info("Cancel!!!");
     }
+
+    private void OnSelectedRowChange(Blazorise.DataGrid.DataGridRowMouseEventArgs<EventView> args)
+    {
+        trueSelectedEvent = BoardGameEventService.GetBoardGameEventByID(args.Item?.ID ?? 0);
+    }
+
 }

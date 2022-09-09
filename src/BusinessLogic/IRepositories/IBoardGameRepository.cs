@@ -11,6 +11,7 @@ namespace BusinessLogic.IRepositories
         List<BoardGame> GetByPlayerNum(uint minNum, uint maxNum);
         List<BoardGame> GetByDuration(uint minDuration, uint maxDuration);
         void AddToEvent(long gameID, long eventID);
+        void AddManyToEvent(List<long> gamesIDs, long eventID);
         void DeleteFromEvent(long gameID, long eventID);
         bool CheckGamePlaying(long gameID, long eventID);
         List<BoardGameEvent> GetGameEvents(long gameID);

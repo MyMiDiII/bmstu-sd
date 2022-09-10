@@ -1,9 +1,6 @@
 ﻿@using BusinessLogic.Models
 
-@*@inject NavigationManager NavigationManager
-          RowDoubleClicked="@(() => NavigationManager.NavigateTo("/"))"
-*@
-
+@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService 
 
 <DataGrid TItem="EventView"
@@ -119,7 +116,19 @@
 
     private void OnCancelEventBtnClicked()
     {
-        MessageService.Info("Cancel!!!");
+        if (trueSelectedEvent is not null)
+        {
+            if (trueSelectedEvent.State == BoardGameEventState.Finished)
+            {
+                MessageService.Error("Нельзя отменить проведенную игротеку");
+            }
+            else
+            {
+                trueSelectedEvent.Cancelled = true;
+                BoardGameEventService.UpdateBoardGameEvent(trueSelectedEvent);
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
+            }
+        }
     }
 
     private void OnSelectedRowChange(Blazorise.DataGrid.DataGridRowMouseEventArgs<EventView> args)

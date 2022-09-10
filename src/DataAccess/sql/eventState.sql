@@ -73,6 +73,28 @@ $$
 	end;
 $$ language plpgsql;
 
+create or replace
+function get_event_with_state_by_id("ID" bigint)
+returns table ("ID" bigint, "Title" text, "Date" date, "StartTime" time,
+			   "Duration" bigint, "Cost" bigint, "Purchase" bool,
+			   "OrganizerID" bigint, "VenueID" bigint, "Deleted" bool,
+			   "BeginRegistration" timestamp, "EndRegistration" timestamp,
+			   "Cancelled" bool, "State" integer)
+as
+$$
+    begin
+		return query
+		select e."ID", e."Title", e."Date", e."StartTime", e."Duration",
+	   		e."Cost", e."Purchase", e."OrganizerID", e."VenueID",
+	   		e."Deleted", e."BeginRegistration", e."EndRegistration",
+	   		e."Cancelled", get_event_state(e."Date", e."StartTime", e."Duration",
+	   			  						   e."BeginRegistration", e."EndRegistration",
+	   								  	   e."Cancelled", e."Deleted") as "State"
+		from "Events" e
+		where e."ID" = "ID";
+	end;
+$$ language plpgsql;
+
 DROP FUNCTION get_organizer_events_with_states(bigint);
 
 DROP FUNCTION get_events_with_states();

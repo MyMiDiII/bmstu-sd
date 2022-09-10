@@ -25,10 +25,6 @@ namespace DataAccess.Repositories
             }
             catch(Exception ex)
             {
-                Console.WriteLine("BEGIN");
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.InnerException.Message);
-                Console.WriteLine("END");
                 throw new AddBoardGameEventException();
             }
         }
@@ -43,7 +39,8 @@ namespace DataAccess.Repositories
 
         public BoardGameEvent? GetByID(long id)
         {
-            return _dbcontext.Events.Find(id);
+            return _dbcontext.Events.FromSqlRaw(
+                    "select * from get_event_with_state_by_id({0})", id).ToList()[0];
         }
 
         public void Update(BoardGameEvent elem)

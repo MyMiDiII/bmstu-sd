@@ -47,10 +47,28 @@ namespace DataAccess.Repositories
         {
             try
             {
-                _dbcontext.Events.Update(elem);
-                _dbcontext.SaveChanges();
+                var editEvent = _dbcontext.Events.FirstOrDefault(e => e.ID == elem.ID);
+
+                if (editEvent != null)
+                {
+                    editEvent.BeginRegistration = elem.BeginRegistration;
+                    editEvent.Cancelled = elem.Cancelled;
+                    editEvent.Cost = elem.Cost;
+                    editEvent.Date = elem.Date;
+                    editEvent.Deleted = elem.Deleted;
+                    editEvent.Duration = elem.Duration;
+                    editEvent.EndRegistration = elem.EndRegistration;
+                    editEvent.OrganizerID = elem.OrganizerID;
+                    editEvent.Purchase = elem.Purchase;
+                    editEvent.StartTime = elem.StartTime;
+                    editEvent.Title = elem.Title;
+                    editEvent.VenueID = elem.VenueID;
+
+                    _dbcontext.Events.Update(editEvent);
+                    _dbcontext.SaveChanges();
+                }
             }
-            catch
+            catch (Exception ex)
             {
                 throw new UpdateBoardGameEventException();
             }

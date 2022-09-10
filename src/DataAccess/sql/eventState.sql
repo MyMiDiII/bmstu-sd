@@ -74,7 +74,7 @@ $$
 $$ language plpgsql;
 
 create or replace
-function get_event_with_state_by_id("ID" bigint)
+function get_event_with_state_by_id("eventID" bigint)
 returns table ("ID" bigint, "Title" text, "Date" date, "StartTime" time,
 			   "Duration" bigint, "Cost" bigint, "Purchase" bool,
 			   "OrganizerID" bigint, "VenueID" bigint, "Deleted" bool,
@@ -91,7 +91,7 @@ $$
 	   			  						   e."BeginRegistration", e."EndRegistration",
 	   								  	   e."Cancelled", e."Deleted") as "State"
 		from "Events" e
-		where e."ID" = "ID";
+		where e."ID" = "eventID";
 	end;
 $$ language plpgsql;
 

@@ -76,7 +76,8 @@
 }
 
 <EventModal Title="Новая игротека" @ref="@newEventModal"/>
-<EventModal Title="Изменение информации об игротеке" @ref="@editEventModal" @bind-Event=@trueSelectedEvent/>
+<EventModal Title="Изменение информации об игротеке" EditMode=true
+            @ref="@editEventModal" @bind-Event=@trueSelectedEvent/>
 
 @code {
     [Parameter]

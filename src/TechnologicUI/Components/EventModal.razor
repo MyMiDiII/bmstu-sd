@@ -178,7 +178,7 @@
                                       InputMode="DateInputMode.DateTime" TimeAs24hr
                                       DisplayFormat="dd.MM.Y HH:mm">
                                <Feedback>
-                                    <ValidationNone></ValidationNone>
+                                    <ValidationNone>@endNoneText</ValidationNone>
                                     <ValidationSuccess></ValidationSuccess>
                                     <ValidationError>@endErrorText</ValidationError>
                                 </Feedback>
@@ -190,7 +190,14 @@
             <ModalFooter>
                 <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
                 <Button Color="Color.Primary" Clicked="@OnConfirmBtnClicked">
-                    Создать игротеку
+                    @if (!EditMode)
+                    {
+                        @($"Создать игротеку")
+                    }
+                    else
+                    {
+                        @($"Сохранить изменения")
+                    }
                 </Button>
             </ModalFooter>
         </ModalBody>
@@ -200,6 +207,8 @@
 @code {
     [Parameter]
     public string Title { get; set; } = "";
+    [Parameter]
+    public bool EditMode { get; set; } = false;
 
     private Modal? modal;
     private Validations? eventValidations;
@@ -224,6 +233,7 @@
     private string dateErrorText = "";
     private string beginErrorText = "";
     private string endErrorText = "";
+    private string endNoneText = "";
     private bool venueValid = true;
     private bool gamesValid = true;
 
@@ -250,12 +260,32 @@
         end = Event?.EndRegistration ?? DateTime.Today;
         selectedGamesIDs = Event is not null ? BoardGameEventService.GetGamesByEvent(bgEvent)
                                                .Select((item) => (item.ID)).ToList() : new List<long>();
+        if (EditMode && end <= DateTime.Now)
+        {
+            endNoneText = "При таких данных регистрация не состоится!" +
+                           "\nПроверьте, что игроки уже зарегистрировались на игротеку";
+        }
     }
 
     public void Show()
     {
-        Init();
-        modal?.Show();
+        if (!EditMode)
+        {
+            Init();
+            modal?.Show();
+        }
+        else if (Event is null
+                 || Event.State != BoardGameEventState.Finished
+                 && Event.State != BoardGameEventState.Deleted
+                 && Event.State != BoardGameEventState.Cancelled)
+        {
+            Init();
+            modal?.Show();
+        }
+        else
+        {
+            MessageService.Error("Нельзя изменять завершенную, удаленную или отмененную игротеку!");
+        }
     }
 
     private Task HideModal()
@@ -295,10 +325,16 @@
                 if (timeSpan is not null)
                     bgEvent.StartTime = TimeOnly.FromTimeSpan((TimeSpan) timeSpan);
 
-                bgEvent.State = BoardGameEventState.Planned;
+                if (!EditMode)
+                {
+                    long id = BoardGameEventService.CreateBoardGameEvent(bgEvent);
+                    BoardGameService.AddBoardGamesToEvent(selectedGamesIDs, new BoardGameEvent() {ID = id});
+                }
+                else
+                {
+                    BoardGameEventService.UpdateBoardGameEvent(bgEvent);
+                }
 
-                long id = BoardGameEventService.CreateBoardGameEvent(bgEvent);
-                BoardGameService.AddBoardGamesToEvent(selectedGamesIDs, new BoardGameEvent() {ID = id});
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);
                 await eventValidations?.ClearAll();
             }
@@ -317,20 +353,42 @@
     {
         var date = (e.Value as DateOnly?[])[0];
 
-        if (date is null)
+        if (!EditMode)
         {
-            dateErrorText = "Обязательное поле";
-            e.Status = ValidationStatus.Error;
+            if (date is null)
+            {
+                dateErrorText = "Обязательное поле";
+                e.Status = ValidationStatus.Error;
+            }
+            else if (date <= DateOnly.FromDateTime(DateTime.Today))
+            {
+                dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
+                e.Status = ValidationStatus.Error;
+            }
+            else
+            {
+                e.Status = ValidationStatus.Success;
+            }
         }
-        //else if (date <= DateOnly.FromDateTime(DateTime.Today))
-        //{
-        //    dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
-        //    e.Status = ValidationStatus.Error;
-        //}
         else
         {
-            e.Status = ValidationStatus.Success;
+            if (date is null)
+            {
+                dateErrorText = "Обязательное поле";
+                e.Status = ValidationStatus.Error;
+            }
+            else if (date != Event?.Date && date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                dateErrorText = "Игротека не может быть запланирована на прошлое!";
+                e.Status = ValidationStatus.Error;
+            }
+            else
+            {
+                e.Status = ValidationStatus.Success;
+            }
+
         }
+
     }
 
     private void ValidateDuration(ValidatorEventArgs e)
@@ -411,11 +469,20 @@
             endErrorText = "Регистрация не может закончиться раньше, чем началась";
             e.Status = ValidationStatus.Error;
         }
-        //else if (dateTime <= DateTime.Now)
-        //{
-        //    endErrorText = "При таких данных регистрация не состоится";
-        //    e.Status = ValidationStatus.Error;
-        //}
+        else if (dateTime <= DateTime.Now)
+        {
+            if (!EditMode)
+            {
+                endErrorText = "При таких данных регистрация не состоится";
+                e.Status = ValidationStatus.Error;
+            }
+            else
+            {
+                endNoneText = "При таких данных регистрация не состоится!" +
+                               "\nПроверьте, что игроки уже зарегистрировались на игротеку";
+                e.Status = ValidationStatus.None;
+            }
+        }
         else
         {
             e.Status = ValidationStatus.Success;

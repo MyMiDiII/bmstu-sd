@@ -52,8 +52,6 @@
                                         Игрок
                                     </Badge>
                                 </BarDropdownItem>
-                                <BarDropdownItem Clicked="@GoToMyGames">Мои настолки</BarDropdownItem>
-                                <BarDropdownItem Clicked="@GoToMyEvents">Мои игротеки</BarDropdownItem>
 
                                 @if (UserService.CheckUserRole("organizer"))
                                 {
@@ -62,6 +60,10 @@
                                         Профиль организатора
                                     </BarDropdownItem>
                                 }
+
+                                <BarDropdownDivider/>
+                                <BarDropdownItem Clicked="@GoToMyGames">Мои настолки</BarDropdownItem>
+                                <BarDropdownItem Clicked="@GoToMyEvents">Мои игротеки</BarDropdownItem>
                             }
                             else
                             {
@@ -71,7 +73,6 @@
                                         Организатор
                                     </Badge>
                                 </BarDropdownItem>
-                                <BarDropdownItem Clicked="@GoToMyOrgEvents">Мои игротеки</BarDropdownItem>
 
                                 if (UserService.CheckUserRole("player"))
                                 {
@@ -80,6 +81,9 @@
                                         Профиль игрока
                                     </BarDropdownItem>
                                 }
+
+                                <BarDropdownDivider/>
+                                <BarDropdownItem Clicked="@GoToMyOrgEvents">Мои игротеки</BarDropdownItem>
                             }
                             <BarDropdownDivider/>
                             <BarDropdownItem Clicked="@Logout">Выход</BarDropdownItem>
@@ -150,15 +154,13 @@
     public void ChangeRoleToOrganizer()
     {
         UserService.SetCurrentUserRole("organizer");
-        NavigationManager.NavigateTo(NavigationManager.Uri, true);
-        MessageService.Info("Вы переключились на профиль организатора");
+        NavigationManager.NavigateTo("/", true);
     }
 
     public void ChangeRoleToPlayer()
     {
         UserService.SetCurrentUserRole("player");
-        NavigationManager.NavigateTo(NavigationManager.Uri, true);
-        MessageService.Info("Вы переключились на профиль игрока");
+        NavigationManager.NavigateTo("/", true);
     }
 
     public void GoToMyOrgEvents()

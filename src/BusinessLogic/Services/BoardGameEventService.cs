@@ -15,6 +15,7 @@ namespace BusinessLogic.Services
         List<Player> GetPlayersByEvent(BoardGameEvent boardGameEvent);
         Organizer? GetOrganizerByEvent(BoardGameEvent boardGameEvent);
         Venue? GetVenueByEvent(BoardGameEvent boardGameEvent);
+        void UpdateBoardGameEventWithGames(BoardGameEvent boardGameEvent, List<long> gamesIDs);
     }
 
     public class BoardGameEventService : IBoardGameEventService
@@ -56,6 +57,15 @@ namespace BusinessLogic.Services
                 throw new NotExistsBoardGameEventException();
 
             _boardGameEventRepository.Update(boardGameEvent);
+        }
+
+        public void UpdateBoardGameEventWithGames(BoardGameEvent boardGameEvent,
+                                                  List<long> gamesIDs)
+        {
+            if (NotExist(boardGameEvent.ID))
+                throw new NotExistsBoardGameEventException();
+
+            _boardGameEventRepository.UpdateWithGames(boardGameEvent, gamesIDs);
         }
 
         public void DeleteBoardGameEvent(BoardGameEvent boardGameEvent)

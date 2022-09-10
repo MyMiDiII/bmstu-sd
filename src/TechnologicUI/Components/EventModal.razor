@@ -332,7 +332,7 @@
                 }
                 else
                 {
-                    BoardGameEventService.UpdateBoardGameEvent(bgEvent);
+                    BoardGameEventService.UpdateBoardGameEventWithGames(bgEvent, selectedGamesIDs);
                 }
 
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);

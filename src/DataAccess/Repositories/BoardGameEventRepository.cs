@@ -74,6 +74,27 @@ namespace DataAccess.Repositories
             }
         }
 
+        public void UpdateWithGames(BoardGameEvent elem, List<long> gamesIDs)
+        {
+            using (var transaction = _dbcontext.Database.BeginTransaction())
+            {
+                try
+                {
+                    Update(elem);
+
+                    _dbcontext.Database.ExecuteSqlRaw("call update_event_games({0}, {1});",
+                                                      gamesIDs, elem.ID);
+                    transaction.Commit();
+                }
+                catch(Exception ex)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine(ex.Message);
+                    throw new UpdateBoardGameEventException();
+                }
+            }
+        }
+
         public void Delete(BoardGameEvent elem)
         {
             var tmp = _dbcontext.Events.Find(elem.ID);

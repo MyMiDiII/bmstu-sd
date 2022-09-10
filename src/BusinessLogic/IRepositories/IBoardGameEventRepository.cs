@@ -13,5 +13,6 @@ namespace BusinessLogic.IRepositories
         List<BoardGameEvent> GetByState(BoardGameEventState state);
         List<BoardGame> GetEventGames(long evendID);
         List<Player> GetEventPlayers(long eventID);
+        void UpdateWithGames(BoardGameEvent bgEvent, List<long> gamesIDs);
     }
 }

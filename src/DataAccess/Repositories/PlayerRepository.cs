@@ -99,7 +99,7 @@ namespace DataAccess.Repositories
             }
             catch
             {
-                throw new AddEventGameException();
+                throw new AddPlayerRegistrationException();
             }
         }
 

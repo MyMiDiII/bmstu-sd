@@ -248,10 +248,17 @@
         }
         else
         {
-            PlayerService.RegisterCurrentPlayerForEvent(bgEvent);
-            stateText = "Пройдена";
-            stateColor = Color.Success;
-            MessageService.Info("Вы успешно зарегистрированы на игротеку!");
+            try
+            {
+                PlayerService.RegisterCurrentPlayerForEvent(bgEvent);
+                stateText = "Пройдена";
+                stateColor = Color.Success;
+                MessageService.Info("Вы успешно зарегистрированы на игротеку!");
+            }
+            catch (AddPlayerRegistrationException ex)
+            {
+                MessageService.Error("Регистрация окончена! Обновите страницу!");
+            }
         }
 
         return Task.CompletedTask;
@@ -269,6 +276,7 @@
         confModalVisible = false;
         PlayerService.UnregisterCurrentPlayerForEvent(bgEvent);
         RegComponentsInit();
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
         MessageService.Info("Регистрация отменена");
     }
 

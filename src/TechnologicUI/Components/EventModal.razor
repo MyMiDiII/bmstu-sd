@@ -360,11 +360,11 @@
                 dateErrorText = "Обязательное поле";
                 e.Status = ValidationStatus.Error;
             }
-            else if (date <= DateOnly.FromDateTime(DateTime.Today))
-            {
-                dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
-                e.Status = ValidationStatus.Error;
-            }
+            //else if (date <= DateOnly.FromDateTime(DateTime.Today))
+            //{
+            //    dateErrorText = "Дата проведения игротеки не должна быть раньше завтрашнего дня";
+            //    e.Status = ValidationStatus.Error;
+            //}
             else
             {
                 e.Status = ValidationStatus.Success;

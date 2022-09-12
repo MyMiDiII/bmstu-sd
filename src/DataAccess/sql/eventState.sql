@@ -1,7 +1,11 @@
 create or replace
-function get_event_state(eventDate date, startTime time, duration bigint,
-						 beginReg  timestamp, endReg timestamp,
-						 cancelled bool, deleted bool)
+function get_event_state(eventDate date
+					   , startTime time
+					   , duration bigint
+					   , beginReg  timestamp
+					   , endReg timestamp
+					   , cancelled bool
+					   , deleted bool)
 returns integer as
 $$
 declare
@@ -16,11 +20,11 @@ begin
 			return 6;
 		when curTime < beginReg then
 			return 0;
-		when beginReg <= curTime and curTime < endReg then
+		when curTime < endReg then
 			return 1;
-		when endReg <= curTime and curTime < beginEvent then
+		when curTime < beginEvent then
 			return 2;
-		when beginEvent <= curTime and curTime < endEvent then
+		when curTime < endEvent then
 			return 3;
 		else
 			return 4;

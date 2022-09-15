@@ -17,14 +17,6 @@
     <BarToggler />
     <BarMenu>
         <BarStart>
-@*            <BarItem>
-                <SelectList TItem="User"
-                            TValue="User"
-                            TextField="@((item)=>item.Name)"
-                            SelectedValue="@curUser"
-                            Data="@users" />
-            </BarItem>
-*@
             <BarItem>
                 <BarLink To="/events" TextColor="TextColor.White">Игротеки</BarLink>
             </BarItem>
@@ -65,7 +57,7 @@
                                 <BarDropdownItem Clicked="@GoToMyGames">Мои настолки</BarDropdownItem>
                                 <BarDropdownItem Clicked="@GoToMyEvents">Мои игротеки</BarDropdownItem>
                             }
-                            else
+                            else if (UserService.GetCurrentUserRoleName() == "organizer")
                             {
                                 <BarDropdownItem>
                                     Роль:
@@ -84,6 +76,20 @@
 
                                 <BarDropdownDivider/>
                                 <BarDropdownItem Clicked="@GoToMyOrgEvents">Мои игротеки</BarDropdownItem>
+                            }
+                            else
+                            {
+                                <BarDropdownItem>
+                                    Роль:
+                                    <Badge Color="Color.Info">
+                                        Администратор
+                                    </Badge>
+                                </BarDropdownItem>
+
+                                <BarDropdownDivider/>
+                                <BarDropdownItem Clicked="@GoToUsersTable">Пользователи</BarDropdownItem>
+@*                                <BarDropdownItem Clicked="@GoToVenuesTable">Места проведения</BarDropdownItem>
+*@
                             }
                             <BarDropdownDivider/>
                             <BarDropdownItem Clicked="@Logout">Выход</BarDropdownItem>
@@ -166,6 +172,11 @@
     public void GoToMyOrgEvents()
     {
         NavigationManager.NavigateTo("my-org-events", true);
+    }
+
+    public void GoToUsersTable()
+    {
+        NavigationManager.NavigateTo("users", true);
     }
 
 }

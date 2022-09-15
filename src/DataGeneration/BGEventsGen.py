@@ -8,11 +8,11 @@ from enum import IntEnum, auto
 import OrganizersGen
 import VenuesGen
 
-DATADIR       = '..\\Data\\'
+DATADIR       = '..\\Data\\indexesTest\\'
 EXT           = '.csv'
-BGEFILE       = DATADIR + 'events' + EXT
+BGEFILE       = DATADIR + 'events10000' + EXT
 
-ROWNUM = 1000
+ROWNUM = 10000
 
 class BGEstate(IntEnum):
     Planned = 0

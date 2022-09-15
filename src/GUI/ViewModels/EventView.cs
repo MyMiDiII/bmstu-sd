@@ -1,7 +1,7 @@
 ﻿using Blazorise;
 using BusinessLogic.Models;
 
-namespace TechnologicUI.ViewModels
+namespace GUI.ViewModels
 {
     public class EventView
     {

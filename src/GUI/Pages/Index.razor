@@ -1,0 +1,79 @@
+﻿@page "/"
+
+<PageTitle>Главная</PageTitle>
+
+@inject BusinessLogic.Services.IUserService UserService
+@*<Figure Size="FigureSize.Is256x256" Position="Position.Absolute.Top.Is50.Start.Is50.Translate.Middle">
+    <FigureImage Source="img/motivation.png"></FigureImage>
+</Figure>
+*@
+
+<style>
+    body{
+     background:
+        /* top, transparent black, faked with gradient */ 
+        linear-gradient(
+          rgba(0, 0, 0, 0.7), 
+          rgba(0, 0, 0, 0.7)
+        ),
+        /* bottom, image */
+        url(img/ticket.jpg);
+      background-repeat: no-repeat;
+      background-position: center center;
+     -webkit-background-size: cover;
+     -moz-background-size: cover;
+     -o-background-size: cover;
+      background-size: cover;
+      color: white;
+      height: 100vh;
+    }
+    .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+/*    border: 5px solid #FFFF00;
+*/    transform: translate(-50%, -50%);
+    padding: 10px;
+    }
+    h1 {
+        text-align: center;
+        font-size:  48pt;
+    }
+</style>
+
+<header>
+  <div class="center">
+    <h1>ИгроМир</h1>
+    <p></p>
+    @if (check.Contains(UserService.GetCurrentUserRoleName()) )
+    {
+        <Button Color="Color.Success" Size="Size.ExtraLarge" 
+                Position="Position.Relative.Start.Is50.Translate.MiddleX"
+                Type="Blazorise.ButtonType.Link" To="/events">Выбрать игротеку</Button>
+    }
+    else
+    {
+        <Button Color="Color.Success" Size="Size.ExtraLarge" 
+                Position="Position.Relative.Start.Is50.Translate.MiddleX"
+                Type="Blazorise.ButtonType.Link" To="/my-org-events">Провести игротеку</Button>
+    }
+  </div>
+</header>
+
+@code {
+    List<string> check = new List<string> { "guest", "player" };
+}
+
+@*<CardBody>
+    <BoardGamesTable/>
+</CardBody>
+<CardBody>
+    <OrganizersTable/>
+</CardBody>
+<CardBody>
+    <VenuesTable/>
+</CardBody>
+<CardBody>
+    <PlayersTable/>
+</CardBody>
+*@

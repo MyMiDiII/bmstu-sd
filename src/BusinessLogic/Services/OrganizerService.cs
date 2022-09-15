@@ -8,7 +8,7 @@ namespace BusinessLogic.Services
     {
         List<Organizer> GetOrganizers();
         Organizer? GetOrganizerByID(long id);
-        void CreateOrganizer(Organizer organizer);
+        long CreateOrganizer(Organizer organizer);
         void CreateOrganizerWithUserRole(Organizer organizer);
         void UpdateOrganizer(Organizer organizer);
         void DeleteOrganizer(Organizer organizer);
@@ -37,12 +37,13 @@ namespace BusinessLogic.Services
             return _organizerRepository.GetByID(id);
         }
 
-        public void CreateOrganizer(Organizer organizer)
+
+        public long CreateOrganizer(Organizer organizer)
         {
             if (Exist(organizer))
                 throw new AlreadyExistsOrganizerException();
 
-            _organizerRepository.Add(organizer);
+            return _organizerRepository.Add(organizer);
         }
 
         public void CreateOrganizerWithUserRole(Organizer organizer)

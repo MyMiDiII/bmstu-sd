@@ -22,8 +22,9 @@ namespace DataAccess.Repositories
 
                 return elem.ID;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw new AddUserException();
             }
         }

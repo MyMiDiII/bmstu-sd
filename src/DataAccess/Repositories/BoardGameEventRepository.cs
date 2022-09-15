@@ -180,5 +180,13 @@ namespace DataAccess.Repositories
                     .Select(r => r.p)
                     .ToList();
         }
+        public List<BoardGameEvent> GetByRegistration()
+        {
+            return _dbcontext.Events
+                   .Where(bgEvent => !bgEvent.Deleted
+                                  && bgEvent.BeginRegistration < DateTime.UtcNow
+                                  && bgEvent.EndRegistration >= DateTime.UtcNow)
+                   .ToList();
+        }
     }
 }

@@ -215,6 +215,9 @@ CREATE TABLE "Venues" (
 	CONSTRAINT "PK_Venues" PRIMARY KEY ("ID")
 );
 
+delete from "Users" u
+where u."Name" = 'newuser';
+
 
 
 

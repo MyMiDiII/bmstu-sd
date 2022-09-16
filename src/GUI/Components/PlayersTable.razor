@@ -1,4 +1,6 @@
-﻿@using BusinessLogic.Models
+﻿@using Serilog;
+
+@using BusinessLogic.Models
 
 @inject BusinessLogic.Services.IPlayerService PlayerService
 
@@ -20,6 +22,7 @@
 
     protected override void OnInitialized()
     {
+        Log.Debug("Call OrganizerService.GetOrganizers");
         players = PlayerService.GetPlayers();
     }
 }

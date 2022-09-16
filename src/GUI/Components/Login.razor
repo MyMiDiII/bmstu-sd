@@ -1,4 +1,6 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using Serilog;
+
+@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
 <Modal @ref="@loginModal">
@@ -55,26 +57,31 @@
 
     public void Show()
     {
+        Log.Information("Show LoginModal");
         loginModal?.Show();
     }
 
     async Task OnLoginClicked()
     {
+        Log.Information("Login btn clicked");
         if ( await loginValidations.ValidateAll() )
         {
             try
             {
+                Log.Debug("Call UserService.Login");
                 UserService.Login(loginRequest);
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);
                 await loginValidations.ClearAll();
             }
-            catch(NotExistsUserException)
+            catch(NotExistsUserException ex)
             {
+                Log.Error("Catch exception {0}", ex.GetType());
                 rightName = false;
                 await loginValidations.ValidateAll();
             }
-            catch(IncorrectUserPasswordException)
+            catch(IncorrectUserPasswordException ex)
             {
+                Log.Error("Catch exception {0}", ex.GetType());
                 rightPassword = false;
                 await loginValidations.ValidateAll();
             }
@@ -83,8 +90,11 @@
 
     void ValidateName(ValidatorEventArgs e)
     {
+        Log.Information("ValidateName is called");
+
         if (!rightName)
         {
+            Log.Information("There is not user");
             e.Status = ValidationStatus.Error;
             nameErrMsg = "Пользователя с таким именем не существует";
             rightName = true;
@@ -95,20 +105,25 @@
 
             if (string.IsNullOrEmpty(name))
             {
+                Log.Information("Empty name field");
                 e.Status = ValidationStatus.Error;
                 nameErrMsg = "Введите имя пользователя";
+                Log.Debug("Validate name error");
             }
             else
             {
                 e.Status = ValidationStatus.Success;
+                Log.Debug("Validate name success");
             }
         }
     }
 
     void ValidatePassword(ValidatorEventArgs e)
     {
+        Log.Information("ValidateName is called");
         if (!rightPassword)
         {
+            Log.Information("Wrong password");
             e.Status = ValidationStatus.Error;
             passwordErrMsg = "Неверный пароль";
             rightPassword = true;
@@ -119,12 +134,15 @@
 
             if (string.IsNullOrEmpty(password))
             {
+                Log.Information("Empty password field");
                 e.Status = ValidationStatus.Error;
                 passwordErrMsg = "Введите пароль";
+                Log.Debug("Validate password error");
             }
             else
             {
                 e.Status = ValidationStatus.Success;
+                Log.Debug("Validate password success");
             }
         }
     }

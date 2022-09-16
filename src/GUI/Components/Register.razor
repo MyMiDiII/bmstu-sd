@@ -1,4 +1,6 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using Serilog;
+
+@inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IUserService UserService
 
 <Modal @ref="@registerModal">
@@ -59,14 +61,18 @@
 
     public void Show()
     {
+        Log.Information("Show RegisterModal");
         registerModal?.Show();
     }
 
     async Task OnRegisterClicked()
     {
+        Log.Information("Register btn clicked");
         if ( await regValidations.ValidateAll() )
         {
+            Log.Debug("Call UserService.Register");
             UserService.Register(registerRequest);
+            Log.Debug("Call UserService.Login");
             UserService.Login(new LoginRequest(registerRequest.Name, registerRequest.Password));
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
 
@@ -76,6 +82,7 @@
 
     void ValidateName(ValidatorEventArgs e)
     {
+        Log.Information("ValidateName is called");
         var name = Convert.ToString(e.Value);
 
         e.Status = !string.IsNullOrEmpty(name) && UserService.GetUserByName(name) is null
@@ -84,6 +91,7 @@
 
     void ValidatePassword(ValidatorEventArgs e)
     {
+        Log.Information("ValidatePassword is called");
         var password = Convert.ToString(e.Value);
 
         e.Status = !string.IsNullOrEmpty(password) ? ValidationStatus.Success : ValidationStatus.Error;
@@ -92,6 +100,7 @@
 
     void ValidateRePassword(ValidatorEventArgs e)
     {
+        Log.Information("ValidateRePassword is called");
         var rePassword = Convert.ToString(e.Value);
 
         e.Status = string.IsNullOrEmpty(rePassword) ? ValidationStatus.None :

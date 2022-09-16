@@ -100,12 +100,15 @@
 
     protected override void OnInitialized()
     {
+        Log.Debug("GamePage init");
+        Log.Debug("Call BoardGameService.GetBoardGameByID");
         var tmpGame = BoardGameService.GetBoardGameByID(gameID);
 
         if (tmpGame is not null)
         {
             game = tmpGame;
             Game = new BoardGameView(game);
+            Log.Debug("Call BoardGameService.GetEventsByGame");
             events = BoardGameService.GetEventsByGame(game);
         }
 
@@ -114,11 +117,11 @@
 
     Task AddToFavorites()
     {
-        if (UserService.GetCurrentUserRoleName() != "player")
+        Log.Information("Add To Favorites btn clicked");
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
+        if (UserService.GetCurrentUserRoleName() == "player")
         {
-        }
-        else
-        {
+            Log.Debug("Call BoardGameService.AddBoardGameToFavorite");
             BoardGameService.AddBoardGameToFavorite(game);
         }
 
@@ -127,14 +130,10 @@
 
     Task DeleteFromFavorites()
     {
-        //confModalVisible = true;
+        Log.Information("Delete from Favorites btn clicked");
+        Log.Debug("Call BoardGameService.DeleteBoardGameFromFavorite");
         BoardGameService.DeleteBoardGameFromFavorite(game);
 
         return Task.CompletedTask;
-    }
-
-    private void UnReg()
-    {
-        ;
     }
 }

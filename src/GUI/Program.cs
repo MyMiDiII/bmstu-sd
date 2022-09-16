@@ -4,10 +4,19 @@ using Blazorise.Icons.FontAwesome;
 
 using Microsoft.EntityFrameworkCore;
 
+using Serilog;
+using Serilog.Core;
+
 using DataAccess;
 using BusinessLogic.Services;
 using BusinessLogic.IRepositories;
 using DataAccess.Repositories;
+
+Log.Logger = new LoggerConfiguration()  
+                 .Enrich.FromLogContext()  
+                 .MinimumLevel.Debug()
+                 .WriteTo.File(@"log.txt")
+                 .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +31,6 @@ builder.Services
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
 
-// maybe scoped???
 builder.Services.AddSingleton<CurUserService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBoardGameService, BoardGameService>();
@@ -46,6 +54,7 @@ builder.Services.AddDbContext<BGEContext>(options => options.UseNpgsql(
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,4 +74,5 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+Log.Information("App has been started");
 app.Run();

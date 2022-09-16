@@ -14,6 +14,8 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("Player events page init");
+        Log.Debug("Call PlayerService.GetCurrentPlayerEvents");
         events = PlayerService.GetCurrentPlayerEvents();
         base.OnInitialized();
     }

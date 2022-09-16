@@ -36,19 +36,25 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("Events page init");
         StateHasChanged();
+        Log.Debug("Call BoardGameEventService.GetBoardGameEvents");
         events = BoardGameEventService.GetBoardGameEvents();
         base.OnInitialized();
     }
 
     private void OnOrgBtnClicked()
     {
+        Log.Information("Become organizer btn clicked");
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
         if (UserService.GetCurrentUserRoleName() == "guest")
         {
             regLoginModal?.Show();
         }
         else if (UserService.CheckUserRole("organizer"))
         {
+            Log.Debug("UserService.CheckUserRole was called");
+            Log.Debug("Call UserService.SetCurrentUserRole");
             UserService.SetCurrentUserRole("organizer");
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }

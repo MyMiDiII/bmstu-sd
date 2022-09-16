@@ -1,4 +1,6 @@
-﻿@using BusinessLogic.Models
+﻿@using Serilog;
+
+@using BusinessLogic.Models
 
 @inject BusinessLogic.Services.IOrganizerService OrganizerService
 
@@ -29,6 +31,7 @@
 
     protected override void OnInitialized()
     {
+        Log.Debug("Call OrganizerService.GetOrganizers");
         organizers = OrganizerService.GetOrganizers();
     }
 }

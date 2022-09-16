@@ -1,4 +1,6 @@
-﻿@inject BusinessLogic.Services.IBoardGameService BoardGameService
+﻿@using Serilog;
+
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
 
 <DataGrid TItem="BoardGameView"
           Data="@viewGames"
@@ -48,10 +50,12 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("BooardGamesTable init");
         foreach(var game in Games)
         {
             viewGames.Add(new BoardGameView(game));
         }
+        Log.Information("BooardGamesTable init end");
         base.OnInitialized();
     }
 }

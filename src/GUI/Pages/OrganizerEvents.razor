@@ -14,6 +14,8 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("Organizer events page init");
+        Log.Debug("Call OrganizerService.GetCurrentOrganizerEvents");
         events = OrganizerService.GetCurrentOrganizerEvents();
         base.OnInitialized();
     }

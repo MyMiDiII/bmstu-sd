@@ -88,8 +88,6 @@
 
                                 <BarDropdownDivider/>
                                 <BarDropdownItem Clicked="@GoToUsersTable">Пользователи</BarDropdownItem>
-@*                                <BarDropdownItem Clicked="@GoToVenuesTable">Места проведения</BarDropdownItem>
-*@
                             }
                             <BarDropdownDivider/>
                             <BarDropdownItem Clicked="@Logout">Выход</BarDropdownItem>
@@ -118,15 +116,12 @@
 
     protected override void OnInitialized()
     {
-        for (int i = 1; i <= 4; ++i)
-        {
-            users.Add(UserService.GetUserByID(i) ?? new User("", ""));
-        }
         curUser = UserService.GetCurrentUser();
     }
 
     Task OnLoginClicked()
     {
+        Log.Information("Login btn clicked");
         loginModal?.Show();
 
         return Task.CompletedTask;
@@ -134,6 +129,7 @@
 
     Task OnRegClicked()
     {
+        Log.Information("Regiter btn clicked");
         registerModal?.Show();
 
         return Task.CompletedTask;
@@ -141,6 +137,7 @@
 
     public void Logout()
     {
+        Log.Information("Logout btn clicked");
         var req = new LoginRequest("guest", "guest");
         UserService.Login(req);
         curUser = UserService.GetCurrentUser();
@@ -159,12 +156,14 @@
 
     public void ChangeRoleToOrganizer()
     {
+        Log.Debug("Call UserService.SetCurrentUserRole (organizer)");
         UserService.SetCurrentUserRole("organizer");
         NavigationManager.NavigateTo("/", true);
     }
 
     public void ChangeRoleToPlayer()
     {
+        Log.Debug("Call UserService.SetCurrentUserRole (player)");
         UserService.SetCurrentUserRole("player");
         NavigationManager.NavigateTo("/", true);
     }

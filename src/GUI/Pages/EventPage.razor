@@ -1,8 +1,6 @@
 ﻿@page "/event"
 @page "/event/{eventID:long}"
 
-@*TODO: links to venue and organizer*@
-
 @inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
 @inject BusinessLogic.Services.IPlayerService PlayerService
@@ -202,12 +200,17 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("EventPage init");
+        Log.Debug("Call BoardGameEventService.GetBoardGameEventByID");
         var tmpEvent = BoardGameEventService.GetBoardGameEventByID(eventID);
         if (tmpEvent is not null)
         {
             bgEvent = tmpEvent;
+            Log.Debug("Call BoardGameEventService.GetGamesByEvent");
             games = BoardGameEventService.GetGamesByEvent(bgEvent);
+            Log.Debug("Call BoardGameEventService.GetOrganizerByEvent");
             var organizer = BoardGameEventService.GetOrganizerByEvent(bgEvent);
+            Log.Debug("Call BoardGameEventService.GetVenueByEvent");
             var venue = BoardGameEventService.GetVenueByEvent(bgEvent);
             Event = new EventView(bgEvent, organizer, venue);
 
@@ -220,6 +223,8 @@
 
     private void RegComponentsInit()
     {
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
+        Log.Debug("Call PlayerService.CheckCurrentPlayerRegistration");
         if (UserService.GetCurrentUserRoleName() == "player"
             && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
         {
@@ -242,6 +247,7 @@
 
     Task OnRegBtnClicked()
     {
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
         if (UserService.GetCurrentUserRoleName() != "player")
         {
             regLoginModal?.Show();
@@ -250,6 +256,7 @@
         {
             try
             {
+                Log.Debug("Call PlayerService.RegisterCurrentPlayerForEvent");
                 PlayerService.RegisterCurrentPlayerForEvent(bgEvent);
                 stateText = "Пройдена";
                 stateColor = Color.Success;
@@ -257,6 +264,7 @@
             }
             catch (AddPlayerRegistrationException ex)
             {
+                Log.Error("Catch exception {0}", ex.GetType());
                 MessageService.Error("Регистрация окончена! Обновите страницу!");
             }
         }
@@ -266,6 +274,7 @@
 
     Task OnUnRegBtnClicked()
     {
+        Log.Information("UnRegBtn clicked");
         confModalVisible = true;
 
         return Task.CompletedTask;
@@ -273,6 +282,7 @@
 
     private void UnReg()
     {
+        Log.Information("UnReg");
         confModalVisible = false;
         PlayerService.UnregisterCurrentPlayerForEvent(bgEvent);
         RegComponentsInit();

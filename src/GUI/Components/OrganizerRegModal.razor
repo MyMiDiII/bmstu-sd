@@ -1,4 +1,5 @@
-﻿@using System.Text.RegularExpressions;
+﻿@using Serilog;
+@using System.Text.RegularExpressions;
 
 @inject NavigationManager NavigationManager
 
@@ -109,11 +110,13 @@
 
     public void Show()
     {
+        Log.Information("Show Organizer Modal");
         modal?.Show();
     }
 
     private Task HideModal()
     {
+        Log.Information("Hide Organizer Modal");
         modal?.Hide();
 
         return Task.CompletedTask;
@@ -121,17 +124,21 @@
 
     private async Task OnConfirmBtnClicked()
     {
+        Log.Information("Organizer registration btn clicked");
         if (await orgRegValidations.ValidateAll())
         {
             try
             {
+                Log.Debug("Call OrganizerService.CreateOrganizerWithUserRole");
                 OrganizerService.CreateOrganizerWithUserRole(organizer);
+                Log.Debug("Call UserService.SetCurrentUserRole");
                 UserService.SetCurrentUserRole("organizer");
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);
                 await orgRegValidations?.ClearAll();
             }
-            catch(AlreadyExistsOrganizerException)
+            catch(AlreadyExistsOrganizerException ex)
             {
+                Log.Error("Catch exception {0}", ex.GetType());
                 nameFreeOrg = false;
                 addressFreeOrg = false;
                 nameErrorText = "";
@@ -145,10 +152,12 @@
 
     void ValidateName(ValidatorEventArgs e)
     {
+        Log.Information("ValidateName is called");
         var name = Convert.ToString(e.Value);
 
         if (nameFreeOrg)
         {
+            Log.Information("Empty name field");
             nameErrorText = "Название не может быть пустым";
         }
 
@@ -167,10 +176,12 @@
 
     void ValidateAddress(ValidatorEventArgs e)
     {
+        Log.Information("ValidateAddress is called");
         var name = Convert.ToString(e.Value);
 
         if (addressFreeOrg)
         {
+            Log.Information("Empty address field");
             addressErrorText = "Адрес не может быть пустым";
         }
 
@@ -189,6 +200,7 @@
 
     void ValidateEmail(ValidatorEventArgs e)
     {
+        Log.Information("ValidateEmail is called");
         var email = Convert.ToString(e.Value);
 
         e.Status = ValidationRule.IsEmail(email) ? ValidationStatus.Success : ValidationStatus.Error;
@@ -196,6 +208,7 @@
 
     void ValidateURL(ValidatorEventArgs e)
     {
+        Log.Information("ValidateURL is called");
         var url = Convert.ToString(e.Value) ?? "";
         var pattern = "http[s]{0,1}://.*?\\..*?";
 
@@ -204,6 +217,7 @@
 
     void ValidatePhone(ValidatorEventArgs e)
     {
+        Log.Information("ValidatPhone is called");
         var phone = Convert.ToString(e.Value) ?? "";
         var pattern = @"\+7(\d{10})$";
 

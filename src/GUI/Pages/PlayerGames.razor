@@ -14,6 +14,8 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("Player games page init");
+        Log.Debug("Call PlayerService.GetCurrentPlayerFavorites");
         games = PlayerService.GetCurrentPlayerFavorites();
         base.OnInitialized();
     }

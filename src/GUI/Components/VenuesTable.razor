@@ -30,6 +30,8 @@
 
     protected override void OnInitialized()
     {
+        Log.Debug("VenueTable init");
+        Log.Debug("Call VenueService.GetVenues");
         venues = VenueService.GetVenues();
     }
 }

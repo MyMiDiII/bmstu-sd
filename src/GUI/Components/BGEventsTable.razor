@@ -1,4 +1,5 @@
-﻿@using BusinessLogic.Models
+﻿@using Serilog;
+@using BusinessLogic.Models
 
 @inject NavigationManager NavigationManager
 @inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService 
@@ -97,34 +98,41 @@
 
     protected override void OnInitialized()
     {
+        Log.Information("BGEventsTable init");
         foreach(var bgEvent in Events)
         {
             viewEvents.Add(new EventView(bgEvent));
         }
+        Log.Information("BGEventsTable init end");
         base.OnInitialized();
     }
 
     private void OnNewEventBtnClicked()
     {
+        Log.Information("New event btn clicked");
         newEventModal?.Show();
     }
 
     private void OnEditEventBtnClicked()
     {
+        Log.Information("Edit event btn clicked");
         editEventModal?.Show();
     }
 
     private void OnCancelEventBtnClicked()
     {
+        Log.Information("Cancel event btn clicked");
         if (trueSelectedEvent is not null)
         {
             if (trueSelectedEvent.State == BoardGameEventState.Finished)
             {
+                Log.Information("Event is finished");
                 MessageService.Error("Нельзя отменить проведенную игротеку");
             }
             else
             {
                 trueSelectedEvent.Cancelled = true;
+                Log.Debug("Call BoardGameEventService.UpdateBoardGameEvent");
                 BoardGameEventService.UpdateBoardGameEvent(trueSelectedEvent);
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);
             }
@@ -133,6 +141,7 @@
 
     private void OnSelectedRowChange(Blazorise.DataGrid.DataGridRowMouseEventArgs<EventView> args)
     {
+        Log.Information("Events table row is selected");
         trueSelectedEvent = BoardGameEventService.GetBoardGameEventByID(args.Item?.ID ?? 0);
     }
 

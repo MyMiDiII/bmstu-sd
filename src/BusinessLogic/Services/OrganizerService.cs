@@ -74,7 +74,8 @@ namespace BusinessLogic.Services
         {
              return _organizerRepository.GetAll().Any(elem
                         => elem.Name == organizer.Name
-                        && elem.Address == organizer.Address);
+                        && elem.Address == organizer.Address
+                        && !elem.Deleted);
         }
 
         private bool NotExist(long id)

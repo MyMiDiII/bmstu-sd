@@ -97,7 +97,7 @@ namespace BusinessLogicTests
             var mockUserRepo = new Mock<IUserRepository>();
             mockUserRepo.Setup(repo => repo.GetDefaultUser()).Returns(
                 new User("test", "123") { Roles = new List<Role> { new Role("player") { RoleID = 1 } } });
-            var userService = new UserService(mockUserRepo.Object, new BCryptEntryptionService());
+            var userService = new UserService(mockUserRepo.Object, new CurUserService(), new BCryptEntryptionService());
 
             _service = new OrganizerService(_mockRepo, userService);
         }

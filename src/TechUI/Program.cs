@@ -202,9 +202,11 @@ catch(Exception ex)
 
 Console.WriteLine("[ TEST8 ] Delete Organizer");
 
+var curOrg = organizerService.GetOrganizerByID(orgID);
+
 try
 {
-    organizerService.DeleteOrganizer(organizerService.GetOrganizerByID(orgID));
+    organizerService.DeleteOrganizer(curOrg);
     Console.WriteLine("[ TEST8 ] OK");
 }
 catch(Exception ex)
@@ -212,6 +214,9 @@ catch(Exception ex)
     Console.WriteLine("[ ERROR ] {0}", ex.GetType());
     Console.WriteLine("[ TEST8 ] FAILED");
 }
+
+context.Organizers.Remove(curOrg);
+context.SaveChanges();
 
 Console.WriteLine("[ TEST9 ] Delete player");
 

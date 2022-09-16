@@ -38,6 +38,7 @@ builder.Services.AddTransient<IBoardGameEventService, BoardGameEventService>();
 builder.Services.AddTransient<IOrganizerService, OrganizerService>();
 builder.Services.AddTransient<IVenueService, VenueService>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
+builder.Services.AddTransient<IProducerService, ProducerService>();
 builder.Services.AddTransient<IEncryptionService, BCryptEntryptionService>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
@@ -46,6 +47,7 @@ builder.Services.AddTransient<IBoardGameEventRepository, BoardGameEventRepositor
 builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
 builder.Services.AddTransient<IVenueRepository, VenueRepository>();
 builder.Services.AddTransient<IPlayerRepository, PlayerRepository>();
+builder.Services.AddTransient<IProducerRepository, ProducerRepository>();
 
 builder.Configuration.AddJsonFile("dbsettings.json");
 builder.Services.AddDbContext<BGEContext>(options => options.UseNpgsql(

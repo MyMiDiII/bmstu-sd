@@ -1,11 +1,10 @@
 ﻿@page "/game"
 @page "/game/{gameID:long}"
 
-@* TODO: Modals *@
-
 @inject BusinessLogic.Services.IBoardGameService BoardGameService
 @inject BusinessLogic.Services.IPlayerService PlayerService
 @inject BusinessLogic.Services.IUserService UserService
+@inject BusinessLogic.Services.IProducerService ProducerService
 
 <style>
     body {
@@ -82,7 +81,9 @@
             <BGEventsTable PageSize=2 Events="@events"/>
 
             <LayoutFooter Position="Position.Absolute.Bottom.Is0">
-                @Game.Producer
+                <Blazorise.Link To="@game.Producer.URL" Target="Target.Blank">
+                    @game.Producer.Name
+                </Blazorise.Link>
                 @Game.Year
             </LayoutFooter>
         }
@@ -107,6 +108,7 @@
         if (tmpGame is not null)
         {
             game = tmpGame;
+            game.Producer = ProducerService.GetProducerByID(game.ProducerID);
             Game = new BoardGameView(game);
             Log.Debug("Call BoardGameService.GetEventsByGame");
             events = BoardGameService.GetEventsByGame(game);

@@ -13,6 +13,7 @@ namespace DataAccess
         public DbSet<Organizer> Organizers { get; set; }
         public DbSet<BoardGameEvent> Events { get; set; }
         public DbSet<BoardGame> Games { get; set; }
+        public DbSet<Producer> Producers { get; set; }
         public DbSet<Player> Players { get; set; }
 
         public DbSet<EventGame> EventGameRelations { get; set; }
@@ -29,6 +30,7 @@ namespace DataAccess
 
             builder.Entity<User>().HasData( new User("guest", "guest") { ID = 1 } );
             builder.Entity<Role>().HasData( new Role("guest") { ID = 1, UserID = 1 } );
+            builder.Entity<Producer>().HasData( new Producer("base") { ID = 1 } );
         }
     }
 }

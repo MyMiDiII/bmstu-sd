@@ -1,5 +1,8 @@
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=testDB;Username=postgres;Password=postgres"
-  }
+    "DefaultConnection": "Server=localhost;Database=testDB;Username=postgres;Password=postgres",
+    "MySQL": "Server=localhost;Database=testDB;User=root;Password=mysql"
+  },
+
+  "Database": "MySQL"
 }

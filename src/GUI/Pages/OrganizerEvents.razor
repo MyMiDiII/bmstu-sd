@@ -1,0 +1,24 @@
+﻿@page "/my-org-events"
+
+@inject BusinessLogic.Services.IOrganizerService OrganizerService
+
+<PageTitle>Мои игротеки</PageTitle>
+
+<CardBody>
+    <h2>Мои игротеки</h2>
+    <BGEventsTable Events="@events" Editable=true/>
+</CardBody>
+
+@code {
+    private List<BoardGameEvent> events = new List<BoardGameEvent>();
+
+    protected override void OnInitialized()
+    {
+        Log.Information("Organizer events page init");
+        Log.Debug("Call OrganizerService.GetCurrentOrganizerEvents");
+        events = OrganizerService.GetCurrentOrganizerEvents();
+        base.OnInitialized();
+    }
+}
+
+

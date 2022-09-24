@@ -1,0 +1,71 @@
+﻿@page "/events"
+
+@inject NavigationManager NavigationManager
+@inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
+@inject BusinessLogic.Services.IUserService UserService
+
+<PageTitle>Игротеки</PageTitle>
+
+<CardBody>
+    <Div Flex="Flex.JustifyContent.Between">
+        <h2>Игротеки</h2>
+        @if (UserService.GetCurrentUserRoleName() == "organizer")
+        {
+            <Button Height="Height.Is75" Color="Color.Success" Clicked="@OnNewEventClicked">Провести Игротеку</Button>
+        }
+        else
+        {
+            <Button Height="Height.Is75" Color="Color.Success" Clicked="@OnOrgBtnClicked">Стать организатором</Button>
+        }
+    </Div>
+    <BGEventsTable Events="@events"/>
+</CardBody>
+
+<RegLoginModal @ref="@regLoginModal"
+    InfoText="Для того, чтобы стать организатором, нужно сначала зарегистрироваться или войти!" />
+
+<OrganizerRegModal @ref="@orgModal"/>
+
+@code {
+    private List<BoardGameEvent> events = new List<BoardGameEvent>();
+
+    private RegLoginModal? regLoginModal;
+    private OrganizerRegModal? orgModal;
+
+    [Inject] private IMessageService MessageService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Log.Information("Events page init");
+        StateHasChanged();
+        Log.Debug("Call BoardGameEventService.GetBoardGameEvents");
+        events = BoardGameEventService.GetBoardGameEvents();
+        base.OnInitialized();
+    }
+
+    private void OnOrgBtnClicked()
+    {
+        Log.Information("Become organizer btn clicked");
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
+        if (UserService.GetCurrentUserRoleName() == "guest")
+        {
+            regLoginModal?.Show();
+        }
+        else if (UserService.CheckUserRole("organizer"))
+        {
+            Log.Debug("UserService.CheckUserRole was called");
+            Log.Debug("Call UserService.SetCurrentUserRole");
+            UserService.SetCurrentUserRole("organizer");
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        }
+        else
+        {
+            orgModal?.Show();
+        }
+    }
+
+    private void OnNewEventClicked()
+    {
+    }
+}
+

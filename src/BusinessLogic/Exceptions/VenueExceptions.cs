@@ -9,4 +9,7 @@
     
     public class AlreadyExistsVenueException : VenueException { }
     public class NotExistsVenueException : VenueException { }
+    public class AddVenueException : VenueException { }
+    public class UpdateVenueException : VenueException { }
+    public class AlreadyDeletedVenueException : VenueException { }
 }

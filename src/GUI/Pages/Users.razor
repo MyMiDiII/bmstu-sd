@@ -1,0 +1,22 @@
+﻿@page "/users"
+
+@inject BusinessLogic.Services.IUserService UserService
+
+<PageTitle>Пользователи</PageTitle>
+
+<CardBody Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is75">
+    <h2>Пользователи</h2>
+    <UsersTable Users="@users"/>
+</CardBody>
+
+@code {
+    private List<User> users= new List<User>();
+
+    protected override void OnInitialized()
+    {
+        Log.Information("Users page init");
+        Log.Debug("Call UserService.GetUsers");
+        users = UserService.GetUsers();
+        base.OnInitialized();
+    }
+}

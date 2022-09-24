@@ -1,0 +1,37 @@
+﻿@using BusinessLogic.Models
+
+@inject BusinessLogic.Services.IVenueService VenueService 
+
+<DataGrid TItem="Venue"
+          Data="@venues"
+          ShowPager
+          Striped
+          PageSize="4"
+          >
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(Venue.Name)" Caption="Название" Editable />
+        <DataGridColumn Field="@nameof(Venue.Type)" Caption="Тип" Editable />
+        <DataGridColumn Field="@nameof(Venue.Address)" Caption="Адрес" Editable />
+        <DataGridColumn Caption="Контакты">
+            <DisplayTemplate>
+                @{ var ven = context as Venue; }
+                @ven?.Email
+                <br />
+                <Link To="@ven?.URL">@ven?.URL</Link>
+                <br />
+                @ven?.PhoneNumber
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+</DataGrid>
+
+@code {
+    public List<Venue> venues = new List<Venue>();
+
+    protected override void OnInitialized()
+    {
+        Log.Debug("VenueTable init");
+        Log.Debug("Call VenueService.GetVenues");
+        venues = VenueService.GetVenues();
+    }
+}

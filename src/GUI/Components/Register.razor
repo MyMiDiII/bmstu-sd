@@ -1,0 +1,110 @@
+﻿@using Serilog;
+
+@inject NavigationManager NavigationManager
+@inject BusinessLogic.Services.IUserService UserService
+
+<Modal @ref="@registerModal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Регистрация</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Validations @ref="@regValidations" ValidateOnLoad=false>
+                <Validation Validator="ValidateName">
+                    <Field>
+                        <TextEdit @bind-Text="@registerRequest.Name" Placeholder="Имя пользователя">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Поле пустое, или пользователь с таким
+                                                 именем уже существует</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation Validator="ValidatePassword">
+                    <Field>
+                        <TextEdit @bind-Text="@registerRequest.Password" Placeholder="Пароль"
+                                  Role="TextRole.Password">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Придумайте пароль!</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation @ref="@rePassValid" Validator="ValidateRePassword">
+                    <Field>
+                        <TextEdit Placeholder="Подтверждение пароля" Role="TextRole.Password">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>Пароли не совпадают!</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+            </Validations>
+            <Button Color="Color.Primary" Clicked="@OnRegisterClicked" Block>Регистрация</Button>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+@code {
+    private Modal? registerModal;
+
+    RegisterRequest registerRequest = new RegisterRequest();
+    Validations? regValidations;
+    Validation? rePassValid;
+
+    public void Show()
+    {
+        Log.Information("Show RegisterModal");
+        registerModal?.Show();
+    }
+
+    async Task OnRegisterClicked()
+    {
+        Log.Information("Register btn clicked");
+        if ( await regValidations.ValidateAll() )
+        {
+            Log.Debug("Call UserService.Register");
+            UserService.Register(registerRequest);
+            Log.Debug("Call UserService.Login");
+            UserService.Login(new LoginRequest(registerRequest.Name, registerRequest.Password));
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+
+            await regValidations.ClearAll();
+        }
+    }
+
+    void ValidateName(ValidatorEventArgs e)
+    {
+        Log.Information("ValidateName is called");
+        var name = Convert.ToString(e.Value);
+
+        e.Status = !string.IsNullOrEmpty(name) && UserService.GetUserByName(name) is null
+                   ? ValidationStatus.Success : ValidationStatus.Error;
+    }
+
+    void ValidatePassword(ValidatorEventArgs e)
+    {
+        Log.Information("ValidatePassword is called");
+        var password = Convert.ToString(e.Value);
+
+        e.Status = !string.IsNullOrEmpty(password) ? ValidationStatus.Success : ValidationStatus.Error;
+        rePassValid?.Validate();
+    }
+
+    void ValidateRePassword(ValidatorEventArgs e)
+    {
+        Log.Information("ValidateRePassword is called");
+        var rePassword = Convert.ToString(e.Value);
+
+        e.Status = string.IsNullOrEmpty(rePassword) ? ValidationStatus.None :
+                   rePassword == registerRequest.Password ? ValidationStatus.Success :
+                   ValidationStatus.Error;
+    }
+}

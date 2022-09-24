@@ -6,21 +6,36 @@ namespace BusinessLogic.Services
 {
     public interface IBoardGameEventService
     {
+        BoardGameEvent? GetBoardGameEventByID(long id);
         List<BoardGameEvent> GetBoardGameEvents();
-        void CreateBoardGameEvent(BoardGameEvent boardGameEvent);
+        long CreateBoardGameEvent(BoardGameEvent boardGameEvent);
         void UpdateBoardGameEvent(BoardGameEvent boardGameEvent);
         void DeleteBoardGameEvent(BoardGameEvent boardGameEvent);
         List<BoardGame> GetGamesByEvent(BoardGameEvent boardGameEvent);
         List<Player> GetPlayersByEvent(BoardGameEvent boardGameEvent);
+        Organizer? GetOrganizerByEvent(BoardGameEvent boardGameEvent);
+        Venue? GetVenueByEvent(BoardGameEvent boardGameEvent);
+        void UpdateBoardGameEventWithGames(BoardGameEvent boardGameEvent, List<long> gamesIDs);
     }
 
     public class BoardGameEventService : IBoardGameEventService
     {
         private readonly IBoardGameEventRepository _boardGameEventRepository;
+        private readonly IOrganizerRepository _organizerRepository;
+        private readonly IVenueRepository _venueRepository;
 
-        public BoardGameEventService(IBoardGameEventRepository boardGameEventRepository)
+        public BoardGameEventService(IBoardGameEventRepository boardGameEventRepository,
+                                     IOrganizerRepository organizerRepository,
+                                     IVenueRepository venueRepository)
         {
             _boardGameEventRepository = boardGameEventRepository;
+            _organizerRepository = organizerRepository;
+            _venueRepository = venueRepository;
+        }
+
+        public BoardGameEvent? GetBoardGameEventByID(long id)
+        {
+            return _boardGameEventRepository.GetByID(id);
         }
 
         public List<BoardGameEvent> GetBoardGameEvents()
@@ -28,12 +43,12 @@ namespace BusinessLogic.Services
             return _boardGameEventRepository.GetAll();
         }
 
-        public void CreateBoardGameEvent(BoardGameEvent boardGameEvent)
+        public long CreateBoardGameEvent(BoardGameEvent boardGameEvent)
         {
             if (Exist(boardGameEvent))
                 throw new AlreadyExistsBoardGameEventException();
 
-            _boardGameEventRepository.Add(boardGameEvent);
+            return _boardGameEventRepository.Add(boardGameEvent);
         }
 
         public void UpdateBoardGameEvent(BoardGameEvent boardGameEvent)
@@ -42,6 +57,15 @@ namespace BusinessLogic.Services
                 throw new NotExistsBoardGameEventException();
 
             _boardGameEventRepository.Update(boardGameEvent);
+        }
+
+        public void UpdateBoardGameEventWithGames(BoardGameEvent boardGameEvent,
+                                                  List<long> gamesIDs)
+        {
+            if (NotExist(boardGameEvent.ID))
+                throw new NotExistsBoardGameEventException();
+
+            _boardGameEventRepository.UpdateWithGames(boardGameEvent, gamesIDs);
         }
 
         public void DeleteBoardGameEvent(BoardGameEvent boardGameEvent)
@@ -76,5 +100,14 @@ namespace BusinessLogic.Services
             return _boardGameEventRepository.GetEventPlayers(bgEvent.ID);
         }
 
+        public Organizer? GetOrganizerByEvent(BoardGameEvent boardGameEvent)
+        {
+            return _organizerRepository.GetByID(boardGameEvent.OrganizerID);
+        }
+
+        public Venue? GetVenueByEvent(BoardGameEvent boardGameEvent)
+        {
+            return _venueRepository.GetByID(boardGameEvent.VenueID);
+        }
     }
 }

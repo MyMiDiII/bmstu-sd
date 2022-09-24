@@ -2,3 +2,5 @@
 *.vs/
 *obj/
 *bin/
+*.user
+*__pycache__/

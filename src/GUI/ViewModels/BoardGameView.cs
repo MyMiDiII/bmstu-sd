@@ -16,7 +16,7 @@ namespace GUI.ViewModels
         {
             ID = game.ID;
             Title = game.Title;
-            Producer = game.Producer;
+            Producer = game.Producer.Name;
             Year = game.Year;
             AgeView = game.MaxAge != 150 ? $"{game.MinAge}-{game.MaxAge}" : $"{game.MinAge}+";
             PlayersView = game.MaxPlayerNum == game.MinPlayerNum

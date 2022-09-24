@@ -75,9 +75,10 @@ namespace DataAccess.Repositories
         public List<BoardGame> GetByProducer(string producer)
         {
             return _dbcontext.Games
-                   .Where(game => !game.Deleted
-                               && game.Producer != null
-                               && game.Producer.Contains(producer))
+                   .Where(game => !game.Deleted && _dbcontext.Producers
+                                                   .Where(p => !p.Deleted
+                                                            && p.Name == producer)
+                                                   .Any(p => p.ID == game.ProducerID))
                    .ToList();
         }
 

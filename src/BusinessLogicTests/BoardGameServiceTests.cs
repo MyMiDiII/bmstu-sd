@@ -29,7 +29,6 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 1,
-                    Producer = "Producer1",
                     Year = 2001,
                     MaxAge = 5,
                     MinAge = 0,
@@ -41,7 +40,6 @@ namespace BusinessLogicTests
                 new BoardGame("Title2")
                 {
                     ID = 2,
-                    Producer = "Producer2",
                     Year = 2011,
                     MaxAge = 99,
                     MinAge = 12,
@@ -53,7 +51,6 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 3,
-                    Producer = "Producer2",
                     Year = 2001,
                     MaxAge = 18,
                     MinAge = 12,
@@ -153,7 +150,7 @@ namespace BusinessLogicTests
             var mockUserRepo = new Mock<IUserRepository>();
             mockUserRepo.Setup(repo => repo.GetDefaultUser()).Returns(
                 new User("test", "123") { Roles = new List<Role> { new Role("player") { RoleID = 1 } } });
-            var userService = new UserService(mockUserRepo.Object, new BCryptEntryptionService());
+            var userService = new UserService(mockUserRepo.Object, new CurUserService(), new BCryptEntryptionService());
 
             _playerService = new PlayerService(new Mock<IPlayerRepository>().Object, userService);
             _boardGameService = new BoardGameService(_mockBGRepo, _playerService);
@@ -179,7 +176,6 @@ namespace BusinessLogicTests
             var res = _boardGameService.GetBoardGames();
             var boardGame = new BoardGame("Пандемия")
             {
-                Producer = "Hobby World",
                 Year = 2014,
                 MaxAge = 99,
                 MinAge = 12,
@@ -204,7 +200,6 @@ namespace BusinessLogicTests
         {
             var boardGame = new BoardGame("Title1")
             {
-                Producer = "Producer1",
                 Year = 2001,
             };
 
@@ -220,7 +215,6 @@ namespace BusinessLogicTests
             var boardGame = new BoardGame("Бункер")
             {
                 ID = 1,
-                Producer = "Экономикус",
                 Year = 2001,
                 MaxAge = 99,
                 MinAge = 18,

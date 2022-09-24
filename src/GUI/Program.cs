@@ -38,6 +38,7 @@ builder.Services.AddTransient<IBoardGameEventService, BoardGameEventService>();
 builder.Services.AddTransient<IOrganizerService, OrganizerService>();
 builder.Services.AddTransient<IVenueService, VenueService>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
+builder.Services.AddTransient<IProducerService, ProducerService>();
 builder.Services.AddTransient<IEncryptionService, BCryptEntryptionService>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
@@ -46,14 +47,27 @@ builder.Services.AddTransient<IBoardGameEventRepository, BoardGameEventRepositor
 builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
 builder.Services.AddTransient<IVenueRepository, VenueRepository>();
 builder.Services.AddTransient<IPlayerRepository, PlayerRepository>();
+builder.Services.AddTransient<IProducerRepository, ProducerRepository>();
 
 builder.Configuration.AddJsonFile("dbsettings.json");
-builder.Services.AddDbContext<BGEContext>(options => options.UseNpgsql(
-      builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient);
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+var provider = builder.Configuration["Database"];
+builder.Services.AddDbContext<BGEContext>(
+    options => _ = provider switch
+    {
+        "Postgres" => options.UseNpgsql(builder.Configuration
+                                        .GetConnectionString("DefaultConnection")),
+        "MySQL" => options.UseMySql(builder.Configuration.GetConnectionString("MySQL"),
+                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MySQL"))),
+        _ => throw new Exception($"Unsupported provider: {provider}")
+    }
+); 
 
+if (provider == "Postgres")
+{
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+}
 
 var app = builder.Build();
 

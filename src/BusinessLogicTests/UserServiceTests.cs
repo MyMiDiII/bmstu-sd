@@ -109,7 +109,7 @@ namespace BusinessLogicTests
                 });
 
             _mockRepo = mockRepo.Object;
-            _service = new UserService(_mockRepo, _encryptionService);
+            _service = new UserService(_mockRepo, new CurUserService(), _encryptionService);
         }
 
         [Fact]

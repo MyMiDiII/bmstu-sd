@@ -1,6 +1,7 @@
 ﻿@using Serilog;
 
 @inject BusinessLogic.Services.IBoardGameService BoardGameService
+@inject BusinessLogic.Services.IProducerService ProducerService
 
 <DataGrid TItem="BoardGameView"
           Data="@viewGames"
@@ -53,6 +54,7 @@
         Log.Information("BooardGamesTable init");
         foreach(var game in Games)
         {
+            game.Producer = ProducerService.GetProducerByID(game.ProducerID);
             viewGames.Add(new BoardGameView(game));
         }
         Log.Information("BooardGamesTable init end");

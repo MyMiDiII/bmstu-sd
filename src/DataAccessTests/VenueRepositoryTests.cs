@@ -29,7 +29,7 @@ namespace DataAccessTests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            context.Venues.AddRange(new Venue("V1", "антикафе", "Москва"));
+            context.Venues.AddRange(new Venue("V1", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ"));
 
             context.SaveChanges();
         }
@@ -52,8 +52,8 @@ namespace DataAccessTests
                 {
                     Assert.Equal(1, v.ID);
                     Assert.Equal("V1", v.Name);
-                    Assert.Equal("антикафе", v.Type);
-                    Assert.Equal("Москва", v.Address);
+                    Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", v.Type);
+                    Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅ", v.Address);
                 }
             );
         }
@@ -67,8 +67,8 @@ namespace DataAccessTests
             Assert.NotNull(venue);
             Assert.Equal(1, venue?.ID);
             Assert.Equal("V1", venue?.Name);
-            Assert.Equal("антикафе", venue?.Type);
-            Assert.Equal("Москва", venue?.Address);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", venue?.Type);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅ", venue?.Address);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace DataAccessTests
         {
             var context = CreateContext();
             var rep = CreateVenueRepository(context);
-            var venue = new Venue("V2", "кафе", "Орел");
+            var venue = new Venue("V2", "пїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅ");
 
             rep.Add(venue);
 
@@ -85,8 +85,8 @@ namespace DataAccessTests
             Assert.NotNull(added);
             Assert.Equal(2, added?.ID);
             Assert.Equal("V2", added?.Name);
-            Assert.Equal("кафе", added?.Type);
-            Assert.Equal("Орел", added?.Address);
+            Assert.Equal("пїЅпїЅпїЅпїЅ", added?.Type);
+            Assert.Equal("пїЅпїЅпїЅпїЅ", added?.Address);
         }
 
         [Fact]
@@ -94,18 +94,18 @@ namespace DataAccessTests
         {
             var context = CreateContext();
             var rep = CreateVenueRepository(context);
-            var venue = new Venue("Лучшее", "кафе", "Москва") { ID = 1 };
+            var venue = new Venue("пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ") { ID = 1 };
 
             rep.Update(venue);
 
             Assert.Single(context.Venues);
             Assert.Null(context.Venues.FirstOrDefault(v => v.Name == "V1"));
-            var updated = context.Venues.Single(v => v.Name == "Лучшее");
+            var updated = context.Venues.Single(v => v.Name == "пїЅпїЅпїЅпїЅпїЅпїЅ");
             Assert.NotNull(updated);
             Assert.Equal(1, updated?.ID);
-            Assert.Equal("Лучшее", updated?.Name);
-            Assert.Equal("кафе", updated?.Type);
-            Assert.Equal("Москва", updated?.Address);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅ", updated?.Name);
+            Assert.Equal("пїЅпїЅпїЅпїЅ", updated?.Type);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅ", updated?.Address);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace DataAccessTests
         {
             var rep = CreateVenueRepository();
 
-            var venues = rep.GetByType("кафе");
+            var venues = rep.GetByType("пїЅпїЅпїЅпїЅ");
 
             Assert.NotNull(venues);
             Assert.NotEmpty(venues);
@@ -121,8 +121,8 @@ namespace DataAccessTests
             Assert.NotNull(found);
             Assert.Equal(1, found?.ID);
             Assert.Equal("V1", found?.Name);
-            Assert.Equal("антикафе", found?.Type);
-            Assert.Equal("Москва", found?.Address);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", found?.Type);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅ", found?.Address);
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace DataAccessTests
         {
             var context = CreateContext();
             var rep = CreateVenueRepository(context);
-            var venue = new Venue("V1", "антикафе", "Москва") { ID = 1 };
+            var venue = new Venue("V1", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ") { ID = 1 };
 
             rep.Delete(venue);
 
@@ -140,8 +140,8 @@ namespace DataAccessTests
             Assert.True(deleted.Deleted);
             Assert.Equal(1, deleted?.ID);
             Assert.Equal("V1", deleted?.Name);
-            Assert.Equal("антикафе", deleted?.Type);
-            Assert.Equal("Москва", deleted?.Address);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", deleted?.Type);
+            Assert.Equal("пїЅпїЅпїЅпїЅпїЅпїЅ", deleted?.Address);
         }
     }
 }

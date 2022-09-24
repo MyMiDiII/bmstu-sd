@@ -13,12 +13,14 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(Player elem)
+        public long Add(Player elem)
         {
             try
             {
                 _dbcontext.Players.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
             catch
             {
@@ -83,10 +85,10 @@ namespace DataAccess.Repositories
                    .ToList();
         }
 
-        public void AddToEvent(long playerID, long eventID)
+        public void AddToEvent(long eventID, long playerID)
         {
             if (CheckPlayerRegistration(playerID, eventID))
-                throw new AlreadyExistsEventGameException();
+                throw new AlreadyExistsPlayerRegistraionException();
 
             var newPlayerReg = new PlayerRegistration(playerID, eventID);
 
@@ -97,11 +99,11 @@ namespace DataAccess.Repositories
             }
             catch
             {
-                throw new AddEventGameException();
+                throw new AddPlayerRegistrationException();
             }
         }
 
-        public void DeleteFromEvent(long playerID, long eventID)
+        public void DeleteFromEvent(long eventID, long playerID)
         {
             try
             {
@@ -117,7 +119,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public bool CheckPlayerRegistration(long playerID, long eventID)
+        public bool CheckPlayerRegistration(long eventID, long playerID)
         {
             return _dbcontext.Registrations
                    .Where(reg

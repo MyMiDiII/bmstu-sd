@@ -57,7 +57,6 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 1,
-                    Produser = "Producer1",
                     Year = 2001,
                 }
             };
@@ -139,7 +138,7 @@ namespace BusinessLogicTests
             var mockUserRepo = new Mock<IUserRepository>();
             mockUserRepo.Setup(repo => repo.GetDefaultUser()).Returns(
                 new User("test", "123") { Roles = new List<Role> { new Role("player") { RoleID = 1 } } });
-            var userService = new UserService(mockUserRepo.Object, new BCryptEntryptionService());
+            var userService = new UserService(mockUserRepo.Object, new CurUserService(), new BCryptEntryptionService());
 
             _service = new PlayerService(_mockRepo, userService);
         }

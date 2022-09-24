@@ -1,0 +1,226 @@
+﻿@using Serilog;
+@using System.Text.RegularExpressions;
+
+@inject NavigationManager NavigationManager
+
+@inject BusinessLogic.Services.IOrganizerService OrganizerService
+@inject BusinessLogic.Services.IUserService UserService 
+
+<Modal @ref="@modal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Форма на регистрацию организатора</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <h5>Основная информация</h5>
+            <Validations @ref="@orgRegValidations" ValidateOnLoad=false>
+                    <Validation @ref="@nameValidation" Validator="@ValidateName">
+                        <Field>
+                            <TextEdit @bind-Text="@organizer.Name" Placeholder="Название организации">
+                               <Feedback> 
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError>@nameErrorText</ValidationError>
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    <Validation @ref="@addressValidation" Validator="ValidateAddress">
+                        <Field>
+                            <TextEdit @bind-Text="@organizer.Address" Placeholder="Адрес">
+                               <Feedback>
+                                    <ValidationNone></ValidationNone>
+                                    <ValidationSuccess></ValidationSuccess>
+                                    <ValidationError>@addressErrorText</ValidationError>
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+            <h5>Контакты</h5>
+                <Validation @ref="@emailValidation" Validator="ValidateEmail">
+                    <Field>
+                        <TextEdit @bind-Text="@organizer.Email" Placeholder="Email (example@examle.ru)"
+                                  Role="TextRole.Email">
+                           <Feedback> 
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>@emailErrorText</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation @ref="@urlValidation" Validator="ValidateURL">
+                    <Field>
+                        <TextEdit @bind-Text="@organizer.URL" Placeholder="Сайт (http(s)://example.com)"
+                                  Role="TextRole.Url">
+                           <Feedback>
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>@urlErrorText</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation @ref="@phoneValidation" Validator="ValidatePhone">
+                    <Field>
+                        <TextEdit @bind-Text="@organizer.PhoneNumber" Placeholder="Телефон (+7XXXXXXXXXX)"
+                                  Role="TextRole.Telephone">
+                           <Feedback> 
+                                <ValidationNone></ValidationNone>
+                                <ValidationSuccess></ValidationSuccess>
+                                <ValidationError>@phoneErrorText</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+            </Validations>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
+                <Button Color="Color.Primary" Clicked="@OnConfirmBtnClicked">
+                    Стать организатором
+                </Button>
+            </ModalFooter>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+@code {
+    private Modal? modal;
+
+    private Validations? orgRegValidations;
+    private Validation? nameValidation;
+    private Validation? addressValidation;
+    private Validation? emailValidation;
+    private Validation? urlValidation;
+    private Validation? phoneValidation;
+
+    private string nameErrorText = "Название не может быть пустым";
+    private string addressErrorText = "Адрес не может быть пустым";
+    private string emailErrorText = "Не соответствует шаблону";
+    private string urlErrorText = "Не соответствует шаблону";
+    private string phoneErrorText = "Не соответствует шаблону";
+
+    private bool nameFreeOrg = true;
+    private bool addressFreeOrg = true;
+    private bool allUpdating = false;
+    private bool anyNotNull = true;
+
+    private Organizer organizer = new Organizer();
+
+    public void Show()
+    {
+        Log.Information("Show Organizer Modal");
+        modal?.Show();
+    }
+
+    private Task HideModal()
+    {
+        Log.Information("Hide Organizer Modal");
+        modal?.Hide();
+
+        return Task.CompletedTask;
+    }
+
+    private async Task OnConfirmBtnClicked()
+    {
+        Log.Information("Organizer registration btn clicked");
+        if (await orgRegValidations.ValidateAll())
+        {
+            try
+            {
+                Log.Debug("Call OrganizerService.CreateOrganizerWithUserRole");
+                OrganizerService.CreateOrganizerWithUserRole(organizer);
+                Log.Debug("Call UserService.SetCurrentUserRole");
+                UserService.SetCurrentUserRole("organizer");
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
+                await orgRegValidations?.ClearAll();
+            }
+            catch(AlreadyExistsOrganizerException ex)
+            {
+                Log.Error("Catch exception {0}", ex.GetType());
+                nameFreeOrg = false;
+                addressFreeOrg = false;
+                nameErrorText = "";
+                addressErrorText = "Организатор с таким названием и адресом уже существует";
+                allUpdating = true;
+                await orgRegValidations?.ValidateAll();
+                allUpdating = false;
+            }
+        }
+    }
+
+    void ValidateName(ValidatorEventArgs e)
+    {
+        Log.Information("ValidateName is called");
+        var name = Convert.ToString(e.Value);
+
+        if (nameFreeOrg)
+        {
+            Log.Information("Empty name field");
+            nameErrorText = "Название не может быть пустым";
+        }
+
+        e.Status = !string.IsNullOrEmpty(name) && nameFreeOrg
+                   ? ValidationStatus.Success : ValidationStatus.Error;
+
+        nameFreeOrg = true;
+
+        if (!allUpdating)
+        {
+            allUpdating = true;
+            addressValidation?.Validate();
+            allUpdating = false;
+        }
+    }
+
+    void ValidateAddress(ValidatorEventArgs e)
+    {
+        Log.Information("ValidateAddress is called");
+        var name = Convert.ToString(e.Value);
+
+        if (addressFreeOrg)
+        {
+            Log.Information("Empty address field");
+            addressErrorText = "Адрес не может быть пустым";
+        }
+
+        e.Status = !string.IsNullOrEmpty(name) && addressFreeOrg
+                   ? ValidationStatus.Success : ValidationStatus.Error;
+
+        addressFreeOrg = true;
+
+        if (!allUpdating)
+        {
+            allUpdating = true;
+            nameValidation?.Validate();
+            allUpdating = false;
+        }
+    }
+
+    void ValidateEmail(ValidatorEventArgs e)
+    {
+        Log.Information("ValidateEmail is called");
+        var email = Convert.ToString(e.Value);
+
+        e.Status = ValidationRule.IsEmail(email) ? ValidationStatus.Success : ValidationStatus.Error;
+    }
+
+    void ValidateURL(ValidatorEventArgs e)
+    {
+        Log.Information("ValidateURL is called");
+        var url = Convert.ToString(e.Value) ?? "";
+        var pattern = "http[s]{0,1}://.*?\\..*?";
+
+        e.Status = Regex.IsMatch(url, pattern) ? ValidationStatus.Success : ValidationStatus.Error;
+    }
+
+    void ValidatePhone(ValidatorEventArgs e)
+    {
+        Log.Information("ValidatPhone is called");
+        var phone = Convert.ToString(e.Value) ?? "";
+        var pattern = @"\+7(\d{10})$";
+
+        e.Status = Regex.IsMatch(phone, pattern) ? ValidationStatus.Success : ValidationStatus.Error;
+    }
+}

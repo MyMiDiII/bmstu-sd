@@ -1,0 +1,141 @@
+﻿@page "/game"
+@page "/game/{gameID:long}"
+
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
+@inject BusinessLogic.Services.IPlayerService PlayerService
+@inject BusinessLogic.Services.IUserService UserService
+@inject BusinessLogic.Services.IProducerService ProducerService
+
+<style>
+    body {
+        background-color: #A3D4F5;
+    }
+</style>
+
+<Card Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is75">
+    <CardBody>
+        @if (Game is null)
+        {
+            <h1>Такой игры не существует</h1>
+        }
+        else
+        {
+            <table width="100%">
+                <tr>
+                    <td width="90%">
+                        <h1>Настольная игра "@Game.Title"</h1>
+                    </td>
+                    <td width="10%">
+                        @if (UserService.GetCurrentUserRoleName() == "player"
+                             && BoardGameService.CheckBoardGameInCurrentUserFavorites(game))
+                        {
+                            <Tooltip Text="Удалить из Моих Настолок">
+                                <Button Color="Color.Danger" Size="Size.ExtraLarge"
+                                        Clicked="@DeleteFromFavorites">
+                                    <Icon Name="IconName.Heart"/>
+                                </Button>
+                            </Tooltip>
+                        }
+                        else
+                        {
+                            <Tooltip Text="В Мои Настолки">
+                                <Button Color="Color.Dark" Size="Size.ExtraLarge" Outline
+                                        Clicked="@AddToFavorites">
+                                    <Icon Name="IconName.Heart"/>
+                                </Button>
+                            </Tooltip>
+                        }
+                    </td>
+                </tr>
+            </table>
+
+            <p/>
+            <CardDeck>
+                <Card Shadow="Shadow.Small">
+                    <CardBody Flex="Flex.JustifyContent.Around">
+                        <Icon Name="IconName.Baby" IconSize="IconSize.x3"></Icon>
+                        <Card TextAlignment="TextAlignment.Center" Border="Border.Is0">
+                            <h1>@Game.AgeView</h1>
+                        </Card>
+                    </CardBody>
+                </Card>
+                <Card Shadow="Shadow.Small">
+                    <CardBody Flex="Flex.JustifyContent.Around">
+                        <Icon Name="IconName.UserFriends" IconSize="IconSize.x3"></Icon>
+                        <Card TextAlignment="TextAlignment.Center" Border="Border.Is0">
+                            <h1>@Game.PlayersView</h1>
+                        </Card>
+                    </CardBody>
+                </Card>
+                <Card Shadow="Shadow.Small">
+                    <CardBody Flex="Flex.JustifyContent.Around">
+                            <Icon Name="IconName.Hourglass" IconSize="IconSize.x3"></Icon>
+                        <Card TextAlignment="TextAlignment.Center" Border="Border.Is0">
+                            <h1>@Game.DurationView</h1>
+                        </Card>
+                    </CardBody>
+                </Card>
+            </CardDeck>
+            <p/>
+            <h3>Игротеки по этой игре</h3>
+            <BGEventsTable PageSize=2 Events="@events"/>
+
+            <LayoutFooter Position="Position.Absolute.Bottom.Is0">
+                <Blazorise.Link To="@game.Producer.URL" Target="Target.Blank">
+                    @game.Producer.Name
+                </Blazorise.Link>
+                @Game.Year
+            </LayoutFooter>
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public long gameID { get; set; } = 0;
+    public BoardGameView? Game;
+    private List<BoardGameEvent> events = new List<BoardGameEvent>();
+    private BoardGame game;
+
+    [Inject] private IMessageService MessageService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Log.Debug("GamePage init");
+        Log.Debug("Call BoardGameService.GetBoardGameByID");
+        var tmpGame = BoardGameService.GetBoardGameByID(gameID);
+
+        if (tmpGame is not null)
+        {
+            game = tmpGame;
+            game.Producer = ProducerService.GetProducerByID(game.ProducerID);
+            Game = new BoardGameView(game);
+            Log.Debug("Call BoardGameService.GetEventsByGame");
+            events = BoardGameService.GetEventsByGame(game);
+        }
+
+        base.OnInitialized();
+    }
+
+    Task AddToFavorites()
+    {
+        Log.Information("Add To Favorites btn clicked");
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
+        if (UserService.GetCurrentUserRoleName() == "player")
+        {
+            Log.Debug("Call BoardGameService.AddBoardGameToFavorite");
+            BoardGameService.AddBoardGameToFavorite(game);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    Task DeleteFromFavorites()
+    {
+        Log.Information("Delete from Favorites btn clicked");
+        Log.Debug("Call BoardGameService.DeleteBoardGameFromFavorite");
+        BoardGameService.DeleteBoardGameFromFavorite(game);
+
+        return Task.CompletedTask;
+    }
+}

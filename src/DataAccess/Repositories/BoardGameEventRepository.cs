@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.Models;
 using BusinessLogic.IRepositories;
 using BusinessLogic.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
@@ -13,14 +14,16 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(BoardGameEvent elem)
+        public long Add(BoardGameEvent elem)
         {
             try
             {
                 _dbcontext.Events.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
-            catch
+            catch(Exception ex)
             {
                 throw new AddBoardGameEventException();
             }
@@ -28,24 +31,67 @@ namespace DataAccess.Repositories
 
         public List<BoardGameEvent> GetAll()
         {
-            return _dbcontext.Events.Where(bgEvent => !bgEvent.Deleted).ToList();
+            var events = _dbcontext.Events.FromSqlRaw(
+               "select * from get_events_with_states()").ToList();
+
+            return events;
         }
 
         public BoardGameEvent? GetByID(long id)
         {
-            return _dbcontext.Events.Find(id);
+            return _dbcontext.Events.FromSqlRaw(
+                    "select * from get_event_with_state_by_id({0})", id).ToList()[0];
         }
 
         public void Update(BoardGameEvent elem)
         {
             try
             {
-                _dbcontext.Events.Update(elem);
-                _dbcontext.SaveChanges();
+                var editEvent = _dbcontext.Events.FirstOrDefault(e => e.ID == elem.ID);
+
+                if (editEvent != null)
+                {
+                    editEvent.BeginRegistration = elem.BeginRegistration;
+                    editEvent.Cancelled = elem.Cancelled;
+                    editEvent.Cost = elem.Cost;
+                    editEvent.Date = elem.Date;
+                    editEvent.Deleted = elem.Deleted;
+                    editEvent.Duration = elem.Duration;
+                    editEvent.EndRegistration = elem.EndRegistration;
+                    editEvent.OrganizerID = elem.OrganizerID;
+                    editEvent.Purchase = elem.Purchase;
+                    editEvent.StartTime = elem.StartTime;
+                    editEvent.Title = elem.Title;
+                    editEvent.VenueID = elem.VenueID;
+
+                    _dbcontext.Events.Update(editEvent);
+                    _dbcontext.SaveChanges();
+                }
             }
-            catch
+            catch (Exception ex)
             {
                 throw new UpdateBoardGameEventException();
+            }
+        }
+
+        public void UpdateWithGames(BoardGameEvent elem, List<long> gamesIDs)
+        {
+            using (var transaction = _dbcontext.Database.BeginTransaction())
+            {
+                try
+                {
+                    Update(elem);
+
+                    _dbcontext.Database.ExecuteSqlRaw("call update_event_games({0}, {1});",
+                                                      gamesIDs, elem.ID);
+                    transaction.Commit();
+                }
+                catch(Exception ex)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine(ex.Message);
+                    throw new UpdateBoardGameEventException();
+                }
             }
         }
 
@@ -98,13 +144,6 @@ namespace DataAccess.Repositories
                    .ToList();
         }
 
-        public List<BoardGameEvent> GetByRegistration(TimeOnly time)
-        {
-            return _dbcontext.Events
-                   .Where(bgEvent => !bgEvent.Deleted && bgEvent.RegistrationTime <= time)
-                   .ToList();
-        }
-
         public List<BoardGameEvent> GetByPurchase(bool purchase)
         {
             return _dbcontext.Events
@@ -140,6 +179,14 @@ namespace DataAccess.Repositories
                     .Where(r => r.BoardGameEventID == bgEventID)
                     .Select(r => r.p)
                     .ToList();
+        }
+        public List<BoardGameEvent> GetByRegistration()
+        {
+            return _dbcontext.Events
+                   .Where(bgEvent => !bgEvent.Deleted
+                                  && bgEvent.BeginRegistration < DateTime.UtcNow
+                                  && bgEvent.EndRegistration >= DateTime.UtcNow)
+                   .ToList();
         }
     }
 }

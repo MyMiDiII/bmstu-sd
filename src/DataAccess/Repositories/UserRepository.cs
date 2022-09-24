@@ -13,15 +13,18 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(User elem)
+        public long Add(User elem)
         {
             try
             {
                 _dbcontext.Users.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw new AddUserException();
             }
         }
@@ -83,8 +86,7 @@ namespace DataAccess.Repositories
 
         public User? GetByName(string name)
         {
-            return _dbcontext.Users
-                   .SingleOrDefault(user => user.Name.Contains(name));
+            return _dbcontext.Users.FirstOrDefault(user => user.Name == name);
         }
 
         public User GetDefaultUser()

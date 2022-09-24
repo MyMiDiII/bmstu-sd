@@ -1,0 +1,181 @@
+﻿@using BusinessLogic.Models
+
+@inject NavigationManager NavigationManager
+@inject BusinessLogic.Services.IUserService UserService
+
+<Bar Breakpoint="Breakpoint.Desktop"
+     Background="Background.Primary"
+     ThemeContrast="ThemeContrast.Light">
+    <BarIcon IconName="customIcon" />
+    <BarBrand>
+        <BarItem>
+            <BarLink To="">
+                ИгроМир
+            </BarLink>
+        </BarItem>
+    </BarBrand>
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="/events" TextColor="TextColor.White">Игротеки</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/games" TextColor="TextColor.White">Игры</BarLink>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                @if (curUser.Name == "guest")
+                {
+                    <Button Color="Color.Primary" Clicked="@OnRegClicked">Регистрация</Button>
+                    <Button Color="Color.Success" Clicked="@OnLoginClicked">Вход</Button>
+                }
+                else
+                {
+                    <BarDropdown>
+                        <BarDropdownToggle>С возвращением, @curUser.Name!</BarDropdownToggle>
+                        <BarDropdownMenu Width="Width.Is100">
+                            @if (UserService.GetCurrentUserRoleName() == "player")
+                            {
+                                <BarDropdownItem>
+                                    Роль:
+                                    <Badge Color="Color.Info">
+                                        Игрок
+                                    </Badge>
+                                </BarDropdownItem>
+
+                                @if (UserService.CheckUserRole("organizer"))
+                                {
+                                    <BarDropdownDivider/>
+                                    <BarDropdownItem Clicked="@ChangeRoleToOrganizer">
+                                        Профиль организатора
+                                    </BarDropdownItem>
+                                }
+
+                                <BarDropdownDivider/>
+                                <BarDropdownItem Clicked="@GoToMyGames">Мои настолки</BarDropdownItem>
+                                <BarDropdownItem Clicked="@GoToMyEvents">Мои игротеки</BarDropdownItem>
+                            }
+                            else if (UserService.GetCurrentUserRoleName() == "organizer")
+                            {
+                                <BarDropdownItem>
+                                    Роль:
+                                    <Badge Color="Color.Info">
+                                        Организатор
+                                    </Badge>
+                                </BarDropdownItem>
+
+                                if (UserService.CheckUserRole("player"))
+                                {
+                                    <BarDropdownDivider/>
+                                    <BarDropdownItem Clicked="@ChangeRoleToPlayer">
+                                        Профиль игрока
+                                    </BarDropdownItem>
+                                }
+
+                                <BarDropdownDivider/>
+                                <BarDropdownItem Clicked="@GoToMyOrgEvents">Мои игротеки</BarDropdownItem>
+                            }
+                            else
+                            {
+                                <BarDropdownItem>
+                                    Роль:
+                                    <Badge Color="Color.Info">
+                                        Администратор
+                                    </Badge>
+                                </BarDropdownItem>
+
+                                <BarDropdownDivider/>
+                                <BarDropdownItem Clicked="@GoToUsersTable">Пользователи</BarDropdownItem>
+                            }
+                            <BarDropdownDivider/>
+                            <BarDropdownItem Clicked="@Logout">Выход</BarDropdownItem>
+                        </BarDropdownMenu>
+                    </BarDropdown>
+                }
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+
+<Login @ref=@loginModal/>
+
+<Register @ref=@registerModal/>
+
+@code {
+    RenderFragment customIcon =@<img src="/board-game.png" style="width:52px; height:52px" /> ;
+
+    List<User> users = new List<User>();
+    User curUser;
+
+    private Login? loginModal;
+    private Register? registerModal;
+
+    [Inject] private IMessageService MessageService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        curUser = UserService.GetCurrentUser();
+    }
+
+    Task OnLoginClicked()
+    {
+        Log.Information("Login btn clicked");
+        loginModal?.Show();
+
+        return Task.CompletedTask;
+    }
+
+    Task OnRegClicked()
+    {
+        Log.Information("Regiter btn clicked");
+        registerModal?.Show();
+
+        return Task.CompletedTask;
+    }
+
+    public void Logout()
+    {
+        Log.Information("Logout btn clicked");
+        var req = new LoginRequest("guest", "guest");
+        UserService.Login(req);
+        curUser = UserService.GetCurrentUser();
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    public void GoToMyEvents()
+    {
+        NavigationManager.NavigateTo("my-events", true);
+    }
+
+    public void GoToMyGames()
+    {
+        NavigationManager.NavigateTo("my-games", true);
+    }
+
+    public void ChangeRoleToOrganizer()
+    {
+        Log.Debug("Call UserService.SetCurrentUserRole (organizer)");
+        UserService.SetCurrentUserRole("organizer");
+        NavigationManager.NavigateTo("/", true);
+    }
+
+    public void ChangeRoleToPlayer()
+    {
+        Log.Debug("Call UserService.SetCurrentUserRole (player)");
+        UserService.SetCurrentUserRole("player");
+        NavigationManager.NavigateTo("/", true);
+    }
+
+    public void GoToMyOrgEvents()
+    {
+        NavigationManager.NavigateTo("my-org-events", true);
+    }
+
+    public void GoToUsersTable()
+    {
+        NavigationManager.NavigateTo("users", true);
+    }
+
+}

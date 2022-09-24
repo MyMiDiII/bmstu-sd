@@ -9,8 +9,9 @@ namespace BusinessLogic.Models
         public long ID { get; set; }
         public string RoleName { get; set; }
         public long RoleID { get; set; }
-        [ForeignKey("User")]
+        [ForeignKey("UserID")]
         public long UserID { get; set; }
+        public virtual User User { get; set; }
 
         public Role(string roleName) { RoleName = roleName; }
     }

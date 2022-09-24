@@ -13,12 +13,14 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(BoardGame elem)
+        public long Add(BoardGame elem)
         {
             try
             {
                 _dbcontext.Games.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
             catch
             {
@@ -73,9 +75,10 @@ namespace DataAccess.Repositories
         public List<BoardGame> GetByProducer(string producer)
         {
             return _dbcontext.Games
-                   .Where(game => !game.Deleted
-                               && game.Produser != null
-                               && game.Produser.Contains(producer))
+                   .Where(game => !game.Deleted && _dbcontext.Producers
+                                                   .Where(p => !p.Deleted
+                                                            && p.Name == producer)
+                                                   .Any(p => p.ID == game.ProducerID))
                    .ToList();
         }
 
@@ -132,6 +135,32 @@ namespace DataAccess.Repositories
             {
                 throw new AddEventGameException();
             }
+        }
+
+        public void AddManyToEvent(List<long> gamesIDs, long eventID)
+        {
+            var eventGames = new List<EventGame>();
+
+            foreach(var gameID in gamesIDs)
+            {
+                var newEventGame = new EventGame(gameID, eventID);
+
+                if (!CheckGamePlaying(gameID, eventID))
+                {
+                    eventGames.Add(newEventGame);
+                }
+            }
+
+            try
+            {
+                _dbcontext.EventGameRelations.AddRange(eventGames);
+                _dbcontext.SaveChanges();
+            }
+            catch
+            {
+                throw new AddEventGameException();
+            }
+
         }
 
         public void DeleteFromEvent(long gameID, long eventID)

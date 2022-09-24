@@ -26,19 +26,30 @@ namespace BusinessLogic.Models
         public uint Duration { get; set; }
         public uint Cost { get; set; }
         public bool Purchase { get; set; }
-        public TimeOnly RegistrationTime { get; set; }
-        public BoardGameEventState State { get; set; }
-        [ForeignKey("Organizer")]
+        public DateTime BeginRegistration { get; set; }
+        public DateTime EndRegistration { get; set; }
+        public bool Cancelled { get; set; } = false;
+        [ForeignKey("OrganizerID")]
         public long OrganizerID { get; set; }
+        [ForeignKey("VenueID")]
         public long VenueID { get; set; }
-        public bool Deleted { get; set; }
+        public bool Deleted { get; set; } = false;
+        public BoardGameEventState State { get; set; }
+
+        public virtual Organizer Organizer { get; set; }
+        public virtual Venue Venue { get; set; }
+
+        public BoardGameEvent()
+        {
+            Title = "";
+            Date = new DateOnly();
+        }
 
         public BoardGameEvent(string title, DateOnly date)
         {
             Title = title;
             Date = date;
             State = BoardGameEventState.Planned;
-            Deleted = false;
         }
     }
 }

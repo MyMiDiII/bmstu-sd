@@ -6,11 +6,14 @@ namespace BusinessLogic.Models
     public class EventGame
     {
         [Key]
-        [ForeignKey("BoardGame")]
+        [ForeignKey("BoardGameID")]
         public long BoardGameID { get; set; }
         [Key]
-        [ForeignKey("BoardGameEvent")]
+        [ForeignKey("BoardGameEventID")]
         public long BoardGameEventID { get; set; }
+
+        public virtual BoardGame BoardGame { get; set; }
+        public virtual BoardGameEvent BoardGameEvent { get; set; }
 
         public EventGame(long boardGameID, long boardGameEventID)
         {

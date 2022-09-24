@@ -1,0 +1,24 @@
+﻿@page "/my-games"
+
+@inject BusinessLogic.Services.IPlayerService PlayerService
+
+<PageTitle>Мои настолки</PageTitle>
+
+<CardBody>
+    <h2>Мои настолки</h2>
+    <BoardGamesTable Games="@games"/>
+</CardBody>
+
+@code {
+    private List<BoardGame> games = new List<BoardGame>();
+
+    protected override void OnInitialized()
+    {
+        Log.Information("Player games page init");
+        Log.Debug("Call PlayerService.GetCurrentPlayerFavorites");
+        games = PlayerService.GetCurrentPlayerFavorites();
+        base.OnInitialized();
+    }
+}
+
+

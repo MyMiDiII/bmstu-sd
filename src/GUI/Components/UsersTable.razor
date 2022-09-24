@@ -1,0 +1,79 @@
+﻿@inject BusinessLogic.Services.IUserService UserService
+
+<DataGrid TItem="UserView"
+          Data="@viewUsers"
+          ShowPager
+          PageSize="@PageSize"
+          Editable="true"
+          Resizable
+          EditMode="Blazorise.DataGrid.DataGridEditMode.Inline"
+          >
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(UserView.Name)" Caption="Логин" />
+        <DataGridCheckColumn Field="@nameof(UserView.IsPlayer)" Caption="Игрок">
+            <DisplayTemplate>
+                <Check TValue="bool" Checked="context.IsPlayer" Disabled ReadOnly />
+            </DisplayTemplate>
+        </DataGridCheckColumn>
+        <DataGridCheckColumn Field="@nameof(UserView.IsOrganizer)" Caption="Организатор">
+            <DisplayTemplate>
+                <Check TValue="bool" Checked="context.IsOrganizer" Disabled ReadOnly />
+            </DisplayTemplate>
+        </DataGridCheckColumn>
+        <DataGridCheckColumn Field="@nameof(UserView.IsAdmin)" Caption="Администратор" Editable>
+            <DisplayTemplate>
+                <Check TValue="bool" Checked="context.IsAdmin" Disabled ReadOnly />
+            </DisplayTemplate>
+        </DataGridCheckColumn>
+        <DataGridCommandColumn>
+            <NewCommandTemplate>
+            </NewCommandTemplate>
+            <EditCommandTemplate>
+                @if (context.Item.Name != "admin" && context.Item.Name != "guest")
+                {
+                    <Button Color="Color.Primary" Clicked="@context.Clicked">Изменить права</Button>
+                }
+            </EditCommandTemplate>
+            <SaveCommandTemplate>
+                <Button Type="Blazorise.ButtonType.Submit"
+                PreventDefaultOnSubmit Color="Color.Primary"
+                Clicked="@context.Clicked">Изменить</Button>
+            </SaveCommandTemplate>
+            <DeleteCommandTemplate>
+                @if (context.Item.Name != "admin" && context.Item.Name != "guest")
+                {
+                    <Button Color="Color.Danger" Clicked="@context.Clicked">Удалить</Button>
+                }
+            </DeleteCommandTemplate>
+            <CancelCommandTemplate>
+                <Button Color="Color.Secondary" Clicked="@context.Clicked">Отменить</Button>
+            </CancelCommandTemplate>
+        </DataGridCommandColumn>
+</DataGridColumns>
+    <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
+    <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
+    <LastPageButtonTemplate><Icon Name="IconName.Forward" /></LastPageButtonTemplate>
+    <FirstPageButtonTemplate><Icon Name="IconName.Backward" /></FirstPageButtonTemplate>
+    <TotalItemsTemplate><Badge Color="Color.Primary">Всего @context.TotalItems пользователей</Badge></TotalItemsTemplate>
+</DataGrid>
+
+@code {
+    [Parameter]
+    public List<User> Users { get; set; } = new List<User>();
+    [Parameter]
+    public int PageSize { get; set; } = 5;
+    [Parameter]
+    public bool Full { get; set; } = true;
+
+    private List<UserView> viewUsers = new List<UserView>();
+
+    protected override void OnInitialized()
+    {
+        Log.Debug("UserTable init");
+        foreach(var user in Users)
+        {
+            viewUsers.Add(new UserView(user));
+        }
+        base.OnInitialized();
+    }
+}

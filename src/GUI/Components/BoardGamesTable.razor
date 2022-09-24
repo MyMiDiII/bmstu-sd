@@ -1,0 +1,63 @@
+﻿@using Serilog;
+
+@inject BusinessLogic.Services.IBoardGameService BoardGameService
+@inject BusinessLogic.Services.IProducerService ProducerService
+
+<DataGrid TItem="BoardGameView"
+          Data="@viewGames"
+          ShowPager
+          Striped
+          PageSize="@PageSize"
+          >
+    <DataGridColumns>
+        <DataGridColumn Caption="Название" Editable >
+            <DisplayTemplate>
+                @{
+                    var game = context as BoardGameView;
+                    var link = "/game/" + game?.ID.ToString();
+                    var title = game?.Title;
+                }
+                <Link To="@link" TextColor="TextColor.Dark">@title</Link>
+            </DisplayTemplate>
+        </DataGridColumn>
+        @if (Full)
+        {
+            <DataGridColumn Field="@nameof(BoardGameView.Producer)" Caption="Производитель" Editable />
+            <DataGridColumn Field="@nameof(BoardGameView.Year)" Caption="Год" Editable />
+        }
+        <DataGridColumn Field="@nameof(BoardGameView.AgeView)" Caption="Возраст" />
+        <DataGridColumn Field="@nameof(BoardGameView.PlayersView)" Caption="Количество игроков" />
+        @if (Full)
+        {
+            <DataGridColumn Field="@nameof(BoardGameView.DurationView)" Caption="Длительность партии" />
+        }
+    </DataGridColumns>
+    <NextPageButtonTemplate><Icon Name="IconName.StepForward" /></NextPageButtonTemplate>
+    <PreviousPageButtonTemplate><Icon Name="IconName.StepBackward" /></PreviousPageButtonTemplate>
+    <LastPageButtonTemplate><Icon Name="IconName.Forward" /></LastPageButtonTemplate>
+    <FirstPageButtonTemplate><Icon Name="IconName.Backward" /></FirstPageButtonTemplate>
+    <TotalItemsTemplate><Badge Color="Color.Primary">Всего @context.TotalItems игр</Badge></TotalItemsTemplate>
+</DataGrid>
+
+@code {
+    [Parameter]
+    public List<BoardGame> Games { get; set; } = new List<BoardGame>();
+    [Parameter]
+    public int PageSize { get; set; } = 6;
+    [Parameter]
+    public bool Full { get; set; } = true;
+
+    private List<BoardGameView> viewGames = new List<BoardGameView>();
+
+    protected override void OnInitialized()
+    {
+        Log.Information("BooardGamesTable init");
+        foreach(var game in Games)
+        {
+            game.Producer = ProducerService.GetProducerByID(game.ProducerID);
+            viewGames.Add(new BoardGameView(game));
+        }
+        Log.Information("BooardGamesTable init end");
+        base.OnInitialized();
+    }
+}

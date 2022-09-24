@@ -1,0 +1,28 @@
+﻿@using Serilog;
+
+@using BusinessLogic.Models
+
+@inject BusinessLogic.Services.IPlayerService PlayerService
+
+<DataGrid TItem="Player"
+          Data="@players"
+          ShowPager
+          Striped
+          PageSize="8"
+          >
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(Player.Name)" Caption="Название" Editable />
+        <DataGridColumn Field="@nameof(Player.League)" Caption="Лига" Editable />
+        <DataGridColumn Field="@nameof(Player.Rating)" Caption="Рейтинг" Editable />
+    </DataGridColumns>
+</DataGrid>
+
+@code {
+    public List<Player> players = new List<Player>();
+
+    protected override void OnInitialized()
+    {
+        Log.Debug("Call OrganizerService.GetOrganizers");
+        players = PlayerService.GetPlayers();
+    }
+}

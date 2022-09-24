@@ -62,7 +62,6 @@ namespace BusinessLogicTests
                 new BoardGame("Title1")
                 {
                     ID = 1,
-                    Produser = "Producer1",
                     Year = 2001,
                 }
             };
@@ -128,7 +127,9 @@ namespace BusinessLogicTests
                 });
 
             _mockRepo = mockRepo.Object;
-            _service = new BoardGameEventService(_mockRepo);
+            var mockOrgRepo = new Mock<IOrganizerRepository>().Object;
+            var mockVenRepo= new Mock<IVenueRepository>().Object;
+            _service = new BoardGameEventService(_mockRepo, mockOrgRepo, mockVenRepo);
         }
 
         [Fact]

@@ -11,12 +11,15 @@ namespace BusinessLogic.Models
         public string Password { get; set; }
         [NotMapped]
         public List<Role> Roles { get; set; }
+        [NotMapped]
+        public string CurRoleName { get; set; }
 
         public User(string name, string password)
         {
             Name = name;
             Password = password;
             Roles = new List<Role>();
+            CurRoleName = "player";
         }
     }
 }

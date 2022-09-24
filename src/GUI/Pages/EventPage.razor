@@ -1,0 +1,304 @@
+﻿@page "/event"
+@page "/event/{eventID:long}"
+
+@inject NavigationManager NavigationManager
+@inject BusinessLogic.Services.IBoardGameEventService BoardGameEventService
+@inject BusinessLogic.Services.IPlayerService PlayerService
+@inject BusinessLogic.Services.IUserService UserService
+
+<style>
+    body {
+        background-color: #A3D4F5;
+    }
+    .card-pointer {
+        cursor: pointer;
+    }
+</style>
+
+<Card Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle" Width="Width.Is75">
+    <CardBody>
+        @if (Event is null)
+        {
+            <h1>Такой игротеки не существует</h1>
+        }
+        else
+        {
+            <Div Flex="Flex.JustifyContent.Between">
+                <h1>Игротека "@Event.Title"</h1>
+                <Card Border="Border.Is0">
+                    <Badge Position="Position.Relative.Top.Is50.Start.Is50.Translate.Middle"
+                           Color="@Event.StateColor" Pill>@Event.StateName</Badge>
+                </Card>
+            </Div>
+
+            @if (Event.Purchase)
+            {
+                <Div>
+                    <Badge Color="Color.Success">
+                        <Icon Name="IconName.Check"/>
+                    </Badge>
+                    На этой игротеке можно приобрести игры
+                </Div>
+            }
+
+            <p/>
+            <table width="100%">
+                <tr>
+                    <td rowspan="6" width="22%">
+                        <h3>Регистрация</h3>
+                        <Div>Начало:</Div>
+                        <Heading Size="HeadingSize.Is5">@Event.BeginRegistration</Heading>
+                        <Div>Конец:</Div>
+                        <Heading Size="HeadingSize.Is5">@Event.EndRegistration</Heading>
+                        <Div Flex="Flex.JustifyContent.Start.AlignItems.Center">
+                            Статус:
+                            <Card Margin="Margin.Is1" Border="Border.Is0">
+                                <Badge Color="@stateColor" Pill>@stateText</Badge>
+                            </Card>
+                        </Div>
+                        <p/>
+                        @if (UserService.GetCurrentUserRoleName() == "player"
+                             && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
+                         {
+                            <Button Color="Color.Danger" Size="Size.Medium"
+                                    Clicked="@OnUnRegBtnClicked" Block>
+                                    Отменить
+                            </Button>
+                         }
+                         else
+                         {
+                            <Button Color="Color.Primary" Size="Size.Medium" Disabled="@regBtnDisabled"
+                                    Clicked="@OnRegBtnClicked" Block>
+                                @regBtnText
+                            </Button>
+                         }
+                    </td>
+                    <td rowspan="6" width="1%">
+                    </td>
+                    <td rowspan="2" width="32%" style="vertical-align:top">
+                       <Card Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.Clock" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.StartTimeView</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                    <td rowspan="6" width="1%">
+                    </td>
+                    <td rowspan="3" width="37%">
+                        <Card Flex="Flex.AlignSelf.Stretch" @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
+                            <CardBody Flex="Flex.JustifyContent.Between.AlignContent.Center" Border="Border.Is0">
+                                <Icon Border="Border.Is0" Name="IconName.Hotel" IconSize="IconSize.x3"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Flex="Flex.AlignContent.Center" Width="Width.Is75" Height="Height.Is50"
+                                      Border="Border.Is0">
+                                   <h5>@Event?.Venue?.Name</h5>
+                                   <h7>@Event?.Venue?.Address</h7>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                    <td rowspan ="2">
+                        <Card Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.CalendarDay" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.Date</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="3">
+                        <Card @onclick="@go" Class="card-pointer" Shadow="Shadow.Small">
+                            <CardBody Flex="Flex.JustifyContent.Between" Border="Border.Is0">
+                                <Icon Border="Border.Is0" Name="IconName.UserTie" IconSize="IconSize.x3"></Icon>
+                                <Card Flex="Flex.AlignContent.Center" TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h4>@Event?.Organizer?.Name</h4>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan ="2" style="vertical-align:bottom">
+                        <Card Height="Height.Is25" Shadow="Shadow.Small">
+                            <CardBody Padding="Padding.Is3" Flex="Flex.JustifyContent.Between">
+                                <Icon Name="IconName.Hourglass" IconSize="IconSize.x2"></Icon>
+                                <Card TextAlignment="TextAlignment.Center" Width="Width.Is75"
+                                      Border="Border.Is0">
+                                   <h3>@Event.DurationView</h3>
+                                </Card>
+                            </CardBody>
+                        </Card>
+                    </td>
+                </tr>
+                <tr>
+                </tr>
+            </table>
+
+            <p/>
+            <h3>Игры, в которые здесь играют</h3>
+            <BoardGamesTable PageSize="2" Full=false Games="@games"/>
+        }
+    </CardBody>
+</Card>
+
+<Modal @bind-Visible="@confModalVisible">
+    <ModalContent Centered>
+        <ModalHeader>
+            <Icon IconSize="IconSize.x2" Name="IconName.ExclamationTriangle"/>
+            ㅤ
+            ㅤ
+            ㅤ
+            <ModalTitle>Внимание!</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            Если время регистрации уже закончилось, Вы не сможете снова зарегистрироваться!
+            Проверьте время окончания регистрации перед отменой
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Закрыть</Button>
+            <Button Color="Color.Danger" Clicked="@UnReg">
+                Отменить
+            </Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+<RegLoginModal @ref="@regLoginModal" Title="Только для игроков"
+               InfoText="Для регистрации на игротеку необходимо зарегистрироваться или войти!"/>
+
+@code {
+    [Parameter]
+    public long eventID { get; set; } = 0;
+
+    public EventView? Event;
+    private List<BoardGame> games = new List<BoardGame>();
+    private BoardGameEvent bgEvent;
+
+    private bool regBtnDisabled= true;
+    private string regBtnText = "Не доступна";
+
+    private string stateText;
+    private Color stateColor;
+
+    private RegLoginModal? regLoginModal;
+    private bool confModalVisible = false;
+
+    [Inject] private IMessageService MessageService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Log.Information("EventPage init");
+        Log.Debug("Call BoardGameEventService.GetBoardGameEventByID");
+        var tmpEvent = BoardGameEventService.GetBoardGameEventByID(eventID);
+        if (tmpEvent is not null)
+        {
+            bgEvent = tmpEvent;
+            Log.Debug("Call BoardGameEventService.GetGamesByEvent");
+            games = BoardGameEventService.GetGamesByEvent(bgEvent);
+            Log.Debug("Call BoardGameEventService.GetOrganizerByEvent");
+            var organizer = BoardGameEventService.GetOrganizerByEvent(bgEvent);
+            Log.Debug("Call BoardGameEventService.GetVenueByEvent");
+            var venue = BoardGameEventService.GetVenueByEvent(bgEvent);
+            Event = new EventView(bgEvent, organizer, venue);
+
+            RegComponentsInit();
+
+        }
+
+        base.OnInitialized();
+    }
+
+    private void RegComponentsInit()
+    {
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
+        Log.Debug("Call PlayerService.CheckCurrentPlayerRegistration");
+        if (UserService.GetCurrentUserRoleName() == "player"
+            && PlayerService.CheckCurrentPlayerRegistration(bgEvent))
+        {
+            regBtnDisabled = false;
+            stateText = "Пройдена";
+            stateColor = Color.Success;
+        }
+        else
+        {
+            stateText = Event?.RegisterName ?? "";
+            stateColor = Event?.RegisterColor ?? "";
+        }
+
+        if (stateText == "Идет")
+        {
+            regBtnDisabled = false;
+            regBtnText = "Зарегистрироваться";
+        }
+    }
+
+    Task OnRegBtnClicked()
+    {
+        Log.Debug("Call UserService.GetCurrentUserRoleName");
+        if (UserService.GetCurrentUserRoleName() != "player")
+        {
+            regLoginModal?.Show();
+        }
+        else
+        {
+            try
+            {
+                Log.Debug("Call PlayerService.RegisterCurrentPlayerForEvent");
+                PlayerService.RegisterCurrentPlayerForEvent(bgEvent);
+                stateText = "Пройдена";
+                stateColor = Color.Success;
+                MessageService.Info("Вы успешно зарегистрированы на игротеку!");
+            }
+            catch (AddPlayerRegistrationException ex)
+            {
+                Log.Error("Catch exception {0}", ex.GetType());
+                MessageService.Error("Регистрация окончена! Обновите страницу!");
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    Task OnUnRegBtnClicked()
+    {
+        Log.Information("UnRegBtn clicked");
+        confModalVisible = true;
+
+        return Task.CompletedTask;
+    }
+
+    private void UnReg()
+    {
+        Log.Information("UnReg");
+        confModalVisible = false;
+        PlayerService.UnregisterCurrentPlayerForEvent(bgEvent);
+        RegComponentsInit();
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        MessageService.Info("Регистрация отменена");
+    }
+
+    private Task HideModal()
+    {
+        confModalVisible = false;
+
+        return Task.CompletedTask;
+    }
+
+    void go()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

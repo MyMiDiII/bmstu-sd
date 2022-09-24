@@ -6,14 +6,17 @@ namespace BusinessLogic.Services
 {
     public interface IBoardGameService
     {
+        BoardGame? GetBoardGameByID(long id);
         List<BoardGame> GetBoardGames();
         void CreateBoardGame(BoardGame boardGame);
         void UpdateBoardGame(BoardGame boardGame);
         void DeleteBoardGame(BoardGame boardGame);
         void AddBoardGameToFavorite(BoardGame boardGame);
         void DeleteBoardGameFromFavorite(BoardGame boardGame);
+        bool CheckBoardGameInCurrentUserFavorites(BoardGame boardGame);
         List<BoardGameEvent> GetEventsByGame(BoardGame boardGame);
         void AddBoardGameToEvent(BoardGame boardGame, BoardGameEvent bgEvent);
+        void AddBoardGamesToEvent(List<long> boardGameIDs, BoardGameEvent bgEvent);
         void DeleteBoardGameFromEvent(BoardGame boardGame, BoardGameEvent bgEvent);
     }
 
@@ -26,6 +29,11 @@ namespace BusinessLogic.Services
         {
             _boardGameRepository = boardGameRepository;
             _playerService = playerService;
+        }
+
+        public BoardGame? GetBoardGameByID(long id)
+        {
+            return _boardGameRepository.GetByID(id);
         }
 
         public List<BoardGame> GetBoardGames()
@@ -61,7 +69,7 @@ namespace BusinessLogic.Services
         {
              return _boardGameRepository.GetAll().Any(elem
                         => elem.Title == boardGame.Title
-                        && elem.Produser == boardGame.Produser
+                        && elem.Producer == boardGame.Producer
                         && elem.Year == boardGame.Year);
         }
 
@@ -90,6 +98,12 @@ namespace BusinessLogic.Services
             _boardGameRepository.DeleteFromFavorites(boardGame.ID, playerID);
         }
 
+        public bool CheckBoardGameInCurrentUserFavorites(BoardGame boardGame)
+        {
+            long playerID = _playerService.GetCurrentPlayerID();
+            return _boardGameRepository.CheckGameInFavorites(boardGame.ID, playerID);
+        }
+
         public List<BoardGameEvent> GetEventsByGame(BoardGame boardGame)
         {
             return _boardGameRepository.GetGameEvents(boardGame.ID);
@@ -101,6 +115,11 @@ namespace BusinessLogic.Services
                 throw new AlreadyExistsEventGameException();
 
             _boardGameRepository.AddToEvent(boardGame.ID, bgEvent.ID);
+        }
+
+        public void AddBoardGamesToEvent(List<long> boardGamesIDs, BoardGameEvent bgEvent)
+        {
+            _boardGameRepository.AddManyToEvent(boardGamesIDs, bgEvent.ID);
         }
 
         public void DeleteBoardGameFromEvent(BoardGame boardGame, BoardGameEvent bgEvent)

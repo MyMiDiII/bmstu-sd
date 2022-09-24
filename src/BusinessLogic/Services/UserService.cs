@@ -12,7 +12,12 @@ namespace BusinessLogic.Services
         void DeleteUser(User user);
         long GetCurrentUserID();
         User GetCurrentUser();
+        string? SetCurrentUserRole(string roleName);
+        string GetCurrentUserRoleName();
+        User? GetUserByID(long id);
+        User? GetUserByName(string name);
         long GetCurrentUserRoleID(string role);
+        bool CheckUserRole(string role);
         void Login(LoginRequest loginRequest);
         void Register(RegisterRequest registerRequest);
     }
@@ -20,36 +25,57 @@ namespace BusinessLogic.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private User _curUser;
+        private readonly CurUserService _curUserService;
         private readonly IEncryptionService _encryptionService;
 
-        public UserService(IUserRepository userRepository, IEncryptionService encryptionService)
+        public UserService(IUserRepository userRepository, CurUserService curUserService,
+                           IEncryptionService encryptionService)
         {
             _userRepository = userRepository;
-            _curUser = _userRepository.GetDefaultUser();
+            _curUserService = curUserService;
             _encryptionService = encryptionService;
         }
 
         public long GetCurrentUserID()
         {
-            return _curUser.ID;
+            return _curUserService.GetCurrentUserID();
         }
 
         public User GetCurrentUser()
         {
-            return _curUser;
+            return _curUserService.GetCurrentUser();
+        }
+
+        public User? GetUserByID(long id)
+        {
+            return _userRepository.GetByID(id);
+        }
+
+        public User? GetUserByName(string name)
+        {
+            return _userRepository.GetByName(name);
         }
 
         public long GetCurrentUserRoleID(string roleName)
         {
-            var role = _curUser.Roles.Find(x => x.RoleName == roleName);
+            var role = _curUserService.GetCurrentUser().Roles.Find(x => x.RoleName == roleName);
             return role == null ? -1 : role.RoleID;
         }
 
-        private void SetCurrentUser(User user)
+        public string GetCurrentUserRoleName()
+        {
+            return _curUserService.GetCurrentUserRoleName();
+        }
+
+        public string? SetCurrentUserRole(string roleName)
+        {
+            return _curUserService.SetCurrentUserRole(roleName);
+        }
+
+        public void SetCurrentUser(User user, string roleName)
         {
             user.Roles = _userRepository.GetUserRoles(user.ID);
-            _curUser = user;
+            _curUserService.SetCurrentUser(user, roleName);
         }
 
         public List<User> GetUsers()
@@ -91,6 +117,11 @@ namespace BusinessLogic.Services
             return _userRepository.GetByID(id) == null;
         }
 
+        public bool CheckUserRole(string role)
+        {
+            return _curUserService.CheckUserRole(role);
+        }
+
         public void Login(LoginRequest loginRequest)
         {
             var tmpUser = new User(loginRequest.Name, loginRequest.Password);
@@ -103,7 +134,7 @@ namespace BusinessLogic.Services
             if (!_encryptionService.ValidatePassword(tmpUser.Password, existingUser.Password))
                 throw new IncorrectUserPasswordException();
 
-            SetCurrentUser(existingUser);
+            SetCurrentUser(existingUser, "player");
         }
 
         public void Register(RegisterRequest registerRequest)

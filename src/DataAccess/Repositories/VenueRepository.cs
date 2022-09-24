@@ -13,12 +13,14 @@ namespace DataAccess.Repositories
             _dbcontext = dbcontext;
         }
 
-        public void Add(Venue elem)
+        public long Add(Venue elem)
         {
             try
             {
                 _dbcontext.Venues.Add(elem);
                 _dbcontext.SaveChanges();
+
+                return elem.ID;
             }
             catch
             {
